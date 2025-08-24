@@ -1,5 +1,7 @@
+import { PaymentRecord } from "@/component/payment";
+
 export default function Payment(){
     return(
-        <>Payment</>
+        <PaymentRecord />
     )
 }

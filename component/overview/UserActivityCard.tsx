@@ -19,29 +19,7 @@ export const UserActivitiesCard = ({ data }: UserActivitiesCardProps) => {
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-semibold mb-4 ">Search Frequency</h2>
       <div className="space-y-4">
-        {/* {data.map((item, index) => (
-          <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-gray-300 rounded-full mr-3 flex items-center justify-center">
-                {item.image ? (
-                  <Image src={item.image} alt={item.name} height={50} width={50} className="w-10 h-10 rounded-full" />
-                ) : (
-                  <span className="text-sm">{item.name.charAt(0)}</span>
-                )}
-              </div>
-              <div>
-                <p className="font-medium">{item.name}</p>
-                <span className={`text-sm ${item.status === 'premium' ? 'text-yellow-600' : 'text-gray-600'}`}>
-                  {item.status}
-                </span>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="font-bold">{item.numtimes} times</p>
-            </div>
-          </div>
-        ))} */}
-        <Table className="w-full" style={{ borderSpacing: "0 10px" }}>
+        <Table className="w-full">
           <TableHeader className="w-full">
             <TableRow className="w-full">
               <TableHead className="w-1/3">Name </TableHead>
@@ -97,7 +75,7 @@ export const UserActivitiesCard = ({ data }: UserActivitiesCardProps) => {
                     <TableCell className="py-4">
                       {" "}
                       <div className="text-right text-lg">
-                        <p className="font-bold">{item.numtimes} times</p>
+                        <p className=" tracking-wider">{item.numtimes} times</p>
                       </div>
                     </TableCell>
                   </TableRow>

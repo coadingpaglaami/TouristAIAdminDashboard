@@ -1,0 +1,360 @@
+"use client";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useMemo, useState } from "react";
+import Image from "next/image";
+import { Delete, Block, CheckCircle, Chevron, ChevronNext } from "@/svg/Action";
+import React from "react";
+
+interface UserTable {
+  image: string;
+  name: string;
+  subscription: "1 hour" | "2 days" | "3 days" | "5 days" | "7 days" | "9 days";
+  amount: number;
+  lastactive: string;
+  duration: string;
+}
+
+function formatTime(date: Date) {
+  let hours = 0;
+  hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? "PM" : "AM";
+  const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+  const minStr = minutes.toString().padStart(2, "0");
+  return `${hour12}.${minStr}${ampm}`;
+}
+
+function formatDate(date: Date) {
+  return `${date.getDate()} ${date.toLocaleString("default", {
+    month: "long",
+  })}, ${date.getFullYear()}`;
+}
+
+function formatDateRange(start: Date, end: Date) {
+  const sameMonth = start.getMonth() === end.getMonth();
+  let range = `${start.getDate()}${
+    sameMonth ? "" : " " + start.toLocaleString("default", { month: "long" })
+  }`;
+  range += `-${end.getDate()} ${end.toLocaleString("default", {
+    month: "long",
+  })}`;
+  range += `, ${end.getFullYear()}`;
+  return range;
+}
+
+function getDurationJSX(
+  subscription: UserTable["subscription"],
+  baseDate: Date
+) {
+  if (subscription === "1 hour") {
+    const start = new Date(baseDate);
+    const end = new Date(baseDate);
+    end.setHours(start.getHours() + 1);
+    return (
+      <div className="flex flex-col gap-0.5">
+        <span className="font-medium text-sm">
+          {formatTime(start)}-{formatTime(end)}
+        </span>
+        <span className="text-xs text-gray-400">{formatDate(start)}</span>
+      </div>
+    );
+  } else {
+    const days = parseInt(subscription);
+    const start = new Date(baseDate);
+    const end = new Date(baseDate);
+    end.setDate(start.getDate() + days);
+    return (
+      <div className="flex flex-col gap-0.5">
+        <span className="font-medium text-sm">
+          {formatTime(start)}-{formatTime(end)}
+        </span>
+        <span className="text-xs text-gray-400">
+          {formatDateRange(start, end)}
+        </span>
+      </div>
+    );
+  }
+}
+
+const generateDummyData = (count: number): UserTable[] => {
+  const images = [
+    "/table 1.png",
+    "/table 2.png",
+    "/table 3.png",
+    "/table 4.png",
+    "/table 5.png",
+    "/table 6.png",
+    "/table 7.png",
+  ];
+  const names = [
+    "Sujon",
+    "Shihab",
+    "Farhan",
+    "Shaon",
+    "Chailau",
+    "Atik",
+    "Mijan",
+    "Hossain",
+    "Jubayer",
+    "Alamin",
+    "Ankan",
+    "Ayon",
+  ];
+  const subscriptions: Array<
+    "1 hour" | "2 days" | "3 days" | "5 days" | "7 days" | "9 days"
+  > = ["1 hour", "2 days", "3 days", "5 days", "7 days", "9 days"];
+  const amounts = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+
+  return Array.from({ length: count }, (_, i) => {
+    const baseDate = new Date();
+    baseDate.setDate(baseDate.getDate() - Math.floor(Math.random() * 10));
+    const subscription = subscriptions[i % subscriptions.length];
+    return {
+      image: images[i % images.length],
+      name: names[i % names.length],
+      subscription,
+      amount: amounts[i % amounts.length],
+      lastactive: baseDate.toISOString(),
+      duration: "",
+    };
+  });
+};
+
+function getPagination(current: number, total: number) {
+  const delta = 2;
+  const range = [];
+  const rangeWithDots: (number | string)[] = [];
+  let l: number = 0;
+
+  for (let i = 1; i <= total; i++) {
+    if (
+      i === 1 ||
+      i === total ||
+      (i >= current - delta && i <= current + delta)
+    ) {
+      range.push(i);
+    }
+  }
+
+  for (const i of range) {
+    if (l) {
+      if (i - l === 2) {
+        rangeWithDots.push(l + 1);
+      } else if (i - l !== 1) {
+        rangeWithDots.push("...");
+      }
+    }
+    rangeWithDots.push(i);
+    l = i;
+  }
+  return rangeWithDots;
+}
+
+export const PaymentTable = () => {
+  const data = useMemo(() => generateDummyData(80), []);
+  const [blocked, setBlocked] = useState<{ [key: number]: boolean }>({});
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 7;
+
+  const handleBlockToggle = (idx: number) => {
+    setBlocked((prev) => ({
+      ...prev,
+      [idx]: !prev[idx],
+    }));
+  };
+
+  const handleUnblock = (idx: number) => {
+    setBlocked((prev) => ({
+      ...prev,
+      [idx]: false,
+    }));
+  };
+
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+  const paginatedData = data.slice(
+    (page - 1) * rowsPerPage,
+    page * rowsPerPage
+  );
+  const paginationNumbers = getPagination(page, totalPages);
+
+  return (
+    <div className="flex flex-col gap-5 bg-white p-6 rounded-xl shadow border border-gray-100">
+      <h3 className="text-2xl tracking-wider mb-2 ">Payment Records</h3>
+      <Table className="w-full border-b border-gray-300 pb-8">
+        <TableHeader>
+          <TableRow className="">
+            <TableHead className="text-xs font-semibold text-gray-500  py-3">
+              User
+            </TableHead>
+            <TableHead className="text-xs font-semibold text-gray-500  text-center py-3">
+              Subscription
+            </TableHead>
+            <TableHead className="text-xs font-semibold text-gray-500  text-center py-3">
+              Duration
+            </TableHead>
+            <TableHead className="text-xs font-semibold text-gray-500  py-3 text-center">
+              Amount
+            </TableHead>
+            <TableHead className="text-xs font-semibold text-gray-500  py-3 text-center">
+              Last Active
+            </TableHead>
+            <TableHead className="text-xs font-semibold text-gray-500  py-3 text-center">
+              Action
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody className="tracking-wider">
+          {paginatedData.map((item, idx) => {
+            const globalIdx = (page - 1) * rowsPerPage + idx;
+            const isBlocked = blocked[globalIdx];
+
+            return (
+              <TableRow
+                key={globalIdx}
+                className="transition hover:bg-gray-50 border-none"
+              >
+                {/* User */}
+                <TableCell className={`py-4 ${isBlocked ? "opacity-30" : ""}`}>
+                  <div className="flex items-center gap-3">
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      height={36}
+                      width={36}
+                      className="w-9 h-9 rounded-full border border-gray-200"
+                    />
+                    <div className="font-medium text-gray-800">{item.name}</div>
+                  </div>
+                </TableCell>
+                {/* Status */}
+                <TableCell
+                  className={`py-4 text-center ${
+                    isBlocked ? "opacity-30" : ""
+                  }`}
+                >
+                  <div className="flex justify-center">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold mb-1 bg-[#BDBDBD]`}
+                    >
+                      {item.subscription}
+                    </span>
+                  </div>
+                </TableCell>
+                {/* Duration */}
+                <TableCell
+                  className={`py-4 text-center ${
+                    isBlocked ? "opacity-30" : ""
+                  }`}
+                >
+                  <div className="flex flex-col items-center">
+                    {getDurationJSX(
+                      item.subscription,
+                      new Date(item.lastactive)
+                    )}
+                  </div>
+                </TableCell>
+                {/* Amount */}
+                <TableCell
+                  className={`py-4 text-center ${
+                    isBlocked ? "opacity-30" : ""
+                  }`}
+                >
+                  <span className="font-semibold text-gray-700">
+                    ${item.amount}
+                  </span>
+                </TableCell>
+                {/* Last Active */}
+                <TableCell
+                  className={`py-4 text-center ${
+                    isBlocked ? "opacity-30" : ""
+                  }`}
+                >
+                  <span className="text-sm ">
+                    {formatDate(new Date(item.lastactive))}
+                  </span>
+                </TableCell>
+                {/* Action */}
+                <TableCell className="py-4 text-center">
+                  <div className="flex gap-2 justify-center">
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded transition"
+                      title={isBlocked ? "Unblock" : "Block"}
+                      onClick={() =>
+                        isBlocked
+                          ? handleUnblock(globalIdx)
+                          : handleBlockToggle(globalIdx)
+                      }
+                    >
+                      {isBlocked ? <CheckCircle /> : <Block />}
+                    </button>
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded transition"
+                      title="Delete"
+                    >
+                      <Delete />
+                    </button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+      {/* Pagination Controls */}
+
+      <div className="flex items-center justify-between mt-4">
+        <div className="text-sm text-gray-600">
+          Showing {(page - 1) * rowsPerPage + 1} to{" "}
+          {Math.min(page * rowsPerPage, data.length)} from {data.length} records
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            className="p-3 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            <Chevron />
+          </button>
+          {paginationNumbers.map((num, idx) =>
+            typeof num === "number" ? (
+              <button
+                key={idx}
+                className={`p-2 rounded px-3 ${
+                  num === page
+                    ? " text-green-600 border-2 border-[#F7C56B]"
+                    : "bg-gray-200 text-gray-700"
+                }`}
+                style={{
+                  backgroundColor:
+                    num === page ? "rgba(247, 197, 107, 0.3)" : "",
+                }}
+                onClick={() => setPage(num)}
+              >
+                {num}
+              </button>
+            ) : (
+              <span key={idx} className="px-2">
+                ...
+              </span>
+            )
+          )}
+          <button
+            className="p-3 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            <ChevronNext />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

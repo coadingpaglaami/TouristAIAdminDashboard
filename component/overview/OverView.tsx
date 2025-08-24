@@ -14,7 +14,7 @@ export const Overview = () => {
   const periods: TimePeriod[] = ["Weekly", "Monthly", "Yearly"];
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className=" bg-gray-100 p-6">
       <div className="">
         {/* Header */}
         <div className="flex justify-end items-center mb-8">

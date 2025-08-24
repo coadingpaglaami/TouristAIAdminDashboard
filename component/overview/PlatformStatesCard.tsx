@@ -13,10 +13,10 @@ export const PlatformStatsCard = ({ data }: PlatformStatsCardProps) => {
             key={index}
             className="flex flex-col p-3 border rounded-lg  bg-white gap-3"
           >
-            <span className=" text-2xl font-semibold tracking-wider">{item.name}</span>
+            <span className=" text-xl font-semibold tracking-wider text-[#1C1B1F]">{item.name}</span>
             <div className="flex items-center">
               <span className="mr-3">{item.icon}</span>
-              <p className="font-bold text-lg">
+              <p className="font-bold text-2xl">
                 {item.numuser.toLocaleString()}
               </p>
             </div>

@@ -1,5 +1,5 @@
-export default function UserActivity(){
-    return(
-        <>Hello</>
-    )
+import { UserActivity } from "@/component/useractivity";
+
+export default function UserActivityPage() {
+  return <UserActivity />;
 }

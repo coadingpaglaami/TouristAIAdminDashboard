@@ -75,7 +75,7 @@ export const Sidebaar = () => {
             TRIPMATE
           </h4>
         </div>
-        <div className="flex flex-col gap-4 mt-20">
+        <div className="flex flex-col gap-4 mt-12">
           {menus.map(({ path, label, inactiveIcon, activeIcon }) => {
             const isActive =
               pathname === path || pathname.startsWith(`${path}/`);
@@ -83,7 +83,7 @@ export const Sidebaar = () => {
               <Link
                 key={path}
                 href={path}
-                className={`px-4 py-4 flex items-center gap-2  rounded text-xl font-semibold tracking-[0.1em] ${
+                className={`px-2 py-3 flex items-center gap-2  rounded text-xl font-semibold tracking-[0.1em] mx-2 truncate ${
                   isActive ? "orange text-white  " : "text-[#854C3A]"
                 }`}
               >
@@ -94,7 +94,7 @@ export const Sidebaar = () => {
           })}
         </div>
       </div>
-      <div className="flex gap-2 pr-5 items-center justify-between">
+      <div className="flex gap-2 mx-2 items-center justify-between">
         <Image
           src="/user.png"
           alt="user"
@@ -103,11 +103,13 @@ export const Sidebaar = () => {
           className="rounded-full h-14 w-14 "
         />
 
-        <div className="flex flex-col gap-1 text-[#854C3A]">
+        <div className="flex flex-col gap-1 text-[#854C3A] max-lg:hidden">
           <span className="text-lg font-medium">Ostain Alex</span>
           <span className="font-thin">TRIPMATE</span>
         </div>
-        <Settings />
+        <div className="max-lg:hidden">
+          <Settings />
+        </div>
       </div>
     </div>
   );
