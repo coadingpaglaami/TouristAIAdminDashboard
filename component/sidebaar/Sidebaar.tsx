@@ -83,7 +83,7 @@ export const Sidebaar = () => {
               <Link
                 key={path}
                 href={path}
-                className={`px-2 py-3 flex items-center gap-2  rounded text-xl font-semibold tracking-[0.1em] mx-2 truncate ${
+                className={`px-2 py-3 flex items-center gap-2  rounded text-[16px] font-semibold tracking-[0.1em] mx-2 truncate ${
                   isActive ? "orange text-white  " : "text-[#854C3A]"
                 }`}
               >

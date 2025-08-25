@@ -1,5 +1,5 @@
-export default function Analytics(){
-    return(
-        <>Analytics</>
-    )
+import { Analytics } from "@/component/analytics";
+
+export default function AnalyticsPage() {
+  return <Analytics />;
 }
