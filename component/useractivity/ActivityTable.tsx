@@ -178,9 +178,10 @@ export const ActivityTable = () => {
   const paginationNumbers = getPagination(page, totalPages);
 
   return (
-    <div className="flex flex-col gap-3 bg-white p-4 rounded-lg">
+    <div className="flex flex-col gap-3 bg-white p-4 rounded-lg overflow-hidden">
       <h3 className="text-2xl tracking-wider">User Activity</h3>
-      <Table className="w-full">
+
+      <Table className="w-full overflow-hidden">
         <TableHeader>
           <TableRow>
             <TableHead className="text-xs text-[#969696]">User</TableHead>
@@ -189,12 +190,14 @@ export const ActivityTable = () => {
             </TableHead>
             <TableHead className="text-xs text-[#969696]">Details</TableHead>
             <TableHead className="text-xs text-[#969696]">Time</TableHead>
-            <TableHead className="text-xs text-[#969696] text-center">Status</TableHead>
+            <TableHead className="text-xs text-[#969696] text-center">
+              Status
+            </TableHead>
             <TableHead className="text-xs text-[#969696]">Photo</TableHead>
             <TableHead className="text-xs text-[#969696]">Action</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="tracking-wider">
+        <TableBody className="tracking-wider overflow-x-scroll">
           {paginatedData.map((item, index) => (
             <TableRow key={index} className="border-none">
               {/* User */}
@@ -233,13 +236,13 @@ export const ActivityTable = () => {
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold  ${
                       item.status === "Premium"
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-300 text-gray-700"
-                  }`}
-                >
-                  {item.status}
-                </span>
-                   </div>
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-300 text-gray-700"
+                    }`}
+                  >
+                    {item.status}
+                  </span>
+                </div>
               </TableCell>
               {/* Photo */}
               <TableCell>
@@ -264,7 +267,8 @@ export const ActivityTable = () => {
       {/* Pagination and total count */}
       <div className="flex items-center justify-between mt-4">
         <div className="text-sm text-gray-600">
-          Showing {((page - 1) * perPage) + 1} to {Math.min(page * perPage, data.length)} from {data.length} records
+          Showing {(page - 1) * perPage + 1} to{" "}
+          {Math.min(page * perPage, data.length)} from {data.length} records
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -283,7 +287,10 @@ export const ActivityTable = () => {
                     ? " text-green-600 border-2 border-[#F7C56B]"
                     : "bg-gray-200 text-gray-700"
                 }`}
-                style={{ backgroundColor: num === page ? "rgba(247, 197, 107, 0.3)" : "" }}
+                style={{
+                  backgroundColor:
+                    num === page ? "rgba(247, 197, 107, 0.3)" : "",
+                }}
                 onClick={() => setPage(num)}
               >
                 {num}

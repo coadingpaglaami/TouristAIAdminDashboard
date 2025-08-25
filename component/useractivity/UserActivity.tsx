@@ -3,8 +3,9 @@ import { ActivityTable } from "./ActivityTable";
 
 export const UserActivity = () => {
   return (
+    <div className="w-full border border-red-600 overflow-hidden">
     <div className="flex flex-col gap-8 py-10 px-4">
-      <div className="flex justify-between items-center gap-4">
+      <div className="flex md:justify-between md:items-center gap-4 flex-col md:flex-row">
         <div className="flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 w-full max-w-[400px]">
           <SearchIcon />
           <input
@@ -27,6 +28,7 @@ export const UserActivity = () => {
         </div>
       </div>
       <ActivityTable />
+    </div>
     </div>
   );
 };

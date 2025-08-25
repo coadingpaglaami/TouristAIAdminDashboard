@@ -62,14 +62,14 @@ export const Sidebaar = () => {
   ];
 
   return (
-    <div className="lg:w-64 md:w-14  pt-4 sticky top-0 flex flex-col justify-between gap-4 h-screen overflow-y-hidden">
+    <div className="lg:w-64 md:w-14  pt-4 sticky top-0 flex flex-col justify-between gap-4  md:h-screen h-full overflow-y-hidden">
       <div className="flex flex-col gap-2 ">
         <div className="flex flex-col rounded-lg justify-center items-center gap-2">
           <div className="orange p-4 rounded-lg max-lg:hidden">
             <Message />
           </div>
-          <div className="orange p-3 rounded-lg lg:hidden">
-            <MessageSmall />
+                <div className="orange p-2 rounded-lg lg:hidden md:block max-md:hidden">
+            <Message />
           </div>
           <h4 className="text-2xl font-bold tracking-[0.3em] text-[#854C3A] max-lg:hidden">
             TRIPMATE
