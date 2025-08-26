@@ -1,10 +1,5 @@
 "use client";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { ArrowUp } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -78,9 +73,9 @@ export const RevenueLeaderBoard = () => {
   const [timeframe, setTimeframe] = useState<"weekly" | "monthly">("weekly");
 
   return (
-    <div className="bg-white flex flex-col gap-8 p-4 rounded-lg text-xl tracking-wider">
-      <h2 className="font-semibold text-xl ">Revenue Leaderboard</h2>
-      <div className="flex space-x-4">
+    <div className="bg-white flex flex-col gap-4 p-2 rounded-lg text-xl tracking-wider md:max-h-[355px]">
+      <h2 className="font-semibold text-lg">Revenue Leaderboard</h2>
+      <div className="flex gap-2">
         <button
           onClick={() => setTimeframe("weekly")}
           className={
@@ -109,7 +104,7 @@ export const RevenueLeaderBoard = () => {
           Average Revenue Per User
         </span>
         <div className="flex items-center gap-2">
-          <span className="text-3xl font-bold tracking-wider leading-10">
+          <span className="text-2xl font-bold tracking-wider leading-10">
             $42
           </span>
           <div className="text-sm">
@@ -123,7 +118,7 @@ export const RevenueLeaderBoard = () => {
           </div>
         </div>
       </div>
-      <Table className=" w-full border-t border-gray-300">
+      <Table className=" w-full border-t border-gray-300 ">
         <TableBody className="w-full">
           {leaderboardData[timeframe].map((entry) => (
             <TableRow key={entry.rank} className="border-none">
@@ -140,7 +135,7 @@ export const RevenueLeaderBoard = () => {
                   <span>{entry.name}</span>
                 </div>
               </TableCell>
-              <TableCell className="border-none">{entry.amount}</TableCell>
+              <TableCell className="border-none">${entry.amount}</TableCell>
             </TableRow>
           ))}
         </TableBody>

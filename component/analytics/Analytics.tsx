@@ -15,7 +15,7 @@ export const Analytics = () => {
           <PieChartStatus />
         </div>
       </div>
-      <div className="flex flex-col gap-2 w-full md:flex-row">
+      <div className="flex flex-col gap-4 w-full md:flex-row">
         <div className="lg:w-[65%]">
           <BarChartRevenue />
         </div>
@@ -26,3 +26,4 @@ export const Analytics = () => {
     </div>
   );
 };
+

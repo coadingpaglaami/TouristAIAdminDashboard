@@ -9,13 +9,17 @@ export type UserType = {
   isIncrease: boolean;
   increasepercentage: number;
 };
+export type Rating = {
+  name: string;
+  percentage: number;
+  rating: number;
+};
 
 export type PlatformStats = {
   name: string;
   icon: React.ReactNode;
   numuser: number;
-  rate: "Engagment Rate" | "Retention Rate" | "Growth Rate";
-  percentage: number;
+  rate: Rating[] | string;
 };
 
 export type CategoryStats = {
@@ -40,17 +44,17 @@ export type DataCollection = {
 };
 
 // Mock React icons (using emojis for simplicity)
-const UserIcon = () => <Group/>;
-const PersonAddIcon=()=><PersonAdd/>
-const PersonRemoveIcon=()=><PersonRemove/>
-const ProductivityIcon=()=><Productivity/>
+const UserIcon = () => <Group />;
+const PersonAddIcon = () => <PersonAdd />;
+const PersonRemoveIcon = () => <PersonRemove />;
+const ProductivityIcon = () => <Productivity />;
 
 // Data arrays for different time periods
 export const dataByPeriod: Record<TimePeriod, DataCollection> = {
   Weekly: {
     userTypes: [
       {
-        typeuser: "Active Users",
+        typeuser: "Total Users",
         icon: <UserIcon />,
         numuser: 1250,
         isIncrease: true,
@@ -80,25 +84,28 @@ export const dataByPeriod: Record<TimePeriod, DataCollection> = {
     ],
     platformStats: [
       {
-        name: "Daily active users",
+        name: "Daily Active Users",
         icon: <UserIcon />,
         numuser: 850,
-        rate: "Engagment Rate",
-        percentage: 68,
+        rate: [{ name: "Engagment Rate", percentage: 68, rating: 0 }],
       },
       {
-        name: "Monthly active users",
+        name: "App Rating by user",
         icon: <UserIcon />,
         numuser: 320,
-        rate: "Retention Rate",
-        percentage: 25.6,
+        rate: [
+          { name: "Average Rating", percentage: 40, rating: 4.8 },
+          { name: "Average Rating", percentage: 35, rating: 4.5 },
+        ],
       },
       {
-        name: "Yearly active users",
+        name: "Top region user",
         icon: <UserIcon />,
         numuser: 80,
-        rate: "Growth Rate",
-        percentage: 66.4,
+        rate: [
+          { name: "Bangladesh", percentage: 66.4, rating: 0 },
+          { name: "India", percentage: 33.6, rating: 0 },
+        ],
       },
     ],
     categoryStats: [
@@ -136,7 +143,7 @@ export const dataByPeriod: Record<TimePeriod, DataCollection> = {
   Monthly: {
     userTypes: [
       {
-        typeuser: "Active Users",
+        typeuser: "Total Users",
         icon: <UserIcon />,
         numuser: 4800,
         isIncrease: true,
@@ -166,30 +173,33 @@ export const dataByPeriod: Record<TimePeriod, DataCollection> = {
     ],
     platformStats: [
       {
-        name: "Daily active users",
+        name: "Daily Active Users",
         icon: <UserIcon />,
-        numuser: 3200,
-        rate: "Engagment Rate",
-        percentage: 66.7,
+        numuser: 850,
+        rate: [{ name: "Engagment Rate", percentage: 68, rating: 0 }],
       },
       {
-        name: "Monthly active users",
+        name: "App Rating by user",
         icon: <UserIcon />,
-        numuser: 1250,
-        rate: "Retention Rate",
-        percentage: 26,
+        numuser: 320,
+        rate: [
+          { name: "Average Rating", percentage: 40, rating: 4.8 },
+          { name: "Average Rating", percentage: 35, rating: 4.5 },
+        ],
       },
       {
-        name: "Yearly active users",
+        name: "Top region user",
         icon: <UserIcon />,
-        numuser: 350,
-        rate: "Growth Rate",
-        percentage: 7.3,
+        numuser: 80,
+        rate: [
+          { name: "Bangladesh", percentage: 66.4, rating: 0 },
+          { name: "India", percentage: 33.6, rating: 0 },
+        ],
       },
     ],
     categoryStats: [
-      { name: "Premium user insights", percentage: 42 },
-      { name: "Renewal rate", percentage: 33 },
+      { name: "Premium user insights", percentage: 45 },
+      { name: "Renewal rate", percentage: 30 },
       { name: "Churn rate", percentage: 25 },
     ],
     userActivities: [
@@ -197,85 +207,88 @@ export const dataByPeriod: Record<TimePeriod, DataCollection> = {
         image: "/user 1.png",
         name: "John Doe",
         status: "premium",
-        numtimes: 95,
+        numtimes: 28,
       },
       {
         image: "/user 2.png",
         name: "Jane Smith",
         status: "free",
-        numtimes: 62,
+        numtimes: 15,
       },
       {
         image: "/user 3.png",
         name: "Mike Johnson",
         status: "premium",
-        numtimes: 88,
+        numtimes: 22,
       },
       {
         image: "/user 4.png",
         name: "Sarah Wilson",
         status: "free",
-        numtimes: 51,
+        numtimes: 12,
       },
     ],
   },
   Yearly: {
     userTypes: [
       {
-        typeuser: "Active Users",
+        typeuser: "Total Users",
         icon: <UserIcon />,
-        numuser: 55200,
+        numuser: 1250,
         isIncrease: true,
-        increasepercentage: 25.8,
+        increasepercentage: 12.5,
       },
       {
         typeuser: "New Users",
         icon: <PersonAddIcon />,
-        numuser: 17800,
+        numuser: 350,
         isIncrease: true,
-        increasepercentage: 31.4,
+        increasepercentage: 8.2,
       },
       {
         typeuser: "Premium Users",
         icon: <ProductivityIcon />,
-        numuser: 37400,
-        isIncrease: true,
-        increasepercentage: 12.3,
+        numuser: 900,
+        isIncrease: false,
+        increasepercentage: 3.1,
       },
       {
         typeuser: "Deactivated Users",
         icon: <PersonRemoveIcon />,
-        numuser: 7800,
+        numuser: 180,
         isIncrease: true,
-        increasepercentage: 45.2,
+        increasepercentage: 15.7,
       },
     ],
     platformStats: [
       {
-        name: "Daily active users",
+        name: "Daily Active Users",
         icon: <UserIcon />,
-        numuser: 36800,
-        rate: "Engagment Rate",
-        percentage: 66.7,
+        numuser: 850,
+        rate: [{ name: "Engagment Rate", percentage: 68, rating: 0 }],
       },
       {
-        name: "Monthly active users",
+        name: "App Rating by user",
         icon: <UserIcon />,
-        numuser: 14400,
-        rate: "Retention Rate",
-        percentage: 26.1,
+        numuser: 320,
+        rate: [
+          { name: "Average Rating", percentage: 40, rating: 4.8 },
+          { name: "Average Rating", percentage: 35, rating: 4.5 },
+        ],
       },
       {
-        name: "Yearly active users",
+        name: "Top region user",
         icon: <UserIcon />,
-        numuser: 4000,
-        rate: "Growth Rate",
-        percentage: 7.2,
+        numuser: 80,
+        rate: [
+          { name: "Bangladesh", percentage: 66.4, rating: 0 },
+          { name: "India", percentage: 33.6, rating: 0 },
+        ],
       },
     ],
     categoryStats: [
-      { name: "Premium user insights", percentage: 40 },
-      { name: "Renewal rate", percentage: 35 },
+      { name: "Premium user insights", percentage: 45 },
+      { name: "Renewal rate", percentage: 30 },
       { name: "Churn rate", percentage: 25 },
     ],
     userActivities: [
@@ -283,25 +296,25 @@ export const dataByPeriod: Record<TimePeriod, DataCollection> = {
         image: "/user 1.png",
         name: "John Doe",
         status: "premium",
-        numtimes: 1120,
+        numtimes: 28,
       },
       {
         image: "/user 2.png",
         name: "Jane Smith",
         status: "free",
-        numtimes: 780,
+        numtimes: 15,
       },
       {
         image: "/user 3.png",
         name: "Mike Johnson",
         status: "premium",
-        numtimes: 980,
+        numtimes: 22,
       },
       {
         image: "/user 4.png",
         name: "Sarah Wilson",
         status: "free",
-        numtimes: 650,
+        numtimes: 12,
       },
     ],
   },

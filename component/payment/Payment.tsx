@@ -15,15 +15,10 @@ export const PaymentRecord=()=>{
            </div>
            <div className="flex gap-2 items-center max-w-[350px] w-full ">
              <select className="border border-gray-300 rounded-md p-4 w-1/2">
-               <option value="all">All Subscription</option>
-               <option value="active">Free</option>
-               <option value="inactive">Premium</option>
-               <option value="inactive">Expired</option>
-             </select>
-             <select className="border border-gray-300 rounded-md p-4 w-1/2">
-               <option value="all">All Status</option>
-               <option value="active">Free</option>
-               <option value="inactive">Premium</option>
+               <option value="all">1 hour</option>
+               <option value="active">2 hours</option>
+               <option value="inactive">5 hours</option>
+               <option value="inactive">2 days</option>
              </select>
            </div>
          </div>

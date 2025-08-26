@@ -11,6 +11,7 @@ import {
 import { ReactNode, useMemo, useState } from "react";
 import Image from "next/image"; // Example action icon
 import { Chevron, ChevronNext, RemoveIcon } from "@/svg/Action";
+import { Visible } from "@/svg/OverView";
 
 interface ActivityTable {
   image: string;
@@ -168,20 +169,32 @@ export const ActivityTable = () => {
   const data = useMemo(() => generateDummyData(80), []);
   const [page, setPage] = useState(1);
   const perPage = 7;
+  const [blocked, setBlocked] = useState<{ [key: number]: boolean }>({});
   const totalPages = Math.ceil(data.length / perPage);
 
   const paginatedData = useMemo(
     () => data.slice((page - 1) * perPage, page * perPage),
     [data, page]
   );
+  const handleBlockToggle = (idx: number) => {
+    setBlocked((prev) => ({
+      ...prev,
+      [idx]: !prev[idx],
+    }));
+  };
 
+  const handleUnblock = (idx: number) => {
+    setBlocked((prev) => ({
+      ...prev,
+      [idx]: false,
+    }));
+  };
   const paginationNumbers = getPagination(page, totalPages);
 
   return (
     <div className="flex flex-col gap-3 bg-white p-4 rounded-lg overflow-hidden">
       <h3 className="text-2xl tracking-wider">User Activity</h3>
-
-      <Table className="w-full overflow-hidden">
+      <Table>
         <TableHeader>
           <TableRow>
             <TableHead className="text-xs text-[#969696]">User</TableHead>
@@ -198,72 +211,87 @@ export const ActivityTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody className="tracking-wider overflow-x-scroll">
-          {paginatedData.map((item, index) => (
-            <TableRow key={index} className="border-none">
-              {/* User */}
-              <TableCell>
-                <div className="flex items-center">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    height={40}
-                    width={40}
-                    className="w-10 h-10 rounded-full mr-2"
-                  />
-                  <span className="font-medium">{item.name}</span>
-                </div>
-              </TableCell>
-              {/* Activity Type */}
-              <TableCell>
-                {" "}
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    item.activity === "Upload"
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-300 text-gray-700"
-                  }`}
-                >
-                  {item.activity}
-                </span>
-              </TableCell>
-              {/* Details */}
-              <TableCell>{item.Details}</TableCell>
-              {/* Time */}
-              <TableCell>{item.time}</TableCell>
-              {/* Status */}
-              <TableCell>
-                <div className="flex justify-center items-center">
+          {paginatedData.map((item, index) => {
+            const globalIdx = (page - 1) * perPage + index;
+            const isBlocked = blocked[globalIdx];
+            return (
+              <TableRow key={index} className="border-none">
+                {/* User */}
+                <TableCell className={isBlocked ? "opacity-30" : "opacity-100"}>
+                  <div className="flex items-center">
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      height={40}
+                      width={40}
+                      className="w-10 h-10 rounded-full mr-2"
+                    />
+                    <span className="font-medium">{item.name}</span>
+                  </div>
+                </TableCell>
+                {/* Activity Type */}
+                <TableCell className={isBlocked ? "opacity-30" : "opacity-100"}>
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold  ${
-                      item.status === "Premium"
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      item.activity === "Upload"
                         ? "bg-green-500 text-white"
                         : "bg-gray-300 text-gray-700"
                     }`}
                   >
-                    {item.status}
+                    {item.activity}
                   </span>
-                </div>
-              </TableCell>
-              {/* Photo */}
-              <TableCell>
-                <Image
-                  src={item.photo}
-                  alt="photo"
-                  height={32}
-                  width={32}
-                  className="w-8 h-8 rounded"
-                />
-              </TableCell>
-              {/* Action */}
-              <TableCell>
-                <button className="p-2 hover:bg-gray-100 rounded">
-                  <RemoveIcon />
-                </button>
-              </TableCell>
-            </TableRow>
-          ))}
+                </TableCell>
+                {/* Details */}
+                <TableCell className={isBlocked ? "opacity-30" : "opacity-100"}>
+                  {item.Details}
+                </TableCell>
+                {/* Time */}
+                <TableCell className={isBlocked ? "opacity-30" : "opacity-100"}>
+                  {item.time}
+                </TableCell>
+                {/* Status */}
+                <TableCell className={isBlocked ? "opacity-30" : "opacity-100"}>
+                  <div className="flex justify-center items-center">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold  ${
+                        item.status === "Premium"
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-300 text-gray-700"
+                      }`}
+                    >
+                      {item.status}
+                    </span>
+                  </div>
+                </TableCell>
+                {/* Photo */}
+                <TableCell className={isBlocked ? "opacity-30" : "opacity-100"}>
+                  <Image
+                    src={item.photo}
+                    alt="photo"
+                    height={32}
+                    width={32}
+                    className="w-8 h-8 rounded"
+                  />
+                </TableCell>
+                {/* Action */}
+                <TableCell>
+                  <button
+                    className="p-2 hover:bg-gray-100 rounded"
+                    onClick={() =>
+                      isBlocked
+                        ? handleUnblock(globalIdx)
+                        : handleBlockToggle(globalIdx)
+                    }
+                  >
+                    {isBlocked ? <Visible /> : <RemoveIcon />}
+                  </button>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
+
       {/* Pagination and total count */}
       <div className="flex items-center justify-between mt-4">
         <div className="text-sm text-gray-600">

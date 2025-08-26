@@ -49,7 +49,7 @@ export const Overview = () => {
             </div>
           </div>
           {/* Category Stats */}
-          <div className="flex gap-2 flex-col md:flex-row md:h-[420px]">
+          <div className="flex gap-4 flex-col md:flex-row md:h-[420px]">
             <div className="lg:w-1/2 h-full">
               <CategoryStatsCard data={data.categoryStats} />
             </div>

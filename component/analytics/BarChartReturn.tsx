@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
@@ -111,12 +111,12 @@ export const BarChartReturn = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={chartConfig}>
-            <BarChart accessibilityLayer data={chartData}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey={xAxisKey}
-                tickLine={false}
+          <ChartContainer className="max-h-60 min-w-full" config={chartConfig}>
+              <BarChart className="max-h-36" accessibilityLayer data={chartData} >
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey={xAxisKey}
+                  tickLine={false}
                 tickMargin={10}
                 axisLine={false}
               />
@@ -124,7 +124,7 @@ export const BarChartReturn = () => {
                 cursor={false}
                 content={<ChartTooltipContent hideLabel />}
               />
-              <Bar dataKey="returningUser" fill="#FF7A00" radius={8} />
+              <Bar className="h-36" dataKey="returningUser" fill="#FF7A00" radius={8} />
             </BarChart>
           </ChartContainer>
         </CardContent>

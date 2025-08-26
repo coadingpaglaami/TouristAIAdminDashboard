@@ -188,7 +188,7 @@ export const PaymentTable = () => {
   return (
     <div className="flex flex-col gap-5 bg-white p-6 rounded-xl shadow border border-gray-100">
       <h3 className="text-2xl tracking-wider mb-2 ">Payment Records</h3>
-      <Table className="w-full border-b border-gray-300 pb-8">
+      <Table className="border-b border-gray-300 pb-8">
         <TableHeader>
           <TableRow className="">
             <TableHead className="text-xs font-semibold text-gray-500  py-3">
