@@ -3,10 +3,10 @@ import { ActivityTable } from "./ActivityTable";
 
 export const UserActivity = () => {
   return (
-    <div className="w-full border border-red-600 overflow-hidden">
-    <div className="flex flex-col gap-8 py-10 px-4">
-      <div className="flex md:justify-between md:items-center gap-4 flex-col md:flex-row">
-        <div className="flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 w-full max-w-[400px]">
+    <div className="w-full border overflow-hidden">
+    <div className="flex flex-col gap-3 py-10 px-4">
+      <div className="flex md:justify-between md:items-center gap-4 flex-col md:flex-row w-full">
+        <div className="flex items-center gap-2 rounded-md border border-gray-300 px-4 w-full md:max-w-[400px]">
           <SearchIcon />
           <input
             type="text"
@@ -14,13 +14,13 @@ export const UserActivity = () => {
             className="p-2  focus:outline-none"
           />
         </div>
-        <div className="flex gap-2 items-center max-w-[350px] w-full ">
-          <select className="border border-gray-300 rounded-md p-4 w-1/2">
+        <div className="flex gap-2 md:flex-row flex-col  md:max-w-[350px] w-full ">
+          <select className="border border-gray-300 rounded-md p-3 w-1/2">
             <option value="all">All Activity</option>
             <option value="active">Upload</option>
             <option value="inactive">Clicked</option>
           </select>
-          <select className="border border-gray-300 rounded-md p-4 w-1/2">
+          <select className="border border-gray-300 rounded-md p-3 w-1/2">
             <option value="all">All Status</option>
             <option value="active">Free</option>
             <option value="inactive">Premium</option>

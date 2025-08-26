@@ -69,7 +69,7 @@ export const BarChartReturn = () => {
   const xAxisKey = xAxisKeyMap[range];
 
   return (
-    <div className="">
+    <div className="lg:max-h-[35vh]">
       <Card className="border-none rounded-lg ">
         <CardHeader>
           <CardTitle className="tracking-wider text-lg">
@@ -111,8 +111,8 @@ export const BarChartReturn = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ChartContainer className="max-h-60 min-w-full" config={chartConfig}>
-              <BarChart className="max-h-36" accessibilityLayer data={chartData} >
+          <ChartContainer className="max-h-[26vh] min-w-full" config={chartConfig}>
+              <BarChart className="" accessibilityLayer data={chartData} >
                 <CartesianGrid vertical={false} />
                 <XAxis
                   dataKey={xAxisKey}

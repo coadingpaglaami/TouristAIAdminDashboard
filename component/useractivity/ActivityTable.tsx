@@ -194,7 +194,8 @@ export const ActivityTable = () => {
   return (
     <div className="flex flex-col gap-3 bg-white p-4 rounded-lg overflow-hidden">
       <h3 className="text-2xl tracking-wider">User Activity</h3>
-      <Table>
+      <div className=" max-w-screen overflow-x-auto">
+      <Table >
         <TableHeader>
           <TableRow>
             <TableHead className="text-xs text-[#969696]">User</TableHead>
@@ -218,14 +219,16 @@ export const ActivityTable = () => {
               <TableRow key={index} className="border-none">
                 {/* User */}
                 <TableCell className={isBlocked ? "opacity-30" : "opacity-100"}>
-                  <div className="flex items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8">
                     <Image
                       src={item.image}
                       alt={item.name}
-                      height={40}
-                      width={40}
-                      className="w-10 h-10 rounded-full mr-2"
+                      height={32}
+                      width={32}
+                      className="rounded-full object-cover"
                     />
+                    </div>
                     <span className="font-medium">{item.name}</span>
                   </div>
                 </TableCell>
@@ -291,9 +294,9 @@ export const ActivityTable = () => {
           })}
         </TableBody>
       </Table>
-
+</div>
       {/* Pagination and total count */}
-      <div className="flex items-center justify-between mt-4">
+      <div className="flex md:items-center md:flex-row md:justify-between flex-col mt-4">
         <div className="text-sm text-gray-600">
           Showing {(page - 1) * perPage + 1} to{" "}
           {Math.min(page * perPage, data.length)} from {data.length} records

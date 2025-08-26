@@ -251,7 +251,7 @@ export const BarChartRevenue = () => {
     value === 0 ? "0" : `${value}k`;
 
   return (
-    <Card className="flex justify-between">
+    <Card className=" h-full flex justify-between py-6">
       <CardHeader className="pb-2">
         <div className="flex flex-row items-center justify-between">
           <CardTitle className="tracking-wider">Revenue growth</CardTitle>
@@ -259,9 +259,9 @@ export const BarChartRevenue = () => {
         </div>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="max-h-60 min-w-full">
+        <ChartContainer config={chartConfig} className="max-h-[24vh] min-w-full">
           <ResponsiveContainer>
-            <BarChart data={chartData} className="max-h-36 min-w-full">
+            <BarChart data={chartData} className="max-h-[24vh] min-w-full">
               <CartesianGrid vertical={false} strokeDasharray="3 3" />
               <XAxis
                 dataKey="month"

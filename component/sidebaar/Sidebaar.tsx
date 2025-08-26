@@ -183,7 +183,7 @@ export const Sidebaar = () => {
 
         {/* Menu Items */}
         {profile ? (
-          <div className="flex flex-col gap-4 mt-12">
+          <div className="flex flex-col gap-2 mt-12">
             {adminpage.map(({ path, label, inactiveIcon, activeIcon }) => {
               const isActive =
                 pathname === path || pathname.startsWith(`${path}/`);
@@ -191,7 +191,7 @@ export const Sidebaar = () => {
                 <Link
                   key={path}
                   href={path}
-                  className={`px-2 py-3 flex items-center gap-2 rounded text-[16px] font-semibold tracking-[0.1em] mx-2 truncate ${
+                  className={`p-2 flex items-center gap-2 rounded text-[16px] font-semibold tracking-[0.1em] mx-2 truncate ${
                     isActive ? "orange text-white" : "text-[#854C3A]"
                   }`}
                 >
@@ -202,7 +202,7 @@ export const Sidebaar = () => {
             })}
           </div>
         ) : (
-          <div className="flex flex-col gap-4 mt-12">
+          <div className="flex flex-col gap-2 mt-12">
             {menus.map(({ path, label, inactiveIcon, activeIcon }) => {
               const isActive =
                 pathname === path || pathname.startsWith(`${path}/`);
@@ -210,7 +210,7 @@ export const Sidebaar = () => {
                 <Link
                   key={path}
                   href={path}
-                  className={`px-2 py-3 flex items-center gap-2 rounded text-[16px] font-semibold tracking-[0.1em] mx-2 truncate ${
+                  className={`p-2 flex items-center gap-2 rounded text-[16px] font-semibold tracking-[0.1em] mx-2 truncate ${
                     isActive ? "orange text-white" : "text-[#854C3A]"
                   }`}
                 >

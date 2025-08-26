@@ -26,7 +26,7 @@ import { ReactNode } from "react";
 export default function DashboardLayOut({ children }: { children: ReactNode }) {
   return (
     <div className="max-w-full font-inter">
-      <div className="flex w-full border-2 border-green-600 z-50 relative">
+      <div className="flex w-full ">
         {/* Sidebar */}
         <div className="hidden md:block border-r border-gray-200 ">
           {/* normal sidebar for PC */}

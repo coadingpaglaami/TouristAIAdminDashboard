@@ -77,7 +77,7 @@ export const PieChartStatus = () => {
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-56"
+          className="mx-auto aspect-square lg:max-h-[26vh] max-h-60"
         >
           <PieChart>
             <ChartTooltip

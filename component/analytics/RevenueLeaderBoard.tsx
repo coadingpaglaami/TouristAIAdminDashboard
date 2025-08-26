@@ -73,7 +73,7 @@ export const RevenueLeaderBoard = () => {
   const [timeframe, setTimeframe] = useState<"weekly" | "monthly">("weekly");
 
   return (
-    <div className="bg-white flex flex-col gap-4 p-2 rounded-lg text-xl tracking-wider md:max-h-[355px]">
+    <div className="bg-white flex flex-col gap-4 p-2 rounded-lg text-xl tracking-wider md:max-h-[40vh]">
       <h2 className="font-semibold text-lg">Revenue Leaderboard</h2>
       <div className="flex gap-2">
         <button
