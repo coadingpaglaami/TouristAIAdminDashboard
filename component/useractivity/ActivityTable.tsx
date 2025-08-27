@@ -195,106 +195,118 @@ export const ActivityTable = () => {
     <div className="flex flex-col gap-3 bg-white p-4 rounded-lg overflow-hidden">
       <h3 className="text-2xl tracking-wider">User Activity</h3>
       <div className=" max-w-screen overflow-x-auto">
-      <Table >
-        <TableHeader>
-          <TableRow>
-            <TableHead className="text-xs text-[#969696]">User</TableHead>
-            <TableHead className="text-xs text-[#969696]">
-              Activity Type
-            </TableHead>
-            <TableHead className="text-xs text-[#969696]">Details</TableHead>
-            <TableHead className="text-xs text-[#969696]">Time</TableHead>
-            <TableHead className="text-xs text-[#969696] text-center">
-              Status
-            </TableHead>
-            <TableHead className="text-xs text-[#969696]">Photo</TableHead>
-            <TableHead className="text-xs text-[#969696]">Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody className="tracking-wider overflow-x-scroll">
-          {paginatedData.map((item, index) => {
-            const globalIdx = (page - 1) * perPage + index;
-            const isBlocked = blocked[globalIdx];
-            return (
-              <TableRow key={index} className="border-none">
-                {/* User */}
-                <TableCell className={isBlocked ? "opacity-30" : "opacity-100"}>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8">
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      height={32}
-                      width={32}
-                      className="rounded-full object-cover"
-                    />
-                    </div>
-                    <span className="font-medium">{item.name}</span>
-                  </div>
-                </TableCell>
-                {/* Activity Type */}
-                <TableCell className={isBlocked ? "opacity-30" : "opacity-100"}>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      item.activity === "Upload"
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-300 text-gray-700"
-                    }`}
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-xs text-[#969696]">User</TableHead>
+              <TableHead className="text-xs text-[#969696]">
+                Activity Type
+              </TableHead>
+              <TableHead className="text-xs text-[#969696]">Details</TableHead>
+              <TableHead className="text-xs text-[#969696]">Time</TableHead>
+              <TableHead className="text-xs text-[#969696] text-center">
+                Status
+              </TableHead>
+              <TableHead className="text-xs text-[#969696]">Photo</TableHead>
+              <TableHead className="text-xs text-[#969696]">Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="tracking-wider overflow-x-scroll">
+            {paginatedData.map((item, index) => {
+              const globalIdx = (page - 1) * perPage + index;
+              const isBlocked = blocked[globalIdx];
+              return (
+                <TableRow key={index} className="border-none">
+                  {/* User */}
+                  <TableCell
+                    className={isBlocked ? "opacity-30" : "opacity-100"}
                   >
-                    {item.activity}
-                  </span>
-                </TableCell>
-                {/* Details */}
-                <TableCell className={isBlocked ? "opacity-30" : "opacity-100"}>
-                  {item.Details}
-                </TableCell>
-                {/* Time */}
-                <TableCell className={isBlocked ? "opacity-30" : "opacity-100"}>
-                  {item.time}
-                </TableCell>
-                {/* Status */}
-                <TableCell className={isBlocked ? "opacity-30" : "opacity-100"}>
-                  <div className="flex justify-center items-center">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          height={32}
+                          width={32}
+                          className="rounded-full object-cover"
+                        />
+                      </div>
+                      <span className="font-medium">{item.name}</span>
+                    </div>
+                  </TableCell>
+                  {/* Activity Type */}
+                  <TableCell
+                    className={isBlocked ? "opacity-30" : "opacity-100"}
+                  >
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold  ${
-                        item.status === "Premium"
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        item.activity === "Upload"
                           ? "bg-green-500 text-white"
                           : "bg-gray-300 text-gray-700"
                       }`}
                     >
-                      {item.status}
+                      {item.activity}
                     </span>
-                  </div>
-                </TableCell>
-                {/* Photo */}
-                <TableCell className={isBlocked ? "opacity-30" : "opacity-100"}>
-                  <Image
-                    src={item.photo}
-                    alt="photo"
-                    height={32}
-                    width={32}
-                    className="w-8 h-8 rounded"
-                  />
-                </TableCell>
-                {/* Action */}
-                <TableCell>
-                  <button
-                    className="p-2 hover:bg-gray-100 rounded"
-                    onClick={() =>
-                      isBlocked
-                        ? handleUnblock(globalIdx)
-                        : handleBlockToggle(globalIdx)
-                    }
+                  </TableCell>
+                  {/* Details */}
+                  <TableCell
+                    className={isBlocked ? "opacity-30" : "opacity-100"}
                   >
-                    {isBlocked ? <Visible /> : <RemoveIcon />}
-                  </button>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-</div>
+                    {item.Details}
+                  </TableCell>
+                  {/* Time */}
+                  <TableCell
+                    className={isBlocked ? "opacity-30" : "opacity-100"}
+                  >
+                    {item.time}
+                  </TableCell>
+                  {/* Status */}
+                  <TableCell
+                    className={isBlocked ? "opacity-30" : "opacity-100"}
+                  >
+                    <div className="flex justify-center items-center">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold  ${
+                          item.status === "Premium"
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-300 text-gray-700"
+                        }`}
+                      >
+                        {item.status}
+                      </span>
+                    </div>
+                  </TableCell>
+                  {/* Photo */}
+                  <TableCell
+                    className={isBlocked ? "opacity-30" : "opacity-100"}
+                  >
+                    <Image
+                      src={item.photo}
+                      alt="photo"
+                      height={32}
+                      width={32}
+                      className="w-8 h-8 rounded"
+                    />
+                  </TableCell>
+                  {/* Action */}
+                  <TableCell>
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded"
+                      onClick={() =>
+                        isBlocked
+                          ? handleUnblock(globalIdx)
+                          : handleBlockToggle(globalIdx)
+                      }
+                    >
+                      {isBlocked ? <Visible /> : <RemoveIcon />}
+                    </button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
       {/* Pagination and total count */}
       <div className="flex md:items-center md:flex-row md:justify-between flex-col mt-4">
         <div className="text-sm text-gray-600">

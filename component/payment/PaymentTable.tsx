@@ -12,6 +12,16 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Delete, Block, CheckCircle, Chevron, ChevronNext } from "@/svg/Action";
 import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface UserTable {
   image: string;
@@ -159,9 +169,10 @@ function getPagination(current: number, total: number) {
 }
 
 export const PaymentTable = () => {
-  const data = useMemo(() => generateDummyData(80), []);
+  const [data, setData] = useState<UserTable[]>(generateDummyData(80));
   const [blocked, setBlocked] = useState<{ [key: number]: boolean }>({});
   const [page, setPage] = useState(1);
+  const [deleteUser, setDeleteUser] = useState<UserTable | null>(null); // Added delete user state
   const rowsPerPage = 7;
 
   const handleBlockToggle = (idx: number) => {
@@ -178,6 +189,18 @@ export const PaymentTable = () => {
     }));
   };
 
+  const handleDelete = () => {
+    if (!deleteUser) return;
+
+    // Update the data state by removing the user
+    setData((prevData) =>
+      prevData.filter((user) => user.name !== deleteUser.name)
+    );
+
+    console.log("Deleted user:", deleteUser.name);
+    setDeleteUser(null); // Close the delete dialog
+  };
+
   const totalPages = Math.ceil(data.length / rowsPerPage);
   const paginatedData = data.slice(
     (page - 1) * rowsPerPage,
@@ -188,129 +211,170 @@ export const PaymentTable = () => {
   return (
     <div className="flex flex-col gap-5 bg-white p-6 rounded-xl shadow border border-gray-100">
       <h3 className="text-2xl tracking-wider mb-2 ">Payment Records</h3>
-      <Table className="border-b border-gray-300 pb-8">
-        <TableHeader>
-          <TableRow className="">
-            <TableHead className="text-xs font-semibold text-gray-500  py-3">
-              User
-            </TableHead>
-            <TableHead className="text-xs font-semibold text-gray-500  text-center py-3">
-              Subscription
-            </TableHead>
-            <TableHead className="text-xs font-semibold text-gray-500  text-center py-3">
-              Duration
-            </TableHead>
-            <TableHead className="text-xs font-semibold text-gray-500  py-3 text-center">
-              Amount
-            </TableHead>
-            <TableHead className="text-xs font-semibold text-gray-500  py-3 text-center">
-              Last Active
-            </TableHead>
-            <TableHead className="text-xs font-semibold text-gray-500  py-3 text-center">
-              Action
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody className="tracking-wider">
-          {paginatedData.map((item, idx) => {
-            const globalIdx = (page - 1) * rowsPerPage + idx;
-            const isBlocked = blocked[globalIdx];
+      <div className="overflow-x-auto max-w-screen">
+        <Table className="border-b border-gray-300 pb-8">
+          <TableHeader>
+            <TableRow className="">
+              <TableHead className="text-xs font-semibold text-gray-500  py-3">
+                User
+              </TableHead>
+              <TableHead className="text-xs font-semibold text-gray-500  text-center py-3">
+                Subscription
+              </TableHead>
+              <TableHead className="text-xs font-semibold text-gray-500  text-center py-3">
+                Duration
+              </TableHead>
+              <TableHead className="text-xs font-semibold text-gray-500  py-3 text-center">
+                Amount
+              </TableHead>
+              <TableHead className="text-xs font-semibold text-gray-500  py-3 text-center">
+                Last Active
+              </TableHead>
+              <TableHead className="text-xs font-semibold text-gray-500  py-3 text-center">
+                Action
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="tracking-wider">
+            {paginatedData.map((item, idx) => {
+              const globalIdx = (page - 1) * rowsPerPage + idx;
+              const isBlocked = blocked[globalIdx];
 
-            return (
-              <TableRow
-                key={globalIdx}
-                className="transition hover:bg-gray-50 border-none"
-              >
-                {/* User */}
-                <TableCell className={`py-4 ${isBlocked ? "opacity-30" : ""}`}>
-                  <div className="flex items-center gap-3">
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      height={36}
-                      width={36}
-                      className="w-9 h-9 rounded-full border border-gray-200"
-                    />
-                    <div className="font-medium text-gray-800">{item.name}</div>
-                  </div>
-                </TableCell>
-                {/* Status */}
-                <TableCell
-                  className={`py-4 text-center ${
-                    isBlocked ? "opacity-30" : ""
-                  }`}
+              return (
+                <TableRow
+                  key={globalIdx}
+                  className="transition hover:bg-gray-50 border-none"
                 >
-                  <div className="flex justify-center">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold mb-1 bg-[#BDBDBD]`}
-                    >
-                      {item.subscription}
+                  {/* User */}
+                  <TableCell
+                    className={`py-4 ${isBlocked ? "opacity-30" : ""}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          height={36}
+                          width={36}
+                          className=" rounded-full border border-gray-200"
+                        />
+                      </div>
+                      <div className="font-medium text-gray-800">
+                        {item.name}
+                      </div>
+                    </div>
+                  </TableCell>
+                  {/* Status */}
+                  <TableCell
+                    className={`py-4 text-center ${
+                      isBlocked ? "opacity-30" : ""
+                    }`}
+                  >
+                    <div className="flex justify-center">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold mb-1 bg-[#BDBDBD]`}
+                      >
+                        {item.subscription}
+                      </span>
+                    </div>
+                  </TableCell>
+                  {/* Duration */}
+                  <TableCell
+                    className={`py-4 text-center ${
+                      isBlocked ? "opacity-30" : ""
+                    }`}
+                  >
+                    <div className="flex flex-col items-center">
+                      {getDurationJSX(
+                        item.subscription,
+                        new Date(item.lastactive)
+                      )}
+                    </div>
+                  </TableCell>
+                  {/* Amount */}
+                  <TableCell
+                    className={`py-4 text-center ${
+                      isBlocked ? "opacity-30" : ""
+                    }`}
+                  >
+                    <span className="font-semibold text-gray-700">
+                      ${item.amount}
                     </span>
-                  </div>
-                </TableCell>
-                {/* Duration */}
-                <TableCell
-                  className={`py-4 text-center ${
-                    isBlocked ? "opacity-30" : ""
-                  }`}
-                >
-                  <div className="flex flex-col items-center">
-                    {getDurationJSX(
-                      item.subscription,
-                      new Date(item.lastactive)
-                    )}
-                  </div>
-                </TableCell>
-                {/* Amount */}
-                <TableCell
-                  className={`py-4 text-center ${
-                    isBlocked ? "opacity-30" : ""
-                  }`}
-                >
-                  <span className="font-semibold text-gray-700">
-                    ${item.amount}
-                  </span>
-                </TableCell>
-                {/* Last Active */}
-                <TableCell
-                  className={`py-4 text-center ${
-                    isBlocked ? "opacity-30" : ""
-                  }`}
-                >
-                  <span className="text-sm ">
-                    {formatDate(new Date(item.lastactive))}
-                  </span>
-                </TableCell>
-                {/* Action */}
-                <TableCell className="py-4 text-center">
-                  <div className="flex gap-2 justify-center">
-                    <button
-                      className="p-2 hover:bg-gray-100 rounded transition"
-                      title={isBlocked ? "Unblock" : "Block"}
-                      onClick={() =>
-                        isBlocked
-                          ? handleUnblock(globalIdx)
-                          : handleBlockToggle(globalIdx)
-                      }
-                    >
-                      {isBlocked ? <CheckCircle /> : <Block />}
-                    </button>
-                    <button
-                      className="p-2 hover:bg-gray-100 rounded transition"
-                      title="Delete"
-                    >
-                      <Delete />
-                    </button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-      {/* Pagination Controls */}
+                  </TableCell>
+                  {/* Last Active */}
+                  <TableCell
+                    className={`py-4 text-center ${
+                      isBlocked ? "opacity-30" : ""
+                    }`}
+                  >
+                    <span className="text-sm">
+                      {formatDate(new Date(item.lastactive))}
+                    </span>
+                  </TableCell>
+                  {/* Action */}
+                  <TableCell className="py-4 text-center">
+                    <div className="flex gap-2 justify-center">
+                      <button
+                        className="p-2 hover:bg-gray-100 rounded transition"
+                        title={isBlocked ? "Unblock" : "Block"}
+                        onClick={() =>
+                          isBlocked
+                            ? handleUnblock(globalIdx)
+                            : handleBlockToggle(globalIdx)
+                        }
+                      >
+                        {isBlocked ? <CheckCircle /> : <Block />}
+                      </button>
+                      <button
+                        className="p-2 hover:bg-gray-100 rounded transition"
+                        title="Delete"
+                        onClick={() => setDeleteUser(item)}
+                      >
+                        <Delete />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={!!deleteUser}
+        onOpenChange={(open) => !open && setDeleteUser(null)}
+      >
+        <DialogTrigger asChild>
+          <button className="p-2 hover:bg-gray-100 rounded" />
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Confirmation</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-red-600">
+                {deleteUser?.name}
+              </span>
+              ? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteUser(null)}>
+              Cancel
+            </Button>
+            <Button
+              className="p-2 rounded-md orange text-white"
+              onClick={handleDelete}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      <div className="flex items-center justify-between mt-4">
+      {/* Pagination Controls */}
+      <div className="flex md:items-center md:justify-between md:flex-row flex-col mt-4">
         <div className="text-sm text-gray-600">
           Showing {(page - 1) * rowsPerPage + 1} to{" "}
           {Math.min(page * rowsPerPage, data.length)} from {data.length} records

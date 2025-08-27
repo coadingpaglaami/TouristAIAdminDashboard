@@ -1,3 +1,5 @@
-export default function Subscription() {
-  return <>Subscription</>;
+import { Subscription } from "@/component/subscription";
+
+export default function SubscriptionPage() {
+  return <Subscription />;
 }

@@ -3,7 +3,7 @@ import { ActivityTable } from "./ActivityTable";
 
 export const UserActivity = () => {
   return (
-    <div className="w-full border overflow-hidden">
+    <div className="w-full overflow-hidden">
     <div className="flex flex-col gap-3 py-10 px-4">
       <div className="flex md:justify-between md:items-center gap-4 flex-col md:flex-row w-full">
         <div className="flex items-center gap-2 rounded-md border border-gray-300 px-4 w-full md:max-w-[400px]">

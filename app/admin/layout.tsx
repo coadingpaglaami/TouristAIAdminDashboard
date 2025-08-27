@@ -25,18 +25,16 @@ import { ReactNode } from "react";
 // }
 export default function DashboardLayOut({ children }: { children: ReactNode }) {
   return (
-    <div className="max-w-full font-inter">
+    <div className="max-w-full font-inter overflow-hidden">
       <div className="flex w-full ">
-        {/* Sidebar */}
-        <div className="hidden md:block border-r border-gray-200 ">
-          {/* normal sidebar for PC */}
+        <div className="max-md:hidden md:block border-r border-gray-200 ">
           <Sidebaar />
         </div>
 
         {/* Mobile sidebar (absolute / fixed) */}
-        <div className="md:hidden fixed top-0 left-0 h-full w-14 z-30 bg-white">
+        {/* <div className="md:hidden  top-0 left-0 h-full w-14 z-30 bg-white">
           <Sidebaar />
-        </div>
+        </div> */}
 
         {/* Main content */}
         <div className="md:flex-1 bg-[#F4F4F4] pl-4 ">
