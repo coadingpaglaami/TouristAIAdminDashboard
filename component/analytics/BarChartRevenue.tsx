@@ -261,7 +261,7 @@ export const BarChartRevenue = () => {
       <CardContent>
         <ChartContainer config={chartConfig} className="max-h-[24vh] min-w-full">
           <ResponsiveContainer>
-            <BarChart data={chartData} className="max-h-[24vh] min-w-full">
+            <BarChart data={chartData} className="max-h-[18vh] min-w-full">
               <CartesianGrid vertical={false} strokeDasharray="3 3" />
               <XAxis
                 dataKey="month"

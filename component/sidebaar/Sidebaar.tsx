@@ -16,10 +16,12 @@ import {
   MessageSmall,
   Settings,
 } from "@/svg/Sidebaar";
+
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+
 
 export const Sidebaar = () => {
   const pathname = usePathname();
@@ -78,7 +80,7 @@ export const Sidebaar = () => {
   ];
 
   return (
-    <div className="lg:w-64 md:w-20 w-16 pt-4 sticky top-0 flex flex-col justify-between gap-4 md:h-screen h-full overflow-y-hidden ">
+    <div className="xl:w-64 lg:w-16  pt-4 sticky top-0 flex flex-col justify-between gap-4 md:h-screen h-full overflow-y-hidden ">
       <div className="flex flex-col gap-2">
         {/* Logo + Text */}
         <Link
@@ -86,17 +88,17 @@ export const Sidebaar = () => {
           className="flex flex-col rounded-lg justify-center items-center gap-2"
         >
           {/* Large Logo - Desktop */}
-          <div className="orange p-4 rounded-lg hidden lg:block">
+          <div className="orange p-4 rounded-lg hidden xl:block">
             <Message />
           </div>
 
           {/* Small Logo - Tablet */}
-          <div className="orange p-2 rounded-lg hidden md:block lg:hidden">
+          <div className="orange p-2 rounded-lg hidden md:block xl:hidden">
             <MessageSmall />
           </div>
 
           {/* Brand Text - Desktop only */}
-          <h4 className="text-2xl font-bold tracking-[0.3em] text-[#854C3A] hidden lg:block">
+          <h4 className="text-2xl font-bold tracking-[0.3em] text-[#854C3A] hidden xl:block">
             TRIPMATE
           </h4>
         </Link>
@@ -116,7 +118,7 @@ export const Sidebaar = () => {
                   }`}
                 >
                   {isActive ? activeIcon : inactiveIcon}
-                  <span className="hidden lg:inline">{label}</span>
+                  <span className="hidden xl:inline">{label}</span>
                 </Link>
               );
             })}
@@ -135,7 +137,7 @@ export const Sidebaar = () => {
                   }`}
                 >
                   {isActive ? activeIcon : inactiveIcon}
-                  <span className="hidden lg:inline">{label}</span>
+                  <span className="hidden xl:inline">{label}</span>
                 </Link>
               );
             })}
@@ -159,12 +161,12 @@ export const Sidebaar = () => {
           />
 
           {/* Profile details - Desktop only */}
-          <div className=" flex-col gap-1 text-[#854C3A] hidden lg:flex">
+          <div className=" flex-col gap-1 text-[#854C3A] hidden xl:flex">
             <span className="text-lg font-medium">Ostain Alex</span>
             <span className="font-thin">TRIPMATE</span>
           </div>
 
-          <div className="hidden lg:block">
+          <div className="hidden xl:block">
             <Settings />
           </div>
         </Link>

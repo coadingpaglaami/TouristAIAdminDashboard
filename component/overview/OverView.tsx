@@ -14,10 +14,10 @@ export const Overview = () => {
   const periods: TimePeriod[] = ["Weekly", "Monthly", "Yearly"];
 
   return (
-    <div className=" bg-gray-100 p-6">
+    <div className=" bg-gray-100 p-6 max-md:max-w-screen overflow-hidden">
       <div className="">
         {/* Header */}
-        <div className="flex justify-end items-center mb-8">
+        <div className="flex md:justify-end items-center mb-8">
           <div className="flex space-x-2 border-2 p-2 rounded-lg border-[#969696]">
             {periods.map((period) => (
               <button

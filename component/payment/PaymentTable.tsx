@@ -211,7 +211,7 @@ export const PaymentTable = () => {
   return (
     <div className="flex flex-col gap-5 bg-white p-6 rounded-xl shadow border border-gray-100">
       <h3 className="text-2xl tracking-wider mb-2 ">Payment Records</h3>
-      <div className="overflow-x-auto max-w-screen">
+      <div className="overflow-x-auto max-md:max-w-[85vw]">
         <Table className="border-b border-gray-300 pb-8">
           <TableHeader>
             <TableRow className="">

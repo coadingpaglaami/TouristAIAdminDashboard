@@ -3,9 +3,9 @@ import { UserTable } from "./UserTable"
 
 export const ManageUser=()=>{
     return(
-       <div className="flex flex-col gap-8 py-10 px-4">
+       <div className="flex flex-col gap-8 py-10 px-4 max-md:max-w-screen overflow-hidden">
          <div className="flex md:flex-row flex-col justify-between items-center gap-4">
-           <div className="flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 w-full max-w-[400px]">
+           <div className="flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 w-full md:max-w-[400px]">
              <SearchIcon />
              <input
                type="text"

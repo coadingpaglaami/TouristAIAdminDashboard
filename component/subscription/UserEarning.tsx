@@ -1,3 +1,4 @@
+'use client';
 import {
   Table,
   TableBody,
@@ -6,8 +7,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Chevron } from "@/svg/Action";
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 
 interface UserEarning {
   name: string;
@@ -134,12 +135,27 @@ const userEarnings: UserEarning[] = [
   },
 ];
 export const UserEarning = () => {
+   const contentRef = useRef<HTMLDivElement>(null);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      const el = contentRef.current;
+      const hasOverflow =
+        el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth;
+
+      setIsOverflowing(hasOverflow);
+      // console.log("Is overflowing:", hasOverflow);
+    }
+  }, []);
+
   return (
-    <div className="bg-white rounded-lg p-4  overflow-y-scroll my-4 ">
+    <div className="bg-white rounded-lg p-4  my-4 ">
       <h2 className="font-semibold tracking-wider text-xl text-[#1C1B1F]">
         User-wise earnings
       </h2>
-      <div className="max-w-screen w-full overflow-x-auto">
+      <div className=" overflow-x-auto" ref={contentRef}>
+         {/* <p>{isOverflowing ? "Content is overflowing" : "Content fits"}</p> */}
         <Table className="">
           <TableHeader>
             <TableRow>
@@ -162,18 +178,18 @@ export const UserEarning = () => {
             {userEarnings.map((plan, idx) => (
               <TableRow key={idx} className="border-none">
                 <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
-                  <div className="flex items-center gap-3">
-                    <div>
-                      <Image
-                        src={plan.image}
-                        alt={plan.name}
-                        width={32}
-                        height={32}
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                    </div>
-                    <span>{plan.name}</span>
-                  </div>
+                          <div className="flex items-center gap-2">
+                              <div className="w-8 h-8">
+                                <Image
+                                  src={plan.image}
+                                  alt={plan.name}
+                                  height={32}
+                                  width={32}
+                                  className="rounded-full object-cover"
+                                />
+                              </div>
+                              <span className="font-medium">{plan.name}</span>
+                            </div>
                 </TableCell>
                 <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
                   {plan.email}

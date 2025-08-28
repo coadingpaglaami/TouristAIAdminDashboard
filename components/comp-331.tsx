@@ -1,6 +1,6 @@
 "use client"
 
-import { useId, useState } from "react"
+import { useId } from "react"
 import { CheckIcon, ImagePlusIcon, XIcon } from "lucide-react"
 
 import { useCharacterLimit } from "@/hooks/use-character-limit"
@@ -31,15 +31,15 @@ const initialBgImage = [
   },
 ]
 
-const initialAvatarImage = [
-  {
-    name: "avatar-72-01.jpg",
-    size: 1528737,
-    type: "image/jpeg",
-    url: "/avatar-72-01.jpg",
-    id: "avatar-123456789",
-  },
-]
+// const initialAvatarImage = [
+//   {
+//     name: "avatar-72-01.jpg",
+//     size: 1528737,
+//     type: "image/jpeg",
+//     url: "/avatar-72-01.jpg",
+//     id: "avatar-123456789",
+//   },
+// ]
 
 export default function Component() {
   const id = useId()
@@ -73,7 +73,7 @@ export default function Component() {
         </DialogDescription>
         <div className="overflow-y-auto">
           <ProfileBg />
-          <Avatar />
+          {/* <Avatar /> */}
           <div className="px-6 pt-4 pb-6">
             <form className="space-y-4">
               <div className="flex flex-col gap-4 sm:flex-row">
@@ -183,7 +183,7 @@ function ProfileBg() {
   return (
     <div className="h-32">
       <div className="bg-muted relative flex size-full items-center justify-center overflow-hidden">
-        {currentImage && (
+        {/* {currentImage && (
           <img
             className="size-full object-cover"
             src={currentImage}
@@ -195,7 +195,7 @@ function ProfileBg() {
             width={512}
             height={96}
           />
-        )}
+        )} */}
         <div className="absolute inset-0 flex items-center justify-center gap-2">
           <button
             type="button"
@@ -226,40 +226,40 @@ function ProfileBg() {
   )
 }
 
-function Avatar() {
-  const [{ files }, { openFileDialog, getInputProps }] = useFileUpload({
-    accept: "image/*",
-    initialFiles: initialAvatarImage,
-  })
+// function Avatar() {
+//   const [{ files }, { openFileDialog, getInputProps }] = useFileUpload({
+//     accept: "image/*",
+//     initialFiles: initialAvatarImage,
+//   })
 
-  const currentImage = files[0]?.preview || null
+//   const currentImage = files[0]?.preview || null
 
-  return (
-    <div className="-mt-10 px-6">
-      <div className="border-background bg-muted relative flex size-20 items-center justify-center overflow-hidden rounded-full border-4 shadow-xs shadow-black/10">
-        {currentImage && (
-          <img
-            src={currentImage}
-            className="size-full object-cover"
-            width={80}
-            height={80}
-            alt="Profile image"
-          />
-        )}
-        <button
-          type="button"
-          className="focus-visible:border-ring focus-visible:ring-ring/50 absolute flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-[color,box-shadow] outline-none hover:bg-black/80 focus-visible:ring-[3px]"
-          onClick={openFileDialog}
-          aria-label="Change profile picture"
-        >
-          <ImagePlusIcon size={16} aria-hidden="true" />
-        </button>
-        <input
-          {...getInputProps()}
-          className="sr-only"
-          aria-label="Upload profile picture"
-        />
-      </div>
-    </div>
-  )
-}
+//   return (
+//     <div className="-mt-10 px-6">
+//       <div className="border-background bg-muted relative flex size-20 items-center justify-center overflow-hidden rounded-full border-4 shadow-xs shadow-black/10">
+//         {currentImage && (
+//           <img
+//             src={currentImage}
+//             className="size-full object-cover"
+//             width={80}
+//             height={80}
+//             alt="Profile image"
+//           />
+//         )}
+//         <button
+//           type="button"
+//           className="focus-visible:border-ring focus-visible:ring-ring/50 absolute flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-[color,box-shadow] outline-none hover:bg-black/80 focus-visible:ring-[3px]"
+//           onClick={openFileDialog}
+//           aria-label="Change profile picture"
+//         >
+//           <ImagePlusIcon size={16} aria-hidden="true" />
+//         </button>
+//         <input
+//           {...getInputProps()}
+//           className="sr-only"
+//           aria-label="Upload profile picture"
+//         />
+//       </div>
+//     </div>
+//   )
+// }

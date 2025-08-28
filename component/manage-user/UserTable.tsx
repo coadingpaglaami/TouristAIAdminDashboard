@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import {
   Delete,
@@ -44,6 +44,14 @@ interface UserTable {
   subscription: "Free" | "Premium" | "Expired";
   email: string;
   lastactive: string;
+  duration?:
+    | "1 Hour"
+    | "6 Hours"
+    | "12 Hours"
+    | "1 Day"
+    | "3 Days"
+    | "7 Days"
+    | "15 Days";
 }
 
 const generateDummyData = (count: number): UserTable[] => {
@@ -134,9 +142,18 @@ const generateDummyData = (count: number): UserTable[] => {
     "Active",
     "Inactive",
   ];
+  const durations: Array<UserTable["duration"]> = [
+    "1 Hour",
+    "6 Hours",
+    "12 Hours",
+    "1 Day",
+    "3 Days",
+    "7 Days",
+    "15 Days",
+  ];
 
   const getRandomTimeAgo = () => {
-    const now = new Date();
+    // const now = new Date();
     const random = Math.random();
 
     if (random < 0.33) {
@@ -169,6 +186,7 @@ const generateDummyData = (count: number): UserTable[] => {
     subscription: subscription[i % subscription.length],
     email: emails[i % emails.length],
     lastactive: getRandomTimeAgo(),
+    duration: durations[Math.floor(Math.random() * durations.length)],
   }));
 };
 
@@ -244,219 +262,258 @@ export const UserTable = () => {
   return (
     <div className="flex flex-col gap-3 bg-white p-4 rounded-lg">
       <h3 className="text-2xl tracking-wider">Manage Users</h3>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="text-xs text-[#969696]">User</TableHead>
-            <TableHead className="text-xs text-[#969696] text-center">
-              Status
-            </TableHead>
-            <TableHead className="text-xs text-[#969696] text-center">
-              Subscription
-            </TableHead>
-            <TableHead className="text-xs text-[#969696]">Email</TableHead>
-            <TableHead className="text-xs text-[#969696]">
-              Last Active
-            </TableHead>
-            <TableHead className="text-xs text-[#969696]">Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody className="tracking-wider">
-          {paginatedData.map((item, idx) => {
-            const globalIdx = (page - 1) * rowsPerPage + idx;
-            const isBlocked = blocked[globalIdx];
-            return (
-              <TableRow
-                key={globalIdx}
-                className="border-none transition-opacity"
-              >
-                {/* User */}
-                <TableCell className={isBlocked ? "opacity-50" : "opacity-100"}>
-                  <div className="flex items-center gap-2">
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      height={32}
-                      width={32}
-                      className="w-8 h-8 rounded-full"
-                    />
-                    <div className="font-medium">{item.name}</div>
-                  </div>
-                </TableCell>
-                {/* Status */}
-                <TableCell
-                  className={
-                    isBlocked ? "opacity-50" : "opacity-100 " + "align-middle"
-                  }
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-xs text-[#969696]">User</TableHead>
+              <TableHead className="text-xs text-[#969696] text-center">
+                Status
+              </TableHead>
+              <TableHead className="text-xs text-[#969696] text-center">
+                Subscription
+              </TableHead>
+              <TableHead className="text-xs text-[#969696]">Email</TableHead>
+              <TableHead className="text-xs text-[#969696]">
+                Last Active
+              </TableHead>
+              <TableHead className="text-xs text-[#969696]">Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="tracking-wider">
+            {paginatedData.map((item, idx) => {
+              const globalIdx = (page - 1) * rowsPerPage + idx;
+              const isBlocked = blocked[globalIdx];
+              return (
+                <TableRow
+                  key={globalIdx}
+                  className="border-none transition-opacity"
                 >
-                  <div className="flex justify-center items-center">
-                    <div
-                      className={`text-xs font-semibold px-2 py-0.5 rounded-full  max-w-20 w-fit ${
-                        item.status === "Active"
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-200 text-gray-500"
-                      }`}
-                    >
-                      {item.status}
+                  {/* User */}
+                  <TableCell
+                    className={isBlocked ? "opacity-50" : "opacity-100"}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          height={32}
+                          width={32}
+                          className="rounded-full"
+                        />
+                      </div>
+                      <div className="font-medium">{item.name}</div>
                     </div>
-                  </div>
-                </TableCell>
-                {/* Subscription */}
-                <TableCell className={isBlocked ? "opacity-50" : "opacity-100"}>
-                  <div className="flex justify-center items-center">
-                    <div
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        item.subscription === "Expired"
-                          ? "bg-[#FF7A00] text-white"
-                          : item.subscription === "Premium"
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-200 text-gray-700"
-                      }`}
-                    >
-                      {item.subscription}
+                  </TableCell>
+                  {/* Status */}
+                  <TableCell
+                    className={
+                      isBlocked ? "opacity-50" : "opacity-100 " + "align-middle"
+                    }
+                  >
+                    <div className="flex justify-center items-center">
+                      <div
+                        className={`text-xs font-semibold px-2 py-0.5 rounded-full  max-w-20 w-fit ${
+                          item.status === "Active"
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-200 text-gray-500"
+                        }`}
+                      >
+                        {item.status}
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                {/* Email */}
-                <TableCell className={isBlocked ? "opacity-50" : "opacity-100"}>
-                  {item.email}
-                </TableCell>
-                {/* Last Active */}
-                <TableCell className={isBlocked ? "opacity-50" : "opacity-100"}>
-                  {item.lastactive}
-                </TableCell>
-                {/* Action */}
-                <TableCell>
-                  <div className="flex gap-2 items-center">
-                    {/* Edit Dialog */}
-                    <Dialog
-                      open={!!selectedUser && selectedUser.name === item.name}
-                      onOpenChange={(open) =>
-                        !open ? setSelectedUser(null) : setSelectedUser(item)
-                      }
-                    >
-                      <DialogTrigger asChild>
-                        <button
-                          className="p-2 hover:bg-gray-100 rounded"
-                          title="Edit"
-                          onClick={() => setSelectedUser(item)}
-                        >
-                          <Edit />
-                        </button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Edit User Info</DialogTitle>
-                          <DialogDescription>
-                            Update user details
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex items-center gap-2 p-6">
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            height={32}
-                            width={32}
-                            className="w-8 h-8 rounded-full"
-                          />
-                          <div className="font-medium">{item.name}</div>
-                        </div>
-                        <div className="px-6 pt-4 pb-6">
-                          <form className="space-y-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="status">Status</Label>
-                              <Select defaultValue={item.status}>
-                                <SelectTrigger id="status">
-                                  <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="Active">Active</SelectItem>
-                                  <SelectItem value="Inactive">
-                                    Inactive
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
+                  </TableCell>
+                  {/* Subscription */}
+                  <TableCell
+                    className={isBlocked ? "opacity-50" : "opacity-100"}
+                  >
+                    <div className="flex justify-center items-center">
+                      <div
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          item.subscription === "Expired"
+                            ? "bg-[#FF7A00] text-white"
+                            : item.subscription === "Premium"
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-200 text-gray-700"
+                        }`}
+                      >
+                        {item.subscription}
+                      </div>
+                    </div>
+                  </TableCell>
+                  {/* Email */}
+                  <TableCell
+                    className={isBlocked ? "opacity-50" : "opacity-100"}
+                  >
+                    {item.email}
+                  </TableCell>
+                  {/* Last Active */}
+                  <TableCell
+                    className={isBlocked ? "opacity-50" : "opacity-100"}
+                  >
+                    {item.lastactive}
+                  </TableCell>
+                  {/* Action */}
+                  <TableCell>
+                    <div className="flex gap-2 items-center">
+                      {/* Edit Dialog */}
+                      <Dialog
+                        open={!!selectedUser && selectedUser.name === item.name}
+                        onOpenChange={(open) =>
+                          !open ? setSelectedUser(null) : setSelectedUser(item)
+                        }
+                      >
+                        <DialogTrigger asChild>
+                          <button
+                            className="p-2 hover:bg-gray-100 rounded"
+                            title="Edit"
+                            onClick={() => setSelectedUser(item)}
+                          >
+                            <Edit />
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Change user subscription status</DialogTitle>
+                          </DialogHeader>
+                          <div className="flex items-center gap-2 p-6">
+                            <Image
+                              src={item.image}
+                              alt={item.name}
+                              height={32}
+                              width={32}
+                              className="w-8 h-8 rounded-full"
+                            />
+                            <div className="font-medium">{item.name}</div>
+                            <div
+                              className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                item.subscription === "Expired"
+                                  ? "bg-[#FF7A00] text-white"
+                                  : item.subscription === "Premium"
+                                  ? "bg-green-500 text-white"
+                                  : "bg-gray-200 text-gray-700"
+                              }`}
+                            >
+                              {item.subscription}
                             </div>
-                          </form>
-                        </div>
-                        <DialogFooter>
-                          <Button
-                            variant="outline"
-                            onClick={() => setSelectedUser(null)}
-                          >
-                            Cancel
-                          </Button>
-                          <Button variant="destructive">Save Changes</Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                          </div>
+                          <div className="px-6 pt-4 pb-6">
+                            <form className="space-y-4">
+                              <div className="space-y-2">
+                                <Label htmlFor="status">Duration</Label>
+                                <Select
+                                  defaultValue={item.duration || "1 Hour"}
+                                >
+                                  <SelectTrigger id="status">
+                                    <SelectValue placeholder="Select status" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="1 Hour">
+                                      1 Hour
+                                    </SelectItem>
+                                    <SelectItem value="2 Hours">
+                                      2 Hours
+                                    </SelectItem>
+                                    <SelectItem value="6 Hours">
+                                      6 Hours
+                                    </SelectItem>
+                                    <SelectItem value="12 Hours">
+                                      12 Hours
+                                    </SelectItem>
+                                    <SelectItem value="1 Day">1 Day</SelectItem>
+                                    <SelectItem value="3 Days">
+                                      3 Days
+                                    </SelectItem>
+                                    <SelectItem value="7 Days">
+                                      7 Days
+                                    </SelectItem>
+                                    <SelectItem value="15 Days">
+                                      15 Days
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </form>
+                          </div>
+                          <DialogFooter>
+                            <Button
+                              variant="outline"
+                              onClick={() => setSelectedUser(null)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button className="orange">Save Changes</Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
 
-                    {/* Block / Unblock */}
-                    <button
-                      className="p-2 hover:bg-gray-100 rounded opacity-100"
-                      title={isBlocked ? "Unblock" : "Block"}
-                      onClick={() =>
-                        isBlocked
-                          ? handleUnblock(globalIdx)
-                          : handleBlockToggle(globalIdx)
-                      }
-                    >
-                      {isBlocked ? <CheckCircle /> : <Block />}
-                    </button>
+                      {/* Block / Unblock */}
+                      <button
+                        className="p-2 hover:bg-gray-100 rounded opacity-100"
+                        title={isBlocked ? "Unblock" : "Block"}
+                        onClick={() =>
+                          isBlocked
+                            ? handleUnblock(globalIdx)
+                            : handleBlockToggle(globalIdx)
+                        }
+                      >
+                        {isBlocked ? <CheckCircle /> : <Block />}
+                      </button>
 
-                    {/* Delete Dialog */}
-                    <Dialog
-                      open={!!deleteUser && deleteUser.name === item.name}
-                      onOpenChange={(open) =>
-                        !open ? setDeleteUser(null) : setDeleteUser(item)
-                      }
-                    >
-                      <DialogTrigger asChild>
-                        <button
-                          className="p-2 hover:bg-gray-100 rounded"
-                          title="Delete"
-                          onClick={() => setDeleteUser(item)}
-                        >
-                          <Delete />
-                        </button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Delete Confirmation</DialogTitle>
-                          <DialogDescription>
-                            Are you sure you want to delete{" "}
-                            <span className="font-semibold text-red-600">
-                              {deleteUser?.name}
-                            </span>
-                            ? <br /> This action cannot be undone.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter>
-                          <Button
-                            variant="outline"
-                            onClick={() => setDeleteUser(null)}
+                      {/* Delete Dialog */}
+                      <Dialog
+                        open={!!deleteUser && deleteUser.name === item.name}
+                        onOpenChange={(open) =>
+                          !open ? setDeleteUser(null) : setDeleteUser(item)
+                        }
+                      >
+                        <DialogTrigger asChild>
+                          <button
+                            className="p-2 hover:bg-gray-100 rounded"
+                            title="Delete"
+                            onClick={() => setDeleteUser(item)}
                           >
-                            Cancel
-                          </Button>
-                          <Button
-                            className="orange p-2 rounded-md"
-                            onClick={handleDelete}
-                          >
-                            Delete
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-
+                            <Delete />
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Delete Confirmation</DialogTitle>
+                            <DialogDescription>
+                              Are you sure you want to delete{" "}
+                              <span className="font-semibold text-red-600">
+                                {deleteUser?.name}
+                              </span>
+                              ? <br /> This action cannot be undone.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter>
+                            <Button
+                              variant="outline"
+                              onClick={() => setDeleteUser(null)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              className="orange p-2 rounded-md"
+                              onClick={handleDelete}
+                            >
+                              Delete
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
       {/* Pagination Controls */}
-      <div className="flex items-center justify-between mt-4">
+      <div className="flex items-center md:justify-between md:flex-row flex-col mt-4">
         <div className="text-sm text-gray-600">
           Showing {(page - 1) * rowsPerPage + 1} to{" "}
           {Math.min(page * rowsPerPage, data.length)} from {data.length} records

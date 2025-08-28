@@ -366,7 +366,7 @@ export const SubscriptionPlan = () => {
       <h2 className="font-semibold tracking-wider text-xl text-[#1C1B1F]">
         All subscription plans
       </h2>
-      <div className="max-w-screen w-full overflow-x-auto">
+      <div className=" w-full overflow-x-auto">
         <Table className="">
           <TableHeader>
             <TableRow>

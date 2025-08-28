@@ -7,8 +7,8 @@ interface PlatformStatsCardProps {
 
 export const PlatformStatsCard = ({ data }: PlatformStatsCardProps) => {
   return (
-    <div className="">
-      <div className="grid lg:grid-cols-3 gap-4">
+
+      <div className="grid lg:grid-cols-3 gap-4 max-md:max-w-[90vw]">
         {data.map((item, index) => (
           <div
             key={index}
@@ -47,20 +47,8 @@ export const PlatformStatsCard = ({ data }: PlatformStatsCardProps) => {
                   </div>
                 </div>
               ))}
-            {/* <div className="flex justify-between ">
-
-              <span>{item.rate}</span>
-              <p className="text-sm text-gray-600">{item.percentage} %</p>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-blue-600 h-2 rounded-full"
-                style={{ width: `${item.percentage}%` }}
-              ></div>
-            </div> */}
           </div>
         ))}
       </div>
-    </div>
   );
 };

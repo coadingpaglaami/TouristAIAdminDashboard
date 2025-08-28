@@ -67,7 +67,7 @@ const chartConfig = {
 
 export const PieChartStatus = () => {
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col rounded-lg">
       <CardHeader className="flex flex-col py-1">
         <CardTitle className="tracking-wider text-lg font-medium text-[#1C1B1F]">
           User Status Distribution

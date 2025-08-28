@@ -6,8 +6,7 @@ interface UserTypesCardProps {
 
 export const UserTypesCard = ({ data }: UserTypesCardProps) => {
   return (
-    <div className="">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-md:w-full">
         {data.map((item, index) => (
           <div key={index} className="border rounded-lg p-4 bg-white">
             <div className="flex flex-col gap-4">
@@ -30,6 +29,5 @@ export const UserTypesCard = ({ data }: UserTypesCardProps) => {
           </div>
         ))}
       </div>
-    </div>
   );
 };

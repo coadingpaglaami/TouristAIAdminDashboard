@@ -12,6 +12,12 @@ import { ReactNode, useMemo, useState } from "react";
 import Image from "next/image"; // Example action icon
 import { Chevron, ChevronNext, RemoveIcon } from "@/svg/Action";
 import { Visible } from "@/svg/OverView";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface ActivityTable {
   image: string;
@@ -192,10 +198,10 @@ export const ActivityTable = () => {
   const paginationNumbers = getPagination(page, totalPages);
 
   return (
-    <div className="flex flex-col gap-3 bg-white p-4 rounded-lg overflow-hidden">
+    <div className="flex flex-col gap-3 bg-white p-4 rounded-lg">
       <h3 className="text-2xl tracking-wider">User Activity</h3>
-      <div className=" max-w-screen overflow-x-auto">
-        <Table>
+      <div className="overflow-x-auto max-w-screen">
+        <Table className="w-full">
           <TableHeader>
             <TableRow>
               <TableHead className="text-xs text-[#969696]">User</TableHead>
@@ -217,7 +223,6 @@ export const ActivityTable = () => {
               const isBlocked = blocked[globalIdx];
               return (
                 <TableRow key={index} className="border-none">
-                  {/* User */}
                   <TableCell
                     className={isBlocked ? "opacity-30" : "opacity-100"}
                   >
@@ -234,7 +239,7 @@ export const ActivityTable = () => {
                       <span className="font-medium">{item.name}</span>
                     </div>
                   </TableCell>
-                  {/* Activity Type */}
+
                   <TableCell
                     className={isBlocked ? "opacity-30" : "opacity-100"}
                   >
@@ -248,19 +253,16 @@ export const ActivityTable = () => {
                       {item.activity}
                     </span>
                   </TableCell>
-                  {/* Details */}
                   <TableCell
                     className={isBlocked ? "opacity-30" : "opacity-100"}
                   >
                     {item.Details}
                   </TableCell>
-                  {/* Time */}
                   <TableCell
                     className={isBlocked ? "opacity-30" : "opacity-100"}
                   >
                     {item.time}
                   </TableCell>
-                  {/* Status */}
                   <TableCell
                     className={isBlocked ? "opacity-30" : "opacity-100"}
                   >
@@ -276,17 +278,38 @@ export const ActivityTable = () => {
                       </span>
                     </div>
                   </TableCell>
-                  {/* Photo */}
                   <TableCell
                     className={isBlocked ? "opacity-30" : "opacity-100"}
                   >
-                    <Image
+                    {/* <Image
                       src={item.photo}
                       alt="photo"
                       height={32}
                       width={32}
                       className="w-8 h-8 rounded"
-                    />
+                    /> */}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button className="p-0 border-0 bg-transparent hover:bg-transparent focus:ring-0">
+                          <Image
+                            src={item.photo}
+                            alt="photo"
+                            height={32}
+                            width={32}
+                            className="w-8 h-8 rounded"
+                          />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[425px] flex justify-center items-center">
+                        <Image
+                          src={item.photo}
+                          alt="photo"
+                          height={256}
+                          width={256}
+                          className="rounded object-contain max-h-[60vh] max-w-full"
+                        />
+                      </DialogContent>
+                    </Dialog>
                   </TableCell>
                   {/* Action */}
                   <TableCell>
@@ -307,7 +330,6 @@ export const ActivityTable = () => {
           </TableBody>
         </Table>
       </div>
-      {/* Pagination and total count */}
       <div className="flex md:items-center md:flex-row md:justify-between flex-col mt-4">
         <div className="text-sm text-gray-600">
           Showing {(page - 1) * perPage + 1} to{" "}

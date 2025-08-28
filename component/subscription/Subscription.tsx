@@ -26,7 +26,7 @@ import { useId } from "react";
 export const Subscription = () => {
   const id = useId();
   return (
-    <div className="py-6 px-4 ">
+    <div className="py-6 px-4 max-w-screen overflow-hidden">
       {/* <button className="orange p-3 rounded-md  flex items-center  gap-2 float-right mb-4">
         <Add />{" "}
         <span className="text-[16px] text-white tracking-wider font-light">
