@@ -6,7 +6,6 @@ import {
   SheetContent,
   SheetFooter,
   SheetHeader,
-
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
@@ -14,6 +13,7 @@ import {
   CardMemberShipWhite,
   Dashboard,
   DashboardWhite,
+  LogOut,
   MangeAccounts,
   MangeAccountsWhite,
   Message,
@@ -31,9 +31,12 @@ import { usePathname } from "next/navigation";
 import Link from "next/dist/client/link";
 import { useState } from "react";
 import Image from "next/image";
-export const NavBar = () => {
+interface NavBarProps {
+  isprofile?: boolean;
+}
+export const NavBar = ({ isprofile }: NavBarProps) => {
   const pathname = usePathname();
-  const [profile, openprofile] = useState(false);
+  const [profile, openprofile] = useState(isprofile || false);
   const menus = [
     {
       path: "/admin/dashboard",
@@ -178,10 +181,9 @@ export const NavBar = () => {
               )}
             </div>
             <SheetFooter>
-              {!profile && (
+              {!profile ? (
                 <Link
                   href="/admin/profile"
-                  onClick={() => openprofile(!profile)}
                   className="flex gap-2 mx-2 items-center justify-between"
                 >
                   <Image
@@ -193,14 +195,22 @@ export const NavBar = () => {
                   />
 
                   {/* Profile details - Desktop only */}
-                  <div className=" flex-col gap-1 text-[#854C3A]  lg:flex">
+                  <div className=" flex-col gap-1 text-[#854C3A] hidden xl:flex">
                     <span className="text-lg font-medium">Ostain Alex</span>
                     <span className="font-thin">TRIPMATE</span>
                   </div>
 
-                  <div className="">
+                  <div className="hidden xl:block">
                     <Settings />
                   </div>
+                </Link>
+              ) : (
+                <Link
+                  href={"/"}
+                  className="flex items-center justify-center mb-4 gap-2 font-semibold text-lg"
+                >
+                  <LogOut />{" "}
+                  <span className="text-[#854C3A] tracking-wider">Log Out</span>
                 </Link>
               )}
             </SheetFooter>

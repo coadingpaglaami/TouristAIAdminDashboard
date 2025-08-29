@@ -14,7 +14,7 @@ export default function DashboardLayOut({ children }: { children: ReactNode }) {
         <div className="md:flex-1 bg-[#F4F4F4] md:pl-4 ">
           {/* Navbar */}
           <div className="h-20 w-full  bg-white border-b border-gray-200 sticky top-0 z-20">
-            <NavBar />
+            <NavBar isprofile={true} />
           </div>
           <div className="overflow-hidden">{children}</div>
         </div>
