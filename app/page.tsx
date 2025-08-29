@@ -1,4 +1,3 @@
-import { Home } from "@/component/home";
 import { redirect } from "next/navigation";
 
 export default function HomePage() {

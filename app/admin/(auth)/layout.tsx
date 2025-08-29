@@ -22,7 +22,7 @@ export default function AuthLayOut({ children }: AuthLayoutProps) {
 
       {/* Content */}
       <div className="grid w-full min-h-screen place-items-center p-5">
-        <div className="p-10 px-5 md:px-20 relative z-20 bg-white/5 max-w-[800px] w-full mx-auto text-white rounded-lg">
+        <div className="p-10 px-5 md:px-20 relative z-20 bg-white/5 max-w-[500px] w-full mx-auto text-white rounded-lg">
           {children}
         </div>
       </div>

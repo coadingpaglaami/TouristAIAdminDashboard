@@ -109,16 +109,19 @@ export const SubscriptionPlan = () => {
   const totalPages = Math.ceil(plans.length / rowsPerPage);
 
   const toggleStatus = (index: number) => {
-    setPlans((prev) =>
-      prev.map((plan, i) =>
-        i === index
+    setPlans((prev) => {
+      return prev.map((plan, i) => {
+        if (i === index) {
+          console.log("Toggling status for plan:", plan);
+        }
+        return i === index
           ? {
               ...plan,
               status: plan.status === "Active" ? "Inactive" : "Active",
             }
-          : plan
-      )
-    );
+          : plan;
+      });
+    });
   };
 
   const handleDelete = () => {

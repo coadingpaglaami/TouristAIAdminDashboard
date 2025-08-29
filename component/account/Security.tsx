@@ -70,8 +70,8 @@ export const Security = () => {
             </span>
           </div>
         </div>
-        <div className="flex md:justify-between md:flex-row flex-col gap-8 tracking-wider">
-          <div className="mb-4 flex-1">
+        <div className="flex md:justify-between md:flex-row flex-col md:gap-8 tracking-wider">
+          <div className="md:mb-4 mb-2 flex-1">
             <label
               htmlFor="profile-name"
               className="block text-sm mb-2"
@@ -89,7 +89,7 @@ export const Security = () => {
             />
           </div>
 
-          <div className="mb-6 flex-1">
+          <div className="md:mb-6 mb-2 flex-1">
             <label
               htmlFor="password"
               className="block text-sm mb-2"
