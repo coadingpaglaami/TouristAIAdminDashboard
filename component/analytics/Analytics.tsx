@@ -5,25 +5,23 @@ import { RevenueLeaderBoard } from "./RevenueLeaderBoard";
 
 export const Analytics = () => {
   return (
-    <div className="flex flex-col gap-8 w-full lg:h-[78vh] my-8 px-4 max-md:max-w-screen max-md:overflow-hidden">
-      <div className="grid md:grid-cols-2 gap-4 w-full h-1/2 " >
-        <div className="w-full h-full bg-white rounded-lg">
+    <div className="flex flex-col gap-4 w-full my-4 md:my-6 lg:my-8 px-2 sm:px-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full" >
+        <div className="w-full bg-white rounded-lg">
           <BarChartReturn />
         </div>
-        <div className="w-full h-full bg-white rounded-lg">
-          {/* <PieChartStatus /> */}
+        <div className="w-full bg-white rounded-lg">
           <PieChartStatus />
         </div>
       </div>
-      <div className="flex flex-col gap-4 w-full md:flex-row lg:h-1/2 lg:my-8">
-        <div className="lg:w-[65%] h-full rounded-lg">
+      <div className="flex flex-col md:flex-row gap-4 w-full">
+        <div className="md:w-[65%] rounded-lg">
           <BarChartRevenue />
         </div>
-        <div className=" lg:w-[35%] h-full rounded-lg ">
+        <div className="md:w-[35%] rounded-lg">
             <RevenueLeaderBoard />
         </div>
       </div>
     </div>
   );
 };
-
