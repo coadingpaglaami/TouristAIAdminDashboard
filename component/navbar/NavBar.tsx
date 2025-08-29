@@ -217,7 +217,7 @@ export const NavBar = ({ isprofile }: NavBarProps) => {
           </SheetContent>
         </Sheet>
       </div>
-      Good morning “Jason Wancs”
+      <div className="max-md:text-sm">Good morning “Jason Wancs”</div>
     </div>
   );
 };

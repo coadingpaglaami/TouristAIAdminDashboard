@@ -19,8 +19,8 @@ export const UserActivity = () => {
   return (
     <div className="w-full overflow-hidden max-md:max-w-screen ">
       <div className="flex flex-col gap-3 py-10 px-4">
-        <div className="flex md:justify-between md:items-center gap-4 flex-col md:flex-row w-full">
-          <div className="*:not-first:mt-2 max-w-[400px] w-full">
+        <div className="flex md:justify-between md:items-center gap-4 flex-col md:flex-row w-full ">
+          <div className="*:not-first:mt-2 md:max-w-[400px] w-full ">
             <div className="relative">
               <Input
                 className="peer ps-9 pe-9 focus:outline-none focus:ring-0 focus-visible:ring-0 focus:border-1 focus:border-gray-300"
@@ -34,9 +34,9 @@ export const UserActivity = () => {
               </div>
             </div>
           </div>
-          <div className="flex gap-2 items-center justify-end max-w-[320px] float-right w-1/2 ">
+          <div className="flex gap-2 md:items-center md:justify-end md:max-w-[320px] md:w-1/2 w-full ">
             <Select value={activity ?? "all"} onValueChange={setActivity}>
-              <SelectTrigger className="w-1/2">
+              <SelectTrigger className="" >
                 <SelectValue placeholder="Activity" />
               </SelectTrigger>
               <SelectContent>

@@ -1,12 +1,12 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
-  Title,
+  Title as ChartTitle,
   Tooltip,
   Legend,
   ChartOptions,
@@ -14,16 +14,26 @@ import {
 import { Bar } from "react-chartjs-2";
 
 // Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, ChartTitle, Tooltip, Legend);
 
-const chartDataWeek = [
+type ChartRange = "week" | "month" | "year";
+
+interface WeekData {
+  day: string;
+  returningUser: number;
+}
+
+interface MonthData {
+  week: string;
+  returningUser: number;
+}
+
+interface YearData {
+  month: string;
+  returningUser: number;
+}
+
+const chartDataWeek: WeekData[] = [
   { day: "Mon", returningUser: 32 },
   { day: "Tue", returningUser: 45 },
   { day: "Wed", returningUser: 51 },
@@ -33,14 +43,14 @@ const chartDataWeek = [
   { day: "Sun", returningUser: 41 },
 ];
 
-const chartDataMonth = [
+const chartDataMonth: MonthData[] = [
   { week: "Week 1", returningUser: 186 },
   { week: "Week 2", returningUser: 305 },
   { week: "Week 3", returningUser: 237 },
   { week: "Week 4", returningUser: 73 },
 ];
 
-const chartDataYear = [
+const chartDataYear: YearData[] = [
   { month: "Jan", returningUser: 210 },
   { month: "Feb", returningUser: 180 },
   { month: "Mar", returningUser: 250 },
@@ -55,30 +65,35 @@ const chartDataYear = [
   { month: "Dec", returningUser: 195 },
 ];
 
-// State for switching chart data
-type ChartRange = "week" | "month" | "year";
-
-const chartDataMap = {
+const chartDataMap: Record<ChartRange, WeekData[] | MonthData[] | YearData[]> = {
   week: chartDataWeek,
   month: chartDataMonth,
   year: chartDataYear,
 };
 
-const xAxisKeyMap: Record<ChartRange, string> = {
-  week: "day",
-  month: "week",
-  year: "month",
-};
+// const xAxisKeyMap: Record<ChartRange, string> = {
+//   week: "day",
+//   month: "week",
+//   year: "month",
+// };
 
 export const BarChartReturn = () => {
   const [range, setRange] = useState<ChartRange>("year");
   const chartData = chartDataMap[range];
-  const xAxisKey = xAxisKeyMap[range];
-  
+  // const xAxisKey = xAxisKeyMap[range];
+
   // Prepare data for Chart.js
-  const labels = chartData.map(item => item[xAxisKey as keyof typeof item[0]]);
-  const dataValues = chartData.map(item => item.returningUser);
-  
+  const labels = chartData.map((item) => {
+    if (range === "week") {
+      return (item as WeekData).day;
+    } else if (range === "month") {
+      return (item as MonthData).week;
+    } else {
+      return (item as YearData).month;
+    }
+  });
+  const dataValues = chartData.map((item) => item.returningUser);
+
   const data = {
     labels,
     datasets: [
@@ -91,7 +106,7 @@ export const BarChartReturn = () => {
       },
     ],
   };
-  
+
   const options: ChartOptions<"bar"> = {
     responsive: true,
     maintainAspectRatio: false,
@@ -128,7 +143,6 @@ export const BarChartReturn = () => {
       },
       y: {
         grid: {
-          drawBorder: false,
           color: "#E5E5E5",
         },
         ticks: {

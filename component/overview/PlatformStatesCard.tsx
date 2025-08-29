@@ -50,20 +50,20 @@ export const PlatformStatsCard = ({ data }: PlatformStatsCardProps) => {
                 {item.icon}
                 <span className="flex items-center gap-2">
                   <ArrowUp className="text-green-500 w-4 h-4" />
-                  <p className="text-xs text-green-500 flex flex-row gap-2">
-                    {item.comppercentage}% <p className="text-gray-300">from last month</p>
-                  </p>
+                  <span className="text-xs text-green-500 flex flex-row gap-2">
+                    {item.comppercentage}%{" "}
+                    <p className="text-gray-300">from last month</p>
+                  </span>
                 </span>
               </div>
               {Array.isArray(item.rate) &&
                 item.rate.map((rateItem, rateIndex) => (
                   <React.Fragment key={rateIndex}>
                     <div className="flex items-center gap-4">
-                      <span className="text-sm">
-                        {rateItem.name} 
-                      </span>
+                      <span className="text-sm">{rateItem.name}</span>
                       <p className=" text-sm">
-                        {(rateItem.somenum ?? 0).toLocaleString()}{" "}{rateItem.suffix}
+                        {(rateItem.somenum ?? 0).toLocaleString()}{" "}
+                        {rateItem.suffix}
                       </p>
                     </div>
                   </React.Fragment>

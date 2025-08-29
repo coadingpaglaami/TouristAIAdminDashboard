@@ -118,7 +118,8 @@ export const RevenueLeaderBoard = () => {
           </div>
         </div>
       </div>
-      <Table className=" w-full border-t border-gray-300 ">
+      <div className="md:max-w-[35vw] overflow-x-auto">
+      <Table className=" w-full border-t border-gray-300 overflow-y-scroll">
         <TableBody className="w-full">
           {leaderboardData[timeframe].map((entry) => (
             <TableRow key={entry.rank} className="border-none">
@@ -140,6 +141,7 @@ export const RevenueLeaderBoard = () => {
           ))}
         </TableBody>
       </Table>
+      </div>
     </div>
   );
 };

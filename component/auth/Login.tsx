@@ -13,6 +13,7 @@ interface FormData {
 export const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState("");
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
@@ -26,9 +27,15 @@ export const Login = () => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Form Submitted:", formData);
-
-    // Dummy redirect (no API)
-    router.push("/");
+    if (
+      formData.email === "json@gmail.com" &&
+      formData.password === "password123"
+    ) {
+      // Dummy redirect (no API)
+      router.push("/admin/dashboard");
+    } else {
+      setErrorMessage("Invalid email or password");
+    }
   };
 
   return (
@@ -38,6 +45,9 @@ export const Login = () => {
       </h4>
 
       <form onSubmit={handleSubmit} className="grid gap-2">
+        {errorMessage && (
+          <p className="text-red-500 text-sm text-center">{errorMessage}</p>
+        )}
         {/* Email */}
         <div>
           <label htmlFor="email" className="text-sm font-medium text-white">
