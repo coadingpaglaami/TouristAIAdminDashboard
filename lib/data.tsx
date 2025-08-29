@@ -1,3 +1,4 @@
+import { Schedule } from "@/svg/Action";
 import { Group, PersonAdd, PersonRemove, Productivity } from "@/svg/OverView";
 import React from "react";
 
@@ -11,15 +12,17 @@ export type UserType = {
 };
 export type Rating = {
   name: string;
-  percentage: number;
-  rating: number;
+  somenum: number;
+  suffix?: string;
 };
 
 export type PlatformStats = {
   name: string;
   icon: React.ReactNode;
-  numuser: number;
+  numuser?: number;
+  comppercentage?: number;
   rate: Rating[] | string;
+  isGraph: boolean;
 };
 
 export type CategoryStats = {
@@ -86,25 +89,28 @@ export const dataByPeriod: Record<TimePeriod, DataCollection> = {
       {
         name: "Daily Active Users",
         icon: <UserIcon />,
+        isGraph: true,
         numuser: 850,
-        rate: [{ name: "Engagment Rate", percentage: 68, rating: 0 }],
+        rate: [{ name: "Engagment Rate", somenum: 32 }],
       },
       {
-        name: "App Rating by user",
-        icon: <UserIcon />,
-        numuser: 320,
+        name: "Boosting stats",
+        icon:<span className="orange p-2"><Schedule /></span> ,
+        isGraph: false,
+        comppercentage: 12.5,
         rate: [
-          { name: "Average Rating", percentage: 40, rating: 4.8 },
-          { name: "Average Rating", percentage: 35, rating: 4.5 },
+          { name: "Total Boosted Hours", somenum: 1250,suffix:"hours" },
+          { name: "Boosting Engagement Rate", somenum: 41.67,suffix:"%" },
         ],
       },
       {
-        name: "Top region user",
+        name: "Searh Activity Stats",
         icon: <UserIcon />,
-        numuser: 80,
+        isGraph: false,
+        comppercentage: 15.4,
         rate: [
-          { name: "Bangladesh", percentage: 66.4, rating: 0 },
-          { name: "India", percentage: 33.6, rating: 0 },
+          { name: "Total Searches", somenum: 3450,suffix:"searches" },
+          { name: "Search Engagement Rate", somenum: 29.36,suffix:"%" },
         ],
       },
     ],
@@ -175,32 +181,36 @@ export const dataByPeriod: Record<TimePeriod, DataCollection> = {
       {
         name: "Daily Active Users",
         icon: <UserIcon />,
+        isGraph: true,
         numuser: 850,
-        rate: [{ name: "Engagment Rate", percentage: 68, rating: 0 }],
+        rate: [{ name: "Engagment Rate", somenum: 35 }],
       },
       {
-        name: "App Rating by user",
-        icon: <UserIcon />,
+        name: "Boosting stats",
+        icon: <span className="orange p-2"><Schedule /></span>,
+        isGraph: false,
+        comppercentage: 12.5,
         numuser: 320,
         rate: [
-          { name: "Average Rating", percentage: 40, rating: 4.8 },
-          { name: "Average Rating", percentage: 35, rating: 4.5 },
+          { name: "Total Boosted Hours", somenum: 1450,suffix:"hours" },
+          { name: "Average Rating", somenum: 50,suffix:"%" },
         ],
       },
       {
-        name: "Top region user",
+        name: "Search Activity Stats",
         icon: <UserIcon />,
-        numuser: 80,
+        isGraph: false,
+        comppercentage: 20.5,
         rate: [
-          { name: "Bangladesh", percentage: 66.4, rating: 0 },
-          { name: "India", percentage: 33.6, rating: 0 },
+          { name: "Total Searches", somenum: 4500,suffix:"searches" },
+          { name: "Search Engagement Rate", somenum: 75.2,suffix:"%" },
         ],
       },
     ],
     categoryStats: [
-      { name: "Premium user insights", percentage: 45 },
-      { name: "Renewal rate", percentage: 30 },
-      { name: "Churn rate", percentage: 25 },
+      { name: "Premium user insights", percentage: 60 },
+      { name: "Renewal rate", percentage: 34 },
+      { name: "Churn rate", percentage: 15 },
     ],
     userActivities: [
       {
@@ -264,32 +274,35 @@ export const dataByPeriod: Record<TimePeriod, DataCollection> = {
       {
         name: "Daily Active Users",
         icon: <UserIcon />,
+        isGraph: true,
         numuser: 850,
-        rate: [{ name: "Engagment Rate", percentage: 68, rating: 0 }],
+        rate: [{ name: "Total Boosted hours", somenum: 1360 }],
       },
       {
-        name: "App Rating by user",
-        icon: <UserIcon />,
-        numuser: 320,
+        name: "Boosting stats",
+        icon: <span className="orange p-2"><Schedule /></span>,
+        isGraph: false,
+        comppercentage: 19,
         rate: [
-          { name: "Average Rating", percentage: 40, rating: 4.8 },
-          { name: "Average Rating", percentage: 35, rating: 4.5 },
+          { name: "Total Boosted Hours", somenum: 4500,suffix:"hours" },
+          { name: "Boosting Engagement Rate", somenum: 56,suffix:"%" },
         ],
       },
       {
-        name: "Top region user",
+        name: "Search Activity Stats",
         icon: <UserIcon />,
-        numuser: 80,
+        isGraph: false,
+        comppercentage: 25.4,
         rate: [
-          { name: "Bangladesh", percentage: 66.4, rating: 0 },
-          { name: "India", percentage: 33.6, rating: 0 },
+          { name: "Total Searches", somenum: 8000,suffix:"searches" },
+          { name: "Search Engagement Rate", somenum: 45.6,suffix:"%" },
         ],
       },
     ],
     categoryStats: [
-      { name: "Premium user insights", percentage: 45 },
-      { name: "Renewal rate", percentage: 30 },
-      { name: "Churn rate", percentage: 25 },
+      { name: "Premium user insights", percentage: 60 },
+      { name: "Renewal rate", percentage: 40 },
+      { name: "Churn rate", percentage: 20 },
     ],
     userActivities: [
       {

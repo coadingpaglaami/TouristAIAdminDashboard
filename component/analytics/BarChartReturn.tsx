@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
@@ -70,7 +70,7 @@ export const BarChartReturn = () => {
 
   return (
     <div className="">
-      <Card className= " rounded-lg">
+      <Card className= "rounded-lg">
         <CardHeader>
           <CardTitle className="tracking-wider text-lg">
             Returning Users
