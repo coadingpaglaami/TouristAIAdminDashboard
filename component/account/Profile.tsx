@@ -6,8 +6,8 @@ import { useState } from "react";
 export const Profile = () => {
   // Set default values for profile photo, name, and email
   const [profileName, setProfileName] = useState("Jason Wanchs");
-  const [email, setEmail] = useState("jasonwanchs@mail.com");
-  console.log(setEmail("hello"))
+  const [email] = useState("jasonwanchs@mail.com");
+  // console.log(setEmail("hello"))
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
