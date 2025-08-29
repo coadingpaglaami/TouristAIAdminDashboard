@@ -24,7 +24,7 @@ export const Security = () => {
   return (
     <div className=" p-6">
       <form onSubmit={handleSubmit}>
-        <div className="flex items-center mb-6 gap-3">
+        <div className="flex items-center mb-6 gap-4">
           <label
             htmlFor="profile-photo"
             className="flex justify-center items-center w-24 h-24 border-2  rounded-full cursor-pointer relative"
@@ -70,7 +70,7 @@ export const Security = () => {
             </span>
           </div>
         </div>
-        <div className="flex md:justify-between md:flex-row flex-col gap-4 tracking-wider">
+        <div className="flex md:justify-between md:flex-row flex-col gap-8 tracking-wider">
           <div className="mb-4 flex-1">
             <label
               htmlFor="profile-name"

@@ -1,34 +1,58 @@
+"use client";
 import { SearchIcon } from "@/svg/Action";
 import { ActivityTable } from "./ActivityTable";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 export const UserActivity = () => {
+  const [search, setSearch] = useState("");
+  const [activity, setActivity] = useState<string | undefined>(undefined);
   return (
     <div className="w-full overflow-hidden max-md:max-w-screen ">
-    <div className="flex flex-col gap-3 py-10 px-4">
-      <div className="flex md:justify-between md:items-center gap-4 flex-col md:flex-row w-full">
-        <div className="flex items-center gap-2 rounded-md border border-gray-300 px-4 w-full md:max-w-[400px]">
-          <SearchIcon />
-          <input
-            type="text"
-            placeholder="Search"
-            className="p-2  focus:outline-none"
-          />
+      <div className="flex flex-col gap-3 py-10 px-4">
+        <div className="flex md:justify-between md:items-center gap-4 flex-col md:flex-row w-full">
+          <div className="*:not-first:mt-2 max-w-[400px] w-full">
+            <div className="relative">
+              <Input
+                className="peer ps-9 pe-9 focus:outline-none focus:ring-0 focus-visible:ring-0 focus:border-1 focus:border-gray-300"
+                placeholder="Search..."
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+                <SearchIcon />
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-2 items-center justify-end max-w-[320px] float-right w-1/2 ">
+            <Select value={activity ?? "all"} onValueChange={setActivity}>
+              <SelectTrigger className="w-1/2">
+                <SelectValue placeholder="Activity" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Activity</SelectLabel>
+                  <SelectItem value="all">All Activity</SelectItem>
+                  <SelectItem value="Upload">Upload</SelectItem>
+                  <SelectItem value="Clicked">Clicked</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+
+          </div>
         </div>
-        <div className="flex gap-2 md:flex-row flex-col  md:max-w-[350px] w-full ">
-          <select className="border border-gray-300 rounded-md p-3 w-1/2">
-            <option value="all">All Activity</option>
-            <option value="active">Upload</option>
-            <option value="inactive">Clicked</option>
-          </select>
-          <select className="border border-gray-300 rounded-md p-3 w-1/2">
-            <option value="all">All Status</option>
-            <option value="active">Free</option>
-            <option value="inactive">Premium</option>
-          </select>
-        </div>
+        <ActivityTable search={search} activity={activity} />
       </div>
-      <ActivityTable />
-    </div>
     </div>
   );
 };

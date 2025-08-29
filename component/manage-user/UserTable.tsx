@@ -17,6 +17,7 @@ import {
   Chevron,
   ChevronNext,
   Edit,
+  Instruction,
 } from "@/svg/Action";
 import {
   Dialog,
@@ -36,6 +37,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface UserTable {
   image: string;
@@ -52,6 +58,7 @@ interface UserTable {
     | "3 Days"
     | "7 Days"
     | "15 Days";
+  isBanned: boolean;
 }
 
 const generateDummyData = (count: number): UserTable[] => {
@@ -153,7 +160,6 @@ const generateDummyData = (count: number): UserTable[] => {
   ];
 
   const getRandomTimeAgo = () => {
-    // const now = new Date();
     const random = Math.random();
 
     if (random < 0.33) {
@@ -187,6 +193,7 @@ const generateDummyData = (count: number): UserTable[] => {
     email: emails[i % emails.length],
     lastactive: getRandomTimeAgo(),
     duration: durations[Math.floor(Math.random() * durations.length)],
+    isBanned: Math.random() < 0.2, // 20% chance to be banned
   }));
 };
 
@@ -277,7 +284,44 @@ export const UserTable = () => {
               <TableHead className="text-xs text-[#969696]">
                 Last Active
               </TableHead>
-              <TableHead className="text-xs text-[#969696]">Action</TableHead>
+              <TableHead className="text-xs text-[#969696] px-6">
+                <div className="flex items-center gap-2 ">
+                  <span className="text-xs">Action</span>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="border-none ">
+                        <Instruction />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-64 p-2">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <span>
+                            {" "}
+                            <Edit />
+                          </span>
+                          <span className="pb-1 text-sm">
+                            Edit User Information
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span>
+                            {" "}
+                            <Block />
+                          </span>
+                          <span className="pb-1 text-sm">Block User</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span>
+                            <Delete />
+                          </span>
+                          <span className="pb-1 text-sm">Delete User</span>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className="tracking-wider">
@@ -373,9 +417,11 @@ export const UserTable = () => {
                             <Edit />
                           </button>
                         </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Change user subscription status</DialogTitle>
+                        <DialogContent className="p-0">
+                          <DialogHeader className="border-b border-gray-300">
+                            <DialogTitle className="p-4">
+                              Change user subscription status
+                            </DialogTitle>
                           </DialogHeader>
                           <div className="flex items-center gap-2 p-6">
                             <Image
@@ -436,14 +482,14 @@ export const UserTable = () => {
                               </div>
                             </form>
                           </div>
-                          <DialogFooter>
+                          <DialogFooter className="p-4">
                             <Button
                               variant="outline"
                               onClick={() => setSelectedUser(null)}
                             >
                               Cancel
                             </Button>
-                            <Button className="orange">Save Changes</Button>
+                            <Button className="orange">Activate</Button>
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>

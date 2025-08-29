@@ -15,17 +15,20 @@ import {
   CardMemberShipWhite,
   MessageSmall,
   Settings,
+  LogOut,
 } from "@/svg/Sidebaar";
 
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+interface SidebaarProps {
+  isProfile?: boolean;
+}
 
-
-export const Sidebaar = () => {
+export const Sidebaar = ({ isProfile }: SidebaarProps) => {
   const pathname = usePathname();
-  const [profile, openprofile] = useState(false);
+  const [profile, openprofile] = useState(isProfile || false);
   const menus = [
     {
       path: "/admin/dashboard",
@@ -84,7 +87,8 @@ export const Sidebaar = () => {
       <div className="flex flex-col gap-2">
         {/* Logo + Text */}
         <Link
-          href="/admin/dashboard" onClick={() => openprofile(false)}
+          href="/admin/dashboard"
+          onClick={() => openprofile(false)}
           className="flex flex-col rounded-lg justify-center items-center gap-2"
         >
           {/* Large Logo - Desktop */}
@@ -146,7 +150,7 @@ export const Sidebaar = () => {
       </div>
 
       {/* Profile Section */}
-      {!profile && (
+      {!profile ? (
         <Link
           href="/admin/profile"
           onClick={() => openprofile(!profile)}
@@ -169,6 +173,10 @@ export const Sidebaar = () => {
           <div className="hidden xl:block">
             <Settings />
           </div>
+        </Link>
+      ):(
+        <Link href={'/'} className="flex items-center justify-center mb-4 gap-2 font-semibold text-lg">
+        <LogOut/> <span className="text-[#854C3A] tracking-wider">Log Out</span>
         </Link>
       )}
     </div>

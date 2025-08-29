@@ -49,13 +49,13 @@ export const Overview = () => {
             </div>
           </div>
           {/* Category Stats */}
-          <div className="flex gap-4 flex-col md:flex-row md:h-[420px]">
-            <div className="lg:w-1/2 h-full">
+          <div className="flex gap-4 flex-col md:flex-row md:justify-between md:h-[420px]">
+            <div className="lg:w-1/2 w-full h-full">
               <CategoryStatsCard data={data.categoryStats} />
             </div>
 
             {/* User Activities - Full width */}
-            <div className="lg:col-span-2 lg:w-1/2 h-full">
+            <div className="lg:col-span-2 w-full lg:w-1/2 h-full">
               <UserActivitiesCard data={data.userActivities} />
             </div>
           </div>
