@@ -15,10 +15,9 @@ import {
 
 export const ManageUser = () => {
   const [search, setSearch] = useState("");
-  const [subscription, setSubscription] = useState<string | null>(
-    null
-  );
-  const [banned, setBanned] = useState<string | null>("all");
+  const [subscription, setSubscription] = useState<string>("all");
+  const [banned, setBanned] = useState<string>("all");
+  
   return (
     <div className="flex flex-col gap-8 py-10 px-4 max-md:max-w-screen overflow-hidden">
       <div className="flex md:justify-between md:items-center gap-4 flex-col md:flex-row w-full">
@@ -37,7 +36,7 @@ export const ManageUser = () => {
           </div>
         </div>
         <div className="flex gap-2 items-center max-w-[320px] w-full ">
-          <Select value={subscription ?? "all"} onValueChange={setSubscription}>
+          <Select value={subscription} onValueChange={setSubscription}>
             <SelectTrigger className="w-1/2">
               <SelectValue placeholder="Subscription" />
             </SelectTrigger>
@@ -45,13 +44,13 @@ export const ManageUser = () => {
               <SelectGroup>
                 <SelectLabel>Subscription</SelectLabel>
                 <SelectItem value="all">All Subscription</SelectItem>
-                <SelectItem value="Upload">Free</SelectItem>
-                <SelectItem value="Clicked">Premium</SelectItem>
+                <SelectItem value="Free">Free</SelectItem>
+                <SelectItem value="Premium">Premium</SelectItem>
                 <SelectItem value="Expired">Expired</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
-          <Select value={banned ?? "all"} onValueChange={setBanned}>
+          <Select value={banned} onValueChange={setBanned}>
             <SelectTrigger className="w-1/2">
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
@@ -66,7 +65,11 @@ export const ManageUser = () => {
           </Select>
         </div>
       </div>
-      <UserTable  />
+      <UserTable 
+        search={search}
+        subscriptionFilter={subscription}
+        bannedFilter={banned}
+      />
     </div>
   );
 };

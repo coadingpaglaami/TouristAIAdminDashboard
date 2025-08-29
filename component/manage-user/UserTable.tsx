@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import {
   Delete,
@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/popover";
 
 interface UserTable {
+  id: number;
   image: string;
   name: string;
   status: "Inactive" | "Active";
@@ -51,13 +52,13 @@ interface UserTable {
   email: string;
   lastactive: string;
   duration?:
-    | "1 Hour"
-    | "6 Hours"
-    | "12 Hours"
-    | "1 Day"
-    | "3 Days"
-    | "7 Days"
-    | "15 Days";
+  | "1 Hour"
+  | "6 Hours"
+  | "12 Hours"
+  | "1 Day"
+  | "3 Days"
+  | "7 Days"
+  | "15 Days";
   isBanned: boolean;
 }
 
@@ -149,6 +150,7 @@ const generateDummyData = (count: number): UserTable[] => {
     "Active",
     "Inactive",
   ];
+
   const durations: Array<UserTable["duration"]> = [
     "1 Hour",
     "6 Hours",
@@ -186,6 +188,7 @@ const generateDummyData = (count: number): UserTable[] => {
   };
 
   return Array.from({ length: count }, (_, i) => ({
+    id: i + 1,
     image: images[i % images.length],
     name: names[i % names.length],
     status: statuses[i % statuses.length],
@@ -227,7 +230,13 @@ function getPagination(current: number, total: number) {
   return rangeWithDots;
 }
 
-export const UserTable = () => {
+interface UserTableProps {
+  search?: string;
+  subscriptionFilter?: string;
+  bannedFilter?: string;
+}
+
+export const UserTable = ({ search = "", subscriptionFilter = "all", bannedFilter = "all" }: UserTableProps) => {
   const [data, setData] = useState<UserTable[]>(generateDummyData(80));
   const [blocked, setBlocked] = useState<{ [key: number]: boolean }>({});
   const [page, setPage] = useState(1);
@@ -235,17 +244,17 @@ export const UserTable = () => {
   const [selectedUser, setSelectedUser] = useState<UserTable | null>(null); // Added state for selected user in dialog
   const rowsPerPage = 7;
 
-  const handleBlockToggle = (idx: number) => {
+  const handleBlockToggle = (id: number) => {
     setBlocked((prev) => ({
       ...prev,
-      [idx]: !prev[idx],
+      [id]: !prev[id],
     }));
   };
 
-  const handleUnblock = (idx: number) => {
+  const handleUnblock = (id: number) => {
     setBlocked((prev) => ({
       ...prev,
-      [idx]: false,
+      [id]: false,
     }));
   };
 
@@ -259,11 +268,40 @@ export const UserTable = () => {
     setDeleteUser(null); // Close the delete dialog after deletion
   };
 
-  const totalPages = Math.ceil(data.length / rowsPerPage);
-  const paginatedData = data.slice(
+  const filteredData = useMemo(() => {
+    return data.filter(user => {
+      // Search filter
+      const matchesSearch = search === "" ||
+        user.name.toLowerCase().includes(search.toLowerCase()) ||
+        user.email.toLowerCase().includes(search.toLowerCase());
+
+      // Subscription filter
+      const matchesSubscription = subscriptionFilter === "all" ||
+        user.subscription === subscriptionFilter;
+
+      // Banned filter - Check both the original isBanned property and the blocked state
+      const isUserBlocked = blocked[user.id] || user.isBanned;
+      const matchesBanned = bannedFilter === "all" ||
+        (bannedFilter === "Banned" && isUserBlocked) ||
+        (bannedFilter === "Unbanned" && !isUserBlocked);
+
+      return matchesSearch && matchesSubscription && matchesBanned;
+    });
+  }, [data, search, subscriptionFilter, bannedFilter, blocked]);
+
+  // Update pagination to use filteredData instead of data
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const paginatedData = filteredData.slice(
     (page - 1) * rowsPerPage,
     page * rowsPerPage
   );
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [search, subscriptionFilter, bannedFilter]);
+
+
   const paginationNumbers = getPagination(page, totalPages);
 
   return (
@@ -327,7 +365,7 @@ export const UserTable = () => {
           <TableBody className="tracking-wider">
             {paginatedData.map((item, idx) => {
               const globalIdx = (page - 1) * rowsPerPage + idx;
-              const isBlocked = blocked[globalIdx];
+              const isBlocked = blocked[item.id] || item.isBanned;
               return (
                 <TableRow
                   key={globalIdx}
@@ -358,11 +396,10 @@ export const UserTable = () => {
                   >
                     <div className="flex justify-center items-center">
                       <div
-                        className={`text-xs font-semibold px-2 py-0.5 rounded-full  max-w-20 w-fit ${
-                          item.status === "Active"
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-200 text-gray-500"
-                        }`}
+                        className={`text-xs font-semibold px-2 py-0.5 rounded-full  max-w-20 w-fit ${item.status === "Active"
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-200 text-gray-500"
+                          }`}
                       >
                         {item.status}
                       </div>
@@ -374,13 +411,12 @@ export const UserTable = () => {
                   >
                     <div className="flex justify-center items-center">
                       <div
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          item.subscription === "Expired"
-                            ? "bg-[#FF7A00] text-white"
-                            : item.subscription === "Premium"
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${item.subscription === "Expired"
+                          ? "bg-[#FF7A00] text-white"
+                          : item.subscription === "Premium"
                             ? "bg-green-500 text-white"
                             : "bg-gray-200 text-gray-700"
-                        }`}
+                          }`}
                       >
                         {item.subscription}
                       </div>
@@ -433,13 +469,12 @@ export const UserTable = () => {
                             />
                             <div className="font-medium">{item.name}</div>
                             <div
-                              className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                item.subscription === "Expired"
-                                  ? "bg-[#FF7A00] text-white"
-                                  : item.subscription === "Premium"
+                              className={`px-3 py-1 rounded-full text-xs font-semibold ${item.subscription === "Expired"
+                                ? "bg-[#FF7A00] text-white"
+                                : item.subscription === "Premium"
                                   ? "bg-green-500 text-white"
                                   : "bg-gray-200 text-gray-700"
-                              }`}
+                                }`}
                             >
                               {item.subscription}
                             </div>
@@ -500,8 +535,8 @@ export const UserTable = () => {
                         title={isBlocked ? "Unblock" : "Block"}
                         onClick={() =>
                           isBlocked
-                            ? handleUnblock(globalIdx)
-                            : handleBlockToggle(globalIdx)
+                            ? handleUnblock(item.id)
+                            : handleBlockToggle(item.id)
                         }
                       >
                         {isBlocked ? <CheckCircle /> : <Block />}
@@ -562,7 +597,7 @@ export const UserTable = () => {
       <div className="flex items-center md:justify-between md:flex-row flex-col mt-4">
         <div className="text-sm text-gray-600">
           Showing {(page - 1) * rowsPerPage + 1} to{" "}
-          {Math.min(page * rowsPerPage, data.length)} from {data.length} records
+          {Math.min(page * rowsPerPage, filteredData.length)} from {filteredData.length} records
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -576,11 +611,10 @@ export const UserTable = () => {
             typeof num === "number" ? (
               <button
                 key={idx}
-                className={`p-2 rounded px-3 ${
-                  num === page
-                    ? " text-green-600 border-2 border-[#F7C56B]"
-                    : "bg-gray-200 text-gray-700"
-                }`}
+                className={`p-2 rounded px-3 ${num === page
+                  ? " text-green-600 border-2 border-[#F7C56B]"
+                  : "bg-gray-200 text-gray-700"
+                  }`}
                 style={{
                   backgroundColor:
                     num === page ? "rgba(247, 197, 107, 0.3)" : "",
