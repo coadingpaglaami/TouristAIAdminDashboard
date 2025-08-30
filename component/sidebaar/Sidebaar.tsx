@@ -154,7 +154,7 @@ export const Sidebaar = ({ isProfile }: SidebaarProps) => {
         <Link
           href="/admin/profile"
           onClick={() => openprofile(!profile)}
-          className="flex gap-2 mx-2 items-center justify-between"
+          className="flex gap-2 mx-2 items-center justify-between py-2"
         >
           <Image
             src="/user.png"
@@ -175,7 +175,7 @@ export const Sidebaar = ({ isProfile }: SidebaarProps) => {
           </div>
         </Link>
       ):(
-        <Link href={'/'} className="flex items-center justify-center mb-4 gap-2 font-semibold text-lg">
+        <Link href={'/'} className="flex items-center justify-center mb-4 gap-2 font-semibold text-lg border-t border-gray-300 pt-2">
         <LogOut/> <span className="text-[#854C3A] tracking-wider">Log Out</span>
         </Link>
       )}

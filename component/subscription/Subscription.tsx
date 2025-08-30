@@ -106,7 +106,7 @@ export const Subscription = () => {
       >
         {label}
       </label>
-      <div className="flex border  w-fit">
+      <div className="flex border border-[#D9D9D9]  w-fit">
         <input
           id={`custom-input-${index}`}
           type="text"

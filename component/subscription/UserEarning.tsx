@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import {
   Table,
   TableBody,
@@ -8,7 +8,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
 
 interface UserEarning {
   name: string;
@@ -25,7 +24,7 @@ interface UserEarning {
 const userEarnings: UserEarning[] = [
   {
     name: "Alice Johnson",
-    image: "/table 1.png",
+    image: "/table 1.jpg",
     email: "alice.johnson@example.com",
     totalSpent: 120.5,
     purchasedate: "2024-05-01",
@@ -36,7 +35,7 @@ const userEarnings: UserEarning[] = [
   },
   {
     name: "Bob Smith",
-    image: "/table 2.png",
+    image: "/table 2.jpg",
     email: "bob.smith@example.com",
     totalSpent: 89.99,
     purchasedate: "2024-04-15",
@@ -47,7 +46,7 @@ const userEarnings: UserEarning[] = [
   },
   {
     name: "Charlie Brown",
-    image: "/table 3.png",
+    image: "/table 3.jpg",
     email: "charlie.brown@example.com",
     totalSpent: 200.0,
     purchasedate: "2024-03-22",
@@ -58,7 +57,7 @@ const userEarnings: UserEarning[] = [
   },
   {
     name: "Diana Prince",
-    image: "/table 4.png",
+    image: "/table 4.jpg",
     email: "diana.prince@example.com",
     totalSpent: 150.75,
     purchasedate: "2024-06-10",
@@ -69,7 +68,7 @@ const userEarnings: UserEarning[] = [
   },
   {
     name: "Ethan Hunt",
-    image: "/table 5.png",
+    image: "/table 5.jpg",
     email: "ethan.hunt@example.com",
     totalSpent: 99.5,
     purchasedate: "2024-05-30",
@@ -80,7 +79,7 @@ const userEarnings: UserEarning[] = [
   },
   {
     name: "Fiona Gallagher",
-    image: "/table 6.png",
+    image: "/table 6.jpg",
     email: "fiona.gallagher@example.com",
     totalSpent: 175.2,
     purchasedate: "2024-04-28",
@@ -91,7 +90,7 @@ const userEarnings: UserEarning[] = [
   },
   {
     name: "George Miller",
-    image: "/table 7.png",
+    image: "/table 7.jpg",
     email: "george.miller@example.com",
     totalSpent: 110.0,
     purchasedate: "2024-03-18",
@@ -102,7 +101,7 @@ const userEarnings: UserEarning[] = [
   },
   {
     name: "Hannah Lee",
-    image: "/table 1.png",
+    image: "/table 8.jpg",
     email: "hannah.lee@example.com",
     totalSpent: 210.3,
     purchasedate: "2024-06-01",
@@ -113,7 +112,7 @@ const userEarnings: UserEarning[] = [
   },
   {
     name: "Ian Curtis",
-    image: "/table 2.png",
+    image: "/table 9.jpg",
     email: "ian.curtis@example.com",
     totalSpent: 130.0,
     purchasedate: "2024-05-12",
@@ -124,7 +123,7 @@ const userEarnings: UserEarning[] = [
   },
   {
     name: "Julia Roberts",
-    image: "/table 3.png",
+    image: "/table 3.jpg",
     email: "julia.roberts@example.com",
     totalSpent: 160.8,
     purchasedate: "2024-04-05",
@@ -135,27 +134,13 @@ const userEarnings: UserEarning[] = [
   },
 ];
 export const UserEarning = () => {
-   const contentRef = useRef<HTMLDivElement>(null);
-  const [isOverflowing, setIsOverflowing] = useState(false);
-
-  useEffect(() => {
-    if (contentRef.current) {
-      const el = contentRef.current;
-      const hasOverflow =
-        el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth;
-
-      setIsOverflowing(hasOverflow);
-      // console.log("Is overflowing:", hasOverflow);
-    }
-  }, []);
-
   return (
     <div className="bg-white rounded-lg p-4  my-4 ">
       <h2 className="font-semibold tracking-wider text-xl text-[#1C1B1F]">
         User-wise earnings
       </h2>
-      <div className=" overflow-x-auto" ref={contentRef}>
-         {/* <p>{isOverflowing ? "Content is overflowing" : "Content fits"}</p> */}
+      <div className=" overflow-x-auto">
+        {/* <p>{isOverflowing ? "Content is overflowing" : "Content fits"}</p> */}
         <Table className="">
           <TableHeader>
             <TableRow>
@@ -178,18 +163,17 @@ export const UserEarning = () => {
             {userEarnings.map((plan, idx) => (
               <TableRow key={idx} className="border-none">
                 <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
-                          <div className="flex items-center gap-2">
-                              <div className="w-8 h-8">
-                                <Image
-                                  src={plan.image}
-                                  alt={plan.name}
-                                  height={32}
-                                  width={32}
-                                  className="rounded-full object-cover"
-                                />
-                              </div>
-                              <span className="font-medium">{plan.name}</span>
-                            </div>
+                  <div className="flex items-center gap-2">
+                    <div className="relative w-8 h-8 rounded-full p-2">
+                      <Image
+                        src={plan.image}
+                        alt={plan.name}
+                        fill
+                        className="  border border-gray-200 object-cover rounded-full"
+                      />
+                    </div>
+                    <span className="font-medium">{plan.name}</span>
+                  </div>
                 </TableCell>
                 <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
                   {plan.email}

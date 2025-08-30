@@ -64,13 +64,15 @@ interface UserTable {
 
 const generateDummyData = (count: number): UserTable[] => {
   const images = [
-    "/table 1.png",
-    "/table 2.png",
-    "/table 3.png",
-    "/table 4.png",
-    "/table 5.png",
-    "/table 6.png",
-    "/table 7.png",
+    "/table 1.jpg",
+    "/table 2.jpg",
+    "/table 3.jpg",
+    "/table 4.jpg",
+    "/table 5.jpg",
+    "/table 6.jpg",
+    "/table 7.jpg",
+    "/table 8.jpg",
+    "/table 9.jpg",
   ];
   const names = [
     "Sujon",
@@ -372,13 +374,12 @@ export const UserTable = ({
                     className={isBlocked ? "opacity-50" : "opacity-100"}
                   >
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8">
+                      <div className="relative w-8 h-8 rounded-full p-2">
                         <Image
                           src={item.image}
                           alt={item.name}
-                          height={32}
-                          width={32}
-                          className="rounded-full"
+                          fill
+                          className="  border border-gray-200 object-cover rounded-full"
                         />
                       </div>
                       <div className="font-medium">{item.name}</div>
@@ -534,7 +535,7 @@ export const UserTable = ({
                         title={item.isBanned ? "Unblock" : "Block"}
                         onClick={() => handleBlockToggle(item.id)}
                       >
-                        {item.isBanned ?  <Block />:<CheckCircle />}
+                        {item.isBanned ? <Block /> : <CheckCircle />}
                       </button>
 
                       {/* Delete Dialog */}
@@ -597,7 +598,7 @@ export const UserTable = ({
         </div>
         <div className="flex items-center gap-1">
           <button
-            className="p-3 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
+            className="p-3.5 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
           >
@@ -610,7 +611,7 @@ export const UserTable = ({
                 className={`p-2 rounded px-3 ${
                   num === page
                     ? " text-green-600 border-2 border-[#F7C56B]"
-                    : "bg-gray-200 text-gray-700"
+                    : "border border-black text-gray-700"
                 }`}
                 style={{
                   backgroundColor:
@@ -627,7 +628,7 @@ export const UserTable = ({
             )
           )}
           <button
-            className="p-3 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
+            className="p-3.5 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
           >

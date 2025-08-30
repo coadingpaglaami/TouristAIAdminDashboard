@@ -49,77 +49,45 @@ interface Filter {
   duration: string | undefined;
 }
 
-function formatTime(date: Date) {
-  let hours = 0;
-  hours = date.getHours();
-  const minutes = date.getMinutes();
-  const ampm = hours >= 12 ? "PM" : "AM";
-  const hour12 = hours % 12 === 0 ? 12 : hours % 12;
-  const minStr = minutes.toString().padStart(2, "0");
-  return `${hour12}.${minStr}${ampm}`;
+// Short date + time for Activate/Expired columns
+function formatShortDateTime(date: Date) {
+  return date.toLocaleString("en-US", {
+    day: "2-digit",
+    month: "short",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
 }
 
-function formatDate(date: Date) {
-  return `${date.getDate()} ${date.toLocaleString("default", {
-    month: "long",
-  })}, ${date.getFullYear()}`;
-}
+// Relative time for Last Active column
+function formatRelativeTime(date: Date) {
+  const now = new Date();
+  const diff = (now.getTime() - date.getTime()) / 1000; // in seconds
 
-function formatDateRange(start: Date, end: Date) {
-  const sameMonth = start.getMonth() === end.getMonth();
-  let range = `${start.getDate()}${
-    sameMonth ? "" : " " + start.toLocaleString("default", { month: "long" })
-  }`;
-  range += `-${end.getDate()} ${end.toLocaleString("default", {
-    month: "long",
-  })}`;
-  range += `, ${end.getFullYear()}`;
-  return range;
-}
+  if (diff < 60) return `${Math.floor(diff)} seconds ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+  if (diff < 345600) return `${Math.floor(diff / 86400)} days ago`; // < 4 days
 
-function getDurationJSX(
-  subscription: UserTable["subscription"],
-  baseDate: Date
-) {
-  if (subscription === "1 hour") {
-    const start = new Date(baseDate);
-    const end = new Date(baseDate);
-    end.setHours(start.getHours() + 1);
-    return (
-      <div className="flex flex-col gap-0.5">
-        <span className="font-medium text-sm">
-          {formatTime(start)}-{formatTime(end)}
-        </span>
-        <span className="text-xs text-gray-400">{formatDate(start)}</span>
-      </div>
-    );
-  } else {
-    const days = parseInt(subscription);
-    const start = new Date(baseDate);
-    const end = new Date(baseDate);
-    end.setDate(start.getDate() + days);
-    return (
-      <div className="flex flex-col gap-0.5">
-        <span className="font-medium text-sm">
-          {formatTime(start)}-{formatTime(end)}
-        </span>
-        <span className="text-xs text-gray-400">
-          {formatDateRange(start, end)}
-        </span>
-      </div>
-    );
-  }
+  // fallback for older than 4 days
+  return date.toLocaleString("en-US", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
-
 const generateDummyData = (count: number): UserTable[] => {
   const images = [
-    "/table 1.png",
-    "/table 2.png",
-    "/table 3.png",
-    "/table 4.png",
-    "/table 5.png",
-    "/table 6.png",
-    "/table 7.png",
+    "/table 1.jpg",
+    "/table 2.jpg",
+    "/table 3.jpg",
+    "/table 4.jpg",
+    "/table 5.jpg",
+    "/table 6.jpg",
+    "/table 7.jpg",
+    "/table 8.jpg",
+    "/table 9.jpg",
   ];
   const names = [
     "Sujon",
@@ -255,8 +223,11 @@ export const PaymentTable = ({ search, duration }: Filter) => {
               <TableHead className="text-xs font-semibold text-gray-500  text-center py-3">
                 Subscription
               </TableHead>
-              <TableHead className="text-xs font-semibold text-gray-500  text-center py-3">
-                Duration
+              <TableHead className="text-xs font-semibold text-gray-500 text-center py-3">
+                Activate Time
+              </TableHead>
+              <TableHead className="text-xs font-semibold text-gray-500 text-center py-3">
+                Expired Time
               </TableHead>
               <TableHead className="text-xs font-semibold text-gray-500  py-3 text-center">
                 Amount
@@ -314,13 +285,12 @@ export const PaymentTable = ({ search, duration }: Filter) => {
                     className={`py-4 ${isBlocked ? "opacity-30" : ""}`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8">
+                      <div className="relative w-8 h-8 rounded-full p-2">
                         <Image
                           src={item.image}
                           alt={item.name}
-                          height={36}
-                          width={36}
-                          className=" rounded-full border border-gray-200"
+                          fill
+                          className="  border border-gray-200 object-cover rounded-full"
                         />
                       </div>
                       <div className="font-medium text-gray-800">
@@ -343,17 +313,38 @@ export const PaymentTable = ({ search, duration }: Filter) => {
                     </div>
                   </TableCell>
                   {/* Duration */}
+                  {/* Activate Time */}
                   <TableCell
                     className={`py-4 text-center ${
                       isBlocked ? "opacity-30" : ""
                     }`}
                   >
-                    <div className="flex flex-col items-center">
-                      {getDurationJSX(
-                        item.subscription,
-                        new Date(item.lastactive)
-                      )}
-                    </div>
+                    <span className="text-sm">
+                      {formatShortDateTime(new Date(item.lastactive))}
+                    </span>
+                  </TableCell>
+
+                  {/* Expired Time */}
+                  <TableCell
+                    className={`py-4 text-center ${
+                      isBlocked ? "opacity-30" : ""
+                    }`}
+                  >
+                    <span className="text-sm">
+                      {(() => {
+                        const start = new Date(item.lastactive);
+                        const end = new Date(start);
+
+                        if (item.subscription === "1 hour") {
+                          end.setHours(start.getHours() + 1);
+                        } else {
+                          const days = parseInt(item.subscription);
+                          end.setDate(start.getDate() + days);
+                        }
+
+                        return formatShortDateTime(end);
+                      })()}
+                    </span>
                   </TableCell>
                   {/* Amount */}
                   <TableCell
@@ -372,7 +363,7 @@ export const PaymentTable = ({ search, duration }: Filter) => {
                     }`}
                   >
                     <span className="text-sm">
-                      {formatDate(new Date(item.lastactive))}
+                      {formatRelativeTime(new Date(item.lastactive))}
                     </span>
                   </TableCell>
                   {/* Action */}
@@ -446,7 +437,7 @@ export const PaymentTable = ({ search, duration }: Filter) => {
         </div>
         <div className="flex items-center gap-1">
           <button
-            className="p-3 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
+            className="p-3.5 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
           >
@@ -459,7 +450,7 @@ export const PaymentTable = ({ search, duration }: Filter) => {
                 className={`p-2 rounded px-3 ${
                   num === page
                     ? " text-green-600 border-2 border-[#F7C56B]"
-                    : "bg-gray-200 text-gray-700"
+                    : "border border-black text-gray-700"
                 }`}
                 style={{
                   backgroundColor:
@@ -476,7 +467,7 @@ export const PaymentTable = ({ search, duration }: Filter) => {
             )
           )}
           <button
-            className="p-3 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
+            className="p-3.5 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
           >

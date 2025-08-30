@@ -14,7 +14,6 @@ import { Chevron, ChevronNext, RemoveIcon } from "@/svg/Action";
 import { Visible } from "@/svg/OverView";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogTitle,
   DialogTrigger,
@@ -34,13 +33,15 @@ interface ActivityTable {
 
 const generateDummyData = (count: number): ActivityTable[] => {
   const images = [
-    "/table 1.png",
-    "/table 2.png",
-    "/table 3.png",
-    "/table 4.png",
-    "/table 5.png",
-    "/table 6.png",
-    "/table 7.png",
+    "/table 1.jpg",
+    "/table 2.jpg",
+    "/table 3.jpg",
+    "/table 4.jpg",
+    "/table 5.jpg",
+    "/table 6.jpg",
+    "/table 7.jpg",
+    "/table 8.jpg",
+    "/table 9.jpg",
   ];
   const names = [
     "Sujon",
@@ -102,6 +103,7 @@ const generateDummyData = (count: number): ActivityTable[] => {
     "/photo 5.png",
     "/photo 6.png",
     "/photo 7.png",
+    "/potrait.jpg",
   ];
   const activities: Array<"Upload" | "Clicked"> = [
     "Upload",
@@ -255,13 +257,12 @@ export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
                     className={isBlocked ? "opacity-30" : "opacity-100"}
                   >
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8">
+                      <div className="relative w-8 h-8 rounded-full p-2">
                         <Image
                           src={item.image}
                           alt={item.name}
-                          height={32}
-                          width={32}
-                          className="rounded-full object-cover"
+                          fill
+                          className="  border border-gray-200 object-cover rounded-full"
                         />
                       </div>
                       <span className="font-medium">{item.name}</span>
@@ -313,21 +314,22 @@ export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
                   <TableCell
                     className={isBlocked ? "opacity-30" : "opacity-100"}
                   >
+
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button className="p-0 border-0 bg-transparent hover:bg-transparent focus:ring-0">
+                        <Button className="p-0 border-0 bg-transparent hover:bg-transparent focus:ring-0 " disabled={isBlocked}>
                           <Image
                             src={item.photo}
                             alt="photo"
                             height={32}
                             width={32}
-                            className="w-8 h-8 rounded"
+                            className="w-8 h-8 rounded object-cover"
                           />
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="lg:max-w-2xl flex justify-center items-center p-0">
                         <DialogTitle className="sr-only">
-                          <VisuallyHidden >Profile photo</VisuallyHidden>
+                          <VisuallyHidden>Profile photo</VisuallyHidden>
                         </DialogTitle>
                         <Image
                           src={item.photo}
@@ -368,7 +370,7 @@ export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
         </div>
         <div className="flex items-center gap-1">
           <button
-            className="p-3 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
+            className="p-3.5 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
           >
@@ -381,7 +383,7 @@ export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
                 className={`p-2 rounded px-3 ${
                   num === page
                     ? "text-green-600 border-2 border-[#F7C56B]"
-                    : "bg-gray-200 text-gray-700"
+                    : "border border-black text-gray-700"
                 }`}
                 onClick={() => setPage(num)}
               >
@@ -394,7 +396,7 @@ export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
             )
           )}
           <button
-            className="p-3 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
+            className="p-3.5 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
           >

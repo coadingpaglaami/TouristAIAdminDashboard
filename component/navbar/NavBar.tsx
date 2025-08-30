@@ -207,7 +207,7 @@ export const NavBar = ({ isprofile }: NavBarProps) => {
               ) : (
                 <Link
                   href={"/"}
-                  className="flex items-center justify-center mb-4 gap-2 font-semibold text-lg"
+                  className="flex items-center justify-center mb-4 gap-2 font-semibold text-lg border-t border-gray-300 pt-2"
                 >
                   <LogOut />{" "}
                   <span className="text-[#854C3A] tracking-wider">Log Out</span>
