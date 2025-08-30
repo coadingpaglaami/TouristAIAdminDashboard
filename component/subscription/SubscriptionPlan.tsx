@@ -169,7 +169,11 @@ export const SubscriptionPlan = () => {
                 key={idx + (page - 1) * rowsPerPage}
                 className="border-none"
               >
-                <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
+                <TableCell
+                  className={`text-sm text-[#1C1B1F] font-medium tracking-wider ${
+                    plan.status === "Inactive" ? "opacity-50" : ""
+                  }`}
+                >
                   <div className="flex items-center gap-2">
                     <div className="bg-[#FF7A00] p-2">
                       <Schedule />
@@ -177,10 +181,18 @@ export const SubscriptionPlan = () => {
                     {plan.name}
                   </div>
                 </TableCell>
-                <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
+                <TableCell
+                  className={`text-sm text-[#1C1B1F] font-medium tracking-wider ${
+                    plan.status === "Inactive" ? "opacity-50" : ""
+                  }`}
+                >
                   {plan.duration} {plan.durationUnit}
                 </TableCell>
-                <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
+                <TableCell
+                  className={`text-sm text-[#1C1B1F] font-medium tracking-wider ${
+                    plan.status === "Inactive" ? "opacity-50" : ""
+                  }`}
+                >
                   ${plan.price} HK
                 </TableCell>
                 <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">

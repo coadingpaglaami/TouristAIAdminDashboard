@@ -127,7 +127,7 @@ export const NavBar = ({ isprofile }: NavBarProps) => {
                 </div>
 
                 {/* Small Logo - Tablet */}
-                <div className="orange p-2 rounded-lg hidden md:block lg:hidden">
+                <div className="orange p-2 rounded-lg  md:block ">
                   <MessageSmall />
                 </div>
 
@@ -195,12 +195,12 @@ export const NavBar = ({ isprofile }: NavBarProps) => {
                   />
 
                   {/* Profile details - Desktop only */}
-                  <div className=" flex-col gap-1 text-[#854C3A] hidden xl:flex">
-                    <span className="text-lg font-medium">Ostain Alex</span>
+                  <div className="flex flex-col gap-1 text-[#854C3A] ">
+                    <span className="text-lg font-medium whitespace-nowrap max-md:text-sm">Ostain Alex</span>
                     <span className="font-thin">TRIPMATE</span>
                   </div>
 
-                  <div className="hidden xl:block">
+                  <div className="">
                     <Settings />
                   </div>
                 </Link>

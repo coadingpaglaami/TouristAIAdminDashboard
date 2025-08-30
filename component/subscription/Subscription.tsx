@@ -1,3 +1,4 @@
+"use client";
 import { Add } from "@/svg/Action";
 import { SubscriptionPlan } from "./SubscriptionPlan";
 import { PopularPlan } from "./PopulerPlan";
@@ -14,17 +15,116 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { SelectNative } from "@/components/ui/select-native";
-import { useId } from "react";
+import { useId, useState } from "react";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 
 export const Subscription = () => {
   const id = useId();
+  const [counters, setCounters] = useState([0, 0, 0]);
+  const [isLifetime, setIsLifetime] = useState(false);
+  const handleChange = (index: number, value: string) => {
+    const num = Number(value.replace(/\D/g, "")); // only digits
+    setCounters((prev) => {
+      const updated = [...prev];
+      if (index === 1) {
+        // Hour (0–23)
+        updated[index] = Math.min(Math.max(num, 0), 23);
+      } else if (index === 2) {
+        // Minute (0–59)
+        updated[index] = Math.min(Math.max(num, 0), 59);
+      } else {
+        // Day (no max)
+        updated[index] = num;
+      }
+      return updated;
+    });
+  };
+
+  // Increment with rollover logic
+  const increment = (index: number) => {
+    setCounters((prev) => {
+      const updated = [...prev];
+      if (index === 2) {
+        if (updated[2] >= 59) {
+          updated[2] = 0;
+          updated[1] = (updated[1] + 1) % 24;
+          if (updated[1] === 0) updated[0] += 1;
+        } else {
+          updated[2] += 1;
+        }
+      } else if (index === 1) {
+        if (updated[1] >= 23) {
+          updated[1] = 0;
+          updated[0] += 1;
+        } else {
+          updated[1] += 1;
+        }
+      } else {
+        updated[0] += 1;
+      }
+      return updated;
+    });
+  };
+
+  // Decrement with rollover logic
+  const decrement = (index: number) => {
+    setCounters((prev) => {
+      const updated = [...prev];
+      if (index === 2) {
+        if (updated[2] <= 0) {
+          updated[2] = 59;
+          if (updated[1] > 0) {
+            updated[1] -= 1;
+          } else {
+            updated[1] = 23;
+            if (updated[0] > 0) updated[0] -= 1;
+          }
+        } else {
+          updated[2] -= 1;
+        }
+      } else if (index === 1) {
+        if (updated[1] <= 0) {
+          updated[1] = 23;
+          if (updated[0] > 0) updated[0] -= 1;
+        } else {
+          updated[1] -= 1;
+        }
+      } else {
+        updated[0] = Math.max(0, updated[0] - 1);
+      }
+      return updated;
+    });
+  };
+
+  const CounterBox = (index: number, label: string) => (
+    <div key={index} className="flex flex-col gap-1">
+      <label
+        htmlFor={`custom-input-${index}`}
+        className="text-xs pt select-none"
+      >
+        {label}
+      </label>
+      <div className="flex border  w-fit">
+        <input
+          id={`custom-input-${index}`}
+          type="text"
+          className="focus:outline-none w-10 text-center"
+          value={counters[index]}
+          onChange={(e) => handleChange(index, e.target.value)}
+        />
+        <div className="flex flex-col ml-1">
+          <button onClick={() => increment(index)}>
+            <ChevronUpIcon size={16} aria-hidden="true" fill="black" />
+          </button>
+          <button onClick={() => decrement(index)}>
+            <ChevronDownIcon size={16} aria-hidden="true" fill="black" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
   return (
     <div className="py-6 px-4 max-w-screen overflow-hidden">
       {/* <button className="orange p-3 rounded-md  flex items-center  gap-2 float-right mb-4">
@@ -64,28 +164,44 @@ export const Subscription = () => {
                   className="focus:outline-none focus:ring-0 focus-visible:ring-0 focus:border-1 focus:border-gray-300"
                 />
               </div>
-              <div className="grid gap-3">
-                <Label
-                  htmlFor="name-1"
-                  className="text-[#1C1B1F] text-sm font-normal tracking-wider"
+              <div className="flex gap-3 items-center justify-between">
+                <div className=" grid ">
+                  <Label
+                    htmlFor="name-1"
+                    className="text-[#1C1B1F] text-sm font-normal tracking-wider"
+                  >
+                    Duration
+                  </Label>
+
+                  <div
+                    className={`max-w-[60%] w-full flex gap-4 mt-2 ${
+                      isLifetime ? "opacity-50 pointer-events-none cursor-not-allowed select-none" : ""
+                    }`}
+                  >
+                    {/* Day */}
+                    {CounterBox(0, "Day")}
+
+                    {/* Hour + Minute together (no gap) */}
+                    <div className="flex">
+                      {CounterBox(1, "Hour")}
+                      {CounterBox(2, "Minute")}
+                    </div>
+                  </div>
+                </div>
+                <div
+                  className="max-w-[40%] w-full mt-12 flex items-center gap-2 border p-2.5
+  [--primary:#FF7A00] 
+  [--ring:#FFB366] 
+  in-[.dark]:[--primary:#FF7A00] 
+  in-[.dark]:[--ring:#CC6600]"
                 >
-                  Duration
-                </Label>
-                <Select defaultValue="1 hour">
-                  <SelectTrigger>
-                    1 hour
-                  </SelectTrigger>
-                  <SelectContent className="max-h-48 overflow-h-auto">
-                    <SelectItem value="1 hour">1 hour</SelectItem>
-                    <SelectItem value="2 hours">2 hours</SelectItem>
-                    <SelectItem value="5 hours">5 hours</SelectItem>
-                    <SelectItem value="9 hours">9 hours</SelectItem>
-                    <SelectItem value="1 day">1 day</SelectItem>
-                    <SelectItem value="2 days">2 days</SelectItem>
-                    <SelectItem value="4 days">4 days</SelectItem>
-                    <SelectItem value="9 days">9 days</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <Checkbox
+                    id={id}
+                    checked={isLifetime}
+                    onCheckedChange={(checked) => setIsLifetime(!!checked)}
+                  />
+                  <Label htmlFor={id}>LifeTime</Label>
+                </div>
               </div>
               <div className="*:not-first:mt-2">
                 <Label
@@ -119,7 +235,7 @@ export const Subscription = () => {
                 </Button>
               </DialogClose>
               <Button className="bg-[#FF7A00] p-3 rounded-md text-white hover:bg-[#FF7A00]">
-                Save changes
+                Activate
               </Button>
             </DialogFooter>
           </DialogContent>
