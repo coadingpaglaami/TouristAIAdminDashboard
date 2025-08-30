@@ -70,15 +70,13 @@ export const ResetPassword = () => {
           </div>
         </div>
 
-
-
         {/* Password */}
         <div>
           <label
             htmlFor="password"
             className="block text-sm font-medium text-white"
           >
-            Password
+            Confirm Password
           </label>
 
           <div className="relative mt-1">
@@ -105,14 +103,12 @@ export const ResetPassword = () => {
           </div>
         </div>
 
-    
-
         {/* Submit */}
         <button
           type="submit"
           className="w-full p-2 text-white orange rounded-md hover:bg-orange-600 font-bold mt-4"
         >
-         Reset Password
+          Reset Password
         </button>
       </form>
     </div>

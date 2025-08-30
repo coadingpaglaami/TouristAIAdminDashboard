@@ -276,7 +276,7 @@ export const dataByPeriod: Record<TimePeriod, DataCollection> = {
         icon: <UserIcon />,
         isGraph: true,
         numuser: 850,
-        rate: [{ name: "Total Boosted hours", somenum: 1360 }],
+        rate: [{ name: "Total Boosted hours", somenum: 60 }],
       },
       {
         name: "Boosting stats",

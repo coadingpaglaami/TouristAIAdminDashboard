@@ -534,7 +534,7 @@ export const UserTable = ({
                         title={item.isBanned ? "Unblock" : "Block"}
                         onClick={() => handleBlockToggle(item.id)}
                       >
-                        {item.isBanned ? <CheckCircle /> : <Block />}
+                        {item.isBanned ?  <Block />:<CheckCircle />}
                       </button>
 
                       {/* Delete Dialog */}

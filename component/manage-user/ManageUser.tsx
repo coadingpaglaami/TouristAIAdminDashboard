@@ -17,7 +17,7 @@ export const ManageUser = () => {
   const [search, setSearch] = useState("");
   const [subscription, setSubscription] = useState<string>("all");
   const [banned, setBanned] = useState<string>("all");
-  
+
   return (
     <div className="flex flex-col gap-8 py-10 px-4 max-md:max-w-screen overflow-hidden">
       <div className="flex md:justify-between md:items-center gap-4 flex-col md:flex-row w-full">
@@ -58,14 +58,14 @@ export const ManageUser = () => {
               <SelectGroup>
                 <SelectLabel>Status</SelectLabel>
                 <SelectItem value="all">All User</SelectItem>
-                <SelectItem value="Banned">Banned</SelectItem>
-                <SelectItem value="Unbanned">Unbanned</SelectItem>
+                <SelectItem value="Banned">Block</SelectItem>
+                <SelectItem value="Unbanned">Unblock</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
         </div>
       </div>
-      <UserTable 
+      <UserTable
         search={search}
         subscriptionFilter={subscription}
         bannedFilter={banned}

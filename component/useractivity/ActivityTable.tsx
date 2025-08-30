@@ -12,8 +12,15 @@ import { ReactNode, useMemo, useState } from "react";
 import Image from "next/image"; // Example action icon
 import { Chevron, ChevronNext, RemoveIcon } from "@/svg/Action";
 import { Visible } from "@/svg/OverView";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface ActivityTable {
   image: string;
@@ -170,213 +177,6 @@ interface ActivityTableProps {
   search: string;
   activity: string | undefined;
 }
-// export const ActivityTable = ({ search, activity, status }: ActivityTableProps) => {
-//   const data = useMemo(() => generateDummyData(80), []);
-//   const [page, setPage] = useState(1);
-//   const perPage = 7;
-//   const [blocked, setBlocked] = useState<{ [key: number]: boolean }>({});
-//   const totalPages = Math.ceil(data.length / perPage);
-
-//   const paginatedData = useMemo(
-//     () => data.slice((page - 1) * perPage, page * perPage),
-//     [data, page]
-//   );
-//   const handleBlockToggle = (idx: number) => {
-//     setBlocked((prev) => ({
-//       ...prev,
-//       [idx]: !prev[idx],
-//     }));
-//   };
-
-//   const handleUnblock = (idx: number) => {
-//     setBlocked((prev) => ({
-//       ...prev,
-//       [idx]: false,
-//     }));
-//   };
-//   const paginationNumbers = getPagination(page, totalPages);
-
-//   return (
-//     <div className="flex flex-col gap-3 bg-white p-4 rounded-lg">
-//       <h3 className="text-2xl tracking-wider">User Activity</h3>
-//       <div className="overflow-x-auto max-w-screen">
-//         <Table className="w-full">
-//           <TableHeader>
-//             <TableRow>
-//               <TableHead className="text-xs text-[#969696]">User</TableHead>
-//               <TableHead className="text-xs text-[#969696]">
-//                 Activity Type
-//               </TableHead>
-//               <TableHead className="text-xs text-[#969696]">Details</TableHead>
-//               <TableHead className="text-xs text-[#969696]">Time</TableHead>
-//               <TableHead className="text-xs text-[#969696] text-center">
-//                 Status
-//               </TableHead>
-//               <TableHead className="text-xs text-[#969696]">Photo</TableHead>
-//               <TableHead className="text-xs text-[#969696]">Action</TableHead>
-//             </TableRow>
-//           </TableHeader>
-//           <TableBody className="tracking-wider overflow-x-scroll">
-//             {paginatedData.map((item, index) => {
-//               const globalIdx = (page - 1) * perPage + index;
-//               const isBlocked = blocked[globalIdx];
-//               return (
-//                 <TableRow key={index} className="border-none">
-//                   <TableCell
-//                     className={isBlocked ? "opacity-30" : "opacity-100"}
-//                   >
-//                     <div className="flex items-center gap-2">
-//                       <div className="w-8 h-8">
-//                         <Image
-//                           src={item.image}
-//                           alt={item.name}
-//                           height={32}
-//                           width={32}
-//                           className="rounded-full object-cover"
-//                         />
-//                       </div>
-//                       <span className="font-medium">{item.name}</span>
-//                     </div>
-//                   </TableCell>
-
-//                   <TableCell
-//                     className={isBlocked ? "opacity-30" : "opacity-100"}
-//                   >
-//                     <span
-//                       className={`px-3 py-1 rounded-full text-xs font-semibold ${
-//                         item.activity === "Upload"
-//                           ? "bg-green-500 text-white"
-//                           : "bg-gray-300 text-gray-700"
-//                       }`}
-//                     >
-//                       {item.activity}
-//                     </span>
-//                   </TableCell>
-//                   <TableCell
-//                     className={isBlocked ? "opacity-30" : "opacity-100"}
-//                   >
-//                     {item.Details}
-//                   </TableCell>
-//                   <TableCell
-//                     className={isBlocked ? "opacity-30" : "opacity-100"}
-//                   >
-//                     {item.time}
-//                   </TableCell>
-//                   <TableCell
-//                     className={isBlocked ? "opacity-30" : "opacity-100"}
-//                   >
-//                     <div className="flex justify-center items-center">
-//                       <span
-//                         className={`px-3 py-1 rounded-full text-xs font-semibold  ${
-//                           item.status === "Premium"
-//                             ? "bg-green-500 text-white"
-//                             : "bg-gray-300 text-gray-700"
-//                         }`}
-//                       >
-//                         {item.status}
-//                       </span>
-//                     </div>
-//                   </TableCell>
-//                   <TableCell
-//                     className={isBlocked ? "opacity-30" : "opacity-100"}
-//                   >
-//                     {/* <Image
-//                       src={item.photo}
-//                       alt="photo"
-//                       height={32}
-//                       width={32}
-//                       className="w-8 h-8 rounded"
-//                     /> */}
-//                     <Dialog>
-//                       <DialogTrigger asChild>
-//                         <Button className="p-0 border-0 bg-transparent hover:bg-transparent focus:ring-0">
-//                           <Image
-//                             src={item.photo}
-//                             alt="photo"
-//                             height={32}
-//                             width={32}
-//                             className="w-8 h-8 rounded"
-//                           />
-//                         </Button>
-//                       </DialogTrigger>
-//                       <DialogContent className="lg:max-w-2xl flex justify-center items-center p-0">
-//                         <Image
-//                           src={item.photo}
-//                           alt="photo"
-//                           height={400}
-//                           width={400}
-//                           className="rounded object-cover max-h-[60vh] w-full  max-w-full"
-//                         />
-//                       </DialogContent>
-//                     </Dialog>
-//                   </TableCell>
-//                   {/* Action */}
-//                   <TableCell>
-//                     <button
-//                       className="p-2 hover:bg-gray-100 rounded"
-//                       onClick={() =>
-//                         isBlocked
-//                           ? handleUnblock(globalIdx)
-//                           : handleBlockToggle(globalIdx)
-//                       }
-//                     >
-//                       {isBlocked ? <Visible /> : <RemoveIcon />}
-//                     </button>
-//                   </TableCell>
-//                 </TableRow>
-//               );
-//             })}
-//           </TableBody>
-//         </Table>
-//       </div>
-//       <div className="flex md:items-center md:flex-row md:justify-between flex-col mt-4">
-//         <div className="text-sm text-gray-600">
-//           Showing {(page - 1) * perPage + 1} to{" "}
-//           {Math.min(page * perPage, data.length)} from {data.length} records
-//         </div>
-//         <div className="flex items-center gap-1">
-//           <button
-//             className="p-3 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
-//             onClick={() => setPage((p) => Math.max(1, p - 1))}
-//             disabled={page === 1}
-//           >
-//             <Chevron />
-//           </button>
-//           {paginationNumbers.map((num, idx) =>
-//             typeof num === "number" ? (
-//               <button
-//                 key={idx}
-//                 className={`p-2 rounded px-3 ${
-//                   num === page
-//                     ? " text-green-600 border-2 border-[#F7C56B]"
-//                     : "bg-gray-200 text-gray-700"
-//                 }`}
-//                 style={{
-//                   backgroundColor:
-//                     num === page ? "rgba(247, 197, 107, 0.3)" : "",
-//                 }}
-//                 onClick={() => setPage(num)}
-//               >
-//                 {num}
-//               </button>
-//             ) : (
-//               <span key={idx} className="px-2">
-//                 ...
-//               </span>
-//             )
-//           )}
-//           <button
-//             className="p-3 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
-//             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-//             disabled={page === totalPages}
-//           >
-//             <ChevronNext />
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
 export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
   const data = useMemo(() => generateDummyData(80), []);
   const [page, setPage] = useState(1);
@@ -397,8 +197,7 @@ export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
 
       // Filter by status (if it's not "all")
 
-
-      return isSearchMatch && isActivityMatch ;
+      return isSearchMatch && isActivityMatch;
     });
   }, [data, search, activity]);
 
@@ -527,6 +326,9 @@ export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="lg:max-w-2xl flex justify-center items-center p-0">
+                        <DialogTitle className="sr-only">
+                          <VisuallyHidden >Profile photo</VisuallyHidden>
+                        </DialogTitle>
                         <Image
                           src={item.photo}
                           alt="photo"

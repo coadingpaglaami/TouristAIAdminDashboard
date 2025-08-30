@@ -49,19 +49,9 @@ export const Security = () => {
                   className="w-full h-full object-cover rounded-full"
                   fill
                 />
-                <div className="relative z-10">
-                  <Camera />
-                </div>
               </>
             )}
           </label>
-          <input
-            type="file"
-            id="profile-photo"
-            onChange={handleFileChange}
-            className="hidden"
-            accept="image/*"
-          />
           <div className="flex flex-col gap-3">
             <span className="text-lg font-semibold">Security</span>
             <span className="text-sm text-[#1C1B1F]">
@@ -72,11 +62,8 @@ export const Security = () => {
         </div>
         <div className="flex md:justify-between md:flex-row flex-col md:gap-8 tracking-wider">
           <div className="md:mb-4 mb-2 flex-1">
-            <label
-              htmlFor="profile-name"
-              className="block text-sm mb-2"
-            >
-             Current Password
+            <label htmlFor="profile-name" className="block text-sm mb-2">
+              Current Password
             </label>
             <input
               type="password"
@@ -90,10 +77,7 @@ export const Security = () => {
           </div>
 
           <div className="md:mb-6 mb-2 flex-1">
-            <label
-              htmlFor="password"
-              className="block text-sm mb-2"
-            >
+            <label htmlFor="password" className="block text-sm mb-2">
               New Password
             </label>
             <input
@@ -109,10 +93,7 @@ export const Security = () => {
         </div>
         {/* Third input at the bottom, 50% width */}
         <div className="mb-6 w-full md:w-1/2">
-          <label
-            htmlFor="new-input"
-            className="block text-sm mb-2"
-          >
+          <label htmlFor="new-input" className="block text-sm mb-2">
             {/* Change label as needed */}
             Confirm Password
           </label>
@@ -128,7 +109,7 @@ export const Security = () => {
           type="submit"
           className="w-fit p-2 float-right rounded-lg text-white text-sm orange tracking-wider"
         >
-          Update Password
+          Save Changes
         </button>
       </form>
     </div>
