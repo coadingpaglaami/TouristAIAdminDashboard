@@ -6,7 +6,6 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useLoginMutation } from "@/services/api";
 import { setCookie } from "@/lib/cookies";
-import { ro } from "date-fns/locale";
 import { toast } from "sonner";
 
 interface FormData {
@@ -15,7 +14,7 @@ interface FormData {
 }
 
 export const Login = () => {
-  const [login, { isLoading, error }] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
