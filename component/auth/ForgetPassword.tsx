@@ -1,9 +1,11 @@
 "use client";
 
+import { useForgotPasswordMutation } from "@/services/api";
 import { useRouter } from "next/navigation";
 import React, { useState, ChangeEvent, FormEvent } from "react";
 
 export const ForgetPassword: React.FC = () => {
+  const [forgotPassword] = useForgotPasswordMutation();
   const [formData, setFormData] = useState<{ email: string }>({
     email: "",
   });
@@ -14,14 +16,22 @@ export const ForgetPassword: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    try {
+      const res = await forgotPassword(formData.email);
+      if (res) {
+        sessionStorage.setItem("userMail", formData.email);
+        router.push("/admin/verifyotp");
+      }
+    } catch {
+      // Handle error
+    }
   };
 
   return (
-    <div>
-      <h4 className="text-2xl font-semibold text-white text-center">
+    <div className="min-w-[400px] w-full">
+      <h4 className="text-2xl font-semibold text-white text-center w-full">
         Forget Password
       </h4>
       <form onSubmit={handleSubmit} className="grid gap-4">
@@ -42,7 +52,6 @@ export const ForgetPassword: React.FC = () => {
         <button
           type="submit"
           className="w-full p-2 text-white defaultbutton rounded-md orange font-bold"
-          onClick={() => router.push("/admin/verifyotp")}
         >
           Get OTP
         </button>

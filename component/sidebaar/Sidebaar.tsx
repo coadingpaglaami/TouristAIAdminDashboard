@@ -1,4 +1,6 @@
 "use client";
+import { getCookie, removeCookie } from "@/lib/cookies";
+import { useLogoutMutation } from "@/services/api";
 import {
   Dashboard,
   Message,
@@ -21,13 +23,17 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 interface SidebaarProps {
   isProfile?: boolean;
 }
 
 export const Sidebaar = ({ isProfile }: SidebaarProps) => {
   const pathname = usePathname();
+  const router = useRouter();
+  const [logout] = useLogoutMutation();
   const [profile, openprofile] = useState(isProfile || false);
   const menus = [
     {
@@ -81,6 +87,26 @@ export const Sidebaar = ({ isProfile }: SidebaarProps) => {
       activeIcon: <DashboardWhite />,
     },
   ];
+
+  const handleLogOut = async () => {
+    const refresh = getCookie("refresh_token") || "";
+    try {
+      const res = await logout({ refresh_token: refresh });
+      if (res) {
+        removeCookie("access_token");
+        removeCookie("refresh_token");
+        sessionStorage.clear();
+        toast.success("Logged out successfully");
+        router.push("/admin/login");
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error("Failed to log out: " + err.message);
+      } else {
+        toast.error("Failed to log out");
+      }
+    }
+  };
 
   return (
     <div className="xl:w-64 lg:w-16  pt-4 sticky top-0 flex flex-col justify-between gap-4 md:h-screen h-full overflow-y-hidden ">
@@ -174,10 +200,14 @@ export const Sidebaar = ({ isProfile }: SidebaarProps) => {
             <Settings />
           </div>
         </Link>
-      ):(
-        <Link href={'/'} className="flex items-center justify-center mb-4 gap-2 font-semibold text-lg border-t border-gray-300 pt-2">
-        <LogOut/> <span className="text-[#854C3A] tracking-wider">Log Out</span>
-        </Link>
+      ) : (
+        <button
+          onClick={() => handleLogOut()}
+          className="flex items-center justify-center mb-4 gap-2 font-semibold text-lg border-t cursor-pointer border-gray-300 pt-2"
+        >
+          <LogOut />{" "}
+          <span className="text-[#854C3A] tracking-wider">Log Out</span>
+        </button>
       )}
     </div>
   );

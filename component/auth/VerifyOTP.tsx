@@ -1,6 +1,6 @@
 "use client";
 
-import { set } from "date-fns";
+import { useVerifyOtpMutation } from "@/services/api";
 import { useRouter } from "next/navigation";
 import React, {
   useRef,
@@ -11,7 +11,7 @@ import React, {
 } from "react";
 
 export const Verify: React.FC = () => {
-  const [otp, setOtp] = useState<string[]>(["", "", "", "", ""]);
+  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]); // 6 digits
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
@@ -19,8 +19,9 @@ export const Verify: React.FC = () => {
   const [buttonText, setButtonText] = useState<string>("Verify OTP");
   const [wrongOtp, setWrongOtp] = useState<boolean>(false);
   const router = useRouter();
+  const [verifyOtp] = useVerifyOtpMutation();
 
-  // enable/disable verify button
+  // ✅ Enable/disable verify button based on input
   useEffect(() => {
     const allFilled = otp.every((digit) => digit.length === 1);
     setIsButtonDisabled(!allFilled);
@@ -29,11 +30,11 @@ export const Verify: React.FC = () => {
   const handleInputChange = (index: number, value: string) => {
     setWrongOtp(false);
     const newOtp = [...otp];
-    newOtp[index] = value.slice(0, 1); // Limit to 1 char
+    newOtp[index] = value.slice(0, 1); // only 1 digit
     setOtp(newOtp);
 
-    // Move focus to next
-    if (value.length === 1 && index < 4) {
+    // auto move to next
+    if (value.length === 1 && index < otp.length - 1) {
       inputs.current[index + 1]?.focus();
     }
   };
@@ -44,22 +45,31 @@ export const Verify: React.FC = () => {
     }
   };
 
-  const handleVerify = () => {
+  // ✅ Verify with backend
+  const handleVerify = async () => {
     const otpCode = otp.join("");
-    const demoCode = "12345";
-    if (otpCode === demoCode) {
-      router.push("/admin/reset-password");
-      setWrongOtp(false);
-    } else {
+
+    try {
+      const verify = await verifyOtp({ otp: otpCode }).unwrap();
+
+      if (verify) {
+        setWrongOtp(false);
+        sessionStorage.removeItem("userMail"); // clear email after success
+        router.push("/admin/reset-password");
+      }
+    } catch (err) {
+      console.log("OTP verification failed", err);
       setWrongOtp(true);
     }
   };
 
-  const countdownDuration = 5;
-
-  const handleVerifyButton = () => {
+  // Resend OTP logic
+  const countdownDuration = 30; // usually 30 or 60 seconds
+  const handleResend = () => {
     setIsDisabled(true);
     setCountdown(countdownDuration);
+    // 🔔 You can also trigger backend resend OTP here
+    // resendOtp({ email: sessionStorage.getItem("userMail") })
   };
 
   useEffect(() => {
@@ -72,7 +82,7 @@ export const Verify: React.FC = () => {
       }, 1000);
     } else if (countdown === 0 && isDisabled) {
       setIsDisabled(false);
-      setButtonText("Resend");
+      setButtonText("Resend OTP");
     }
 
     return () => {
@@ -86,23 +96,26 @@ export const Verify: React.FC = () => {
         Forget Password
       </h4>
       <p className="text-lg text-white text-center">
-        Please input the verification code sent to your email jerry73@aol.com
+        Please input the verification code sent to your email{" "}
+        {sessionStorage.getItem("userMail")}
       </p>
       <div className="grid gap-4 w-full">
-        <div className="flex justify-center w-full gap-6">
-          {Array(5)
+        <div className="flex justify-center w-full gap-3">
+          {Array(6)
             .fill(null)
             .map((_, index) => (
               <input
                 key={index}
-                ref={(el) => { inputs.current[index] = el; }}
+                ref={(el) => {
+                  inputs.current[index] = el;
+                }}
                 type="text"
                 value={otp[index]}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange(index, e.target.value)
                 }
                 onKeyDown={(e) => handleKeyDown(index, e)}
-                className={`otp-input w-15 h-15 text-center ${
+                className={`otp-input w-12 h-12 text-center text-xl font-bold ${
                   otp[index]
                     ? "border-2 border-[#F7C56B]"
                     : "border-2 border-white"
@@ -111,8 +124,9 @@ export const Verify: React.FC = () => {
               />
             ))}
         </div>
+
         {wrongOtp && (
-          <p className="text-red-500 text-center">Invalid code!</p>
+          <p className="text-red-500 text-center">Invalid code! Try again.</p>
         )}
 
         <button
@@ -124,19 +138,16 @@ export const Verify: React.FC = () => {
         </button>
 
         <button
-          onClick={handleVerifyButton}
-          className={`w-full p-2 rounded-md border  bg
-          ${
+          onClick={handleResend}
+          className={`w-full p-2 rounded-md border transition-colors duration-300 ${
             isDisabled
-              ? " bg-[#BDBDBD] cursor-not-allowed text-white font-bold"
+              ? "bg-[#BDBDBD] cursor-not-allowed text-white font-bold"
               : "text-[#F7C56B]"
-          }
-          transition-colors duration-300`}
+          }`}
           disabled={isDisabled}
         >
           {buttonText}
         </button>
-
       </div>
     </div>
   );

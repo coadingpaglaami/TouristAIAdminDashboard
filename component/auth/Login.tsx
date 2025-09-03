@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useLoginMutation } from "@/services/api";
+import { setCookie } from "@/lib/cookies";
+import { ro } from "date-fns/locale";
+import { toast } from "sonner";
 
 interface FormData {
   email: string;
@@ -11,9 +15,9 @@ interface FormData {
 }
 
 export const Login = () => {
+  const [login, { isLoading, error }] = useLoginMutation();
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const [errorMessage, setErrorMessage] = useState("");
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
@@ -24,17 +28,29 @@ export const Login = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Form Submitted:", formData);
-    if (
-      formData.email === "json@gmail.com" &&
-      formData.password === "password123"
-    ) {
-      // Dummy redirect (no API)
-      router.push("/admin/dashboard");
-    } else {
-      setErrorMessage("Invalid email or password");
+    try {
+      const res = await login({
+        email: formData.email,
+        password: formData.password,
+      }).unwrap();
+      if (res?.access) {
+        console.log("Login successful", res);
+        setCookie("access_token", res.access, 7);
+        setCookie("refresh_token", res.refresh, 7);
+        router.push("/admin/dashboard");
+        // Store login data in sessionStorage for immediate access
+        sessionStorage.setItem("isLoggedIn", "true");
+        sessionStorage.setItem("userMail", formData.email);
+        toast.success("Login successful!");
+      } else {
+        toast.error("Login failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("An error occurred during login. Please try again.");
     }
   };
 
@@ -45,9 +61,6 @@ export const Login = () => {
       </h4>
 
       <form onSubmit={handleSubmit} className="grid gap-2">
-        {errorMessage && (
-          <p className="text-red-500 text-sm text-center">{errorMessage}</p>
-        )}
         {/* Email */}
         <div>
           <label htmlFor="email" className="text-sm font-medium text-white">
@@ -103,7 +116,8 @@ export const Login = () => {
         {/* Submit */}
         <button
           type="submit"
-          className="w-full p-2 text-white orange rounded-md  font-semibold"
+          className="w-full p-2 text-white orange rounded-md  font-semibold disabled:opacity-50"
+          disabled={isLoading}
         >
           Log In
         </button>

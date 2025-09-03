@@ -31,11 +31,18 @@ import { usePathname } from "next/navigation";
 import Link from "next/dist/client/link";
 import { useState } from "react";
 import Image from "next/image";
+import { toast } from "sonner";
+import { getCookie, removeCookie } from "@/lib/cookies";
+import { useLogoutMutation, useOverviewQuery } from "@/services/api";
+import { useRouter } from "next/navigation";
 interface NavBarProps {
   isprofile?: boolean;
 }
 export const NavBar = ({ isprofile }: NavBarProps) => {
+  const { data: overviewData } = useOverviewQuery();
   const pathname = usePathname();
+  const [logout] = useLogoutMutation();
+  const router = useRouter();
   const [profile, openprofile] = useState(isprofile || false);
   const menus = [
     {
@@ -89,6 +96,26 @@ export const NavBar = ({ isprofile }: NavBarProps) => {
       activeIcon: <DashboardWhite />,
     },
   ];
+
+  const handleLogOut = async () => {
+    const refresh = getCookie("refresh_token") || "";
+    try {
+      const res = await logout({ refresh_token: refresh });
+      if (res) {
+        removeCookie("access_token");
+        removeCookie("refresh_token");
+        sessionStorage.clear();
+        toast.success("Logged out successfully");
+        router.push("/admin/login");
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error("Failed to log out: " + err.message);
+      } else {
+        toast.error("Failed to log out");
+      }
+    }
+  };
   return (
     <div className="md:px-4 h-full leading-[100%] flex items-center max-md:gap-4 text-xl font-bold px-2">
       <div className="md:hidden">
@@ -196,7 +223,9 @@ export const NavBar = ({ isprofile }: NavBarProps) => {
 
                   {/* Profile details - Desktop only */}
                   <div className="flex flex-col gap-1 text-[#854C3A] ">
-                    <span className="text-lg font-medium whitespace-nowrap max-md:text-sm">Ostain Alex</span>
+                    <span className="text-lg font-medium whitespace-nowrap max-md:text-sm">
+                      Ostain Alex
+                    </span>
                     <span className="font-thin">TRIPMATE</span>
                   </div>
 
@@ -205,19 +234,21 @@ export const NavBar = ({ isprofile }: NavBarProps) => {
                   </div>
                 </Link>
               ) : (
-                <Link
-                  href={"/"}
+                <button
+                  onClick={handleLogOut}
                   className="flex items-center justify-center mb-4 gap-2 font-semibold text-lg border-t border-gray-300 pt-2"
                 >
                   <LogOut />{" "}
                   <span className="text-[#854C3A] tracking-wider">Log Out</span>
-                </Link>
+                </button>
               )}
             </SheetFooter>
           </SheetContent>
         </Sheet>
       </div>
-      <div className="max-md:text-sm">Good morning “Jason Wancs”</div>
+      <div className="max-md:text-sm">
+        {overviewData?.greeting || "Good Morning Jason Wance"}
+      </div>
     </div>
   );
 };

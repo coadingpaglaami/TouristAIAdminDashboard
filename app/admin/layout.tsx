@@ -1,8 +1,6 @@
 import { ReactNode } from "react";
-import AdminLayOut from "./AdminLayOut";
-
-
+import AuthLayOut from "./AuthLayOut";
 
 export default function DashboardLayOut({ children }: { children: ReactNode }) {
-  return <AdminLayOut>{children}</AdminLayOut>;
+  return <AuthLayOut>{children}</AuthLayOut>;
 }

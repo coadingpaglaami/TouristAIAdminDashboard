@@ -7,6 +7,7 @@ import { UserActivitiesCard } from "./UserActivityCard";
 import { UserTypesCard } from "./UserTypeCard";
 import { getDataByPeriod, TimePeriod } from "@/lib/data";
 
+
 export const Overview = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>("Weekly");
   const data = getDataByPeriod(selectedPeriod);
