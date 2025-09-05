@@ -35,18 +35,9 @@ export const Login = () => {
         email: formData.email,
         password: formData.password,
       }).unwrap();
-      if (res?.access) {
-        console.log("Login successful", res);
-        setCookie("access_token", res.access, 7);
-        setCookie("refresh_token", res.refresh, 7);
-        router.push("/admin/dashboard");
-        // Store login data in sessionStorage for immediate access
-        sessionStorage.setItem("isLoggedIn", "true");
-        sessionStorage.setItem("userMail", formData.email);
-        toast.success("Login successful!");
-      } else {
-        toast.error("Login failed. Please try again.");
-      }
+      sessionStorage.setItem("userMail",formData.email);
+      sessionStorage.setItem("Login","true");
+      router.push("/admin/verifyotp");
     } catch (error) {
       console.error("Login error:", error);
       toast.error("An error occurred during login. Please try again.");

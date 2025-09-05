@@ -100,14 +100,12 @@ export const NavBar = ({ isprofile }: NavBarProps) => {
   const handleLogOut = async () => {
     const refresh = getCookie("refresh_token") || "";
     try {
-      const res = await logout({ refresh_token: refresh });
-      if (res) {
-        removeCookie("access_token");
-        removeCookie("refresh_token");
-        sessionStorage.clear();
-        toast.success("Logged out successfully");
-        router.push("/admin/login");
-      }
+      await logout({ refresh });
+      removeCookie("access_token");
+      removeCookie("refresh_token");
+      sessionStorage.clear();
+      toast.success("Logged out successfully");
+      router.push("/admin/login");
     } catch (err: unknown) {
       if (err instanceof Error) {
         toast.error("Failed to log out: " + err.message);

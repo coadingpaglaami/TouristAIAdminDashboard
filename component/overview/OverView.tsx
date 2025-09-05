@@ -6,11 +6,14 @@ import { PlatformStatsCard } from "./PlatformStatesCard";
 import { UserActivitiesCard } from "./UserActivityCard";
 import { UserTypesCard } from "./UserTypeCard";
 import { getDataByPeriod, TimePeriod } from "@/lib/data";
+import { useOverviewQuery } from "@/services/api";
 
 
 export const Overview = () => {
+    const { data: overviewData } = useOverviewQuery();
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>("Weekly");
   const data = getDataByPeriod(selectedPeriod);
+
 
   const periods: TimePeriod[] = ["Weekly", "Monthly", "Yearly"];
 

@@ -1,7 +1,11 @@
 "use client";
 
-import { useVerifyOtpMutation } from "@/services/api";
-import { useRouter } from "next/navigation";
+import { setCookie } from "@/lib/cookies";
+import {
+  useAdminLoginVerifyMutation,
+  useVerifyOtpMutation,
+} from "@/services/api";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import React, {
   useRef,
   useEffect,
@@ -11,7 +15,7 @@ import React, {
 } from "react";
 
 export const Verify: React.FC = () => {
-  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]); // 6 digits
+  const [otpCode, setOtp] = useState<string[]>(["", "", "", "", "", ""]); // 6 digits
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
@@ -19,50 +23,106 @@ export const Verify: React.FC = () => {
   const [buttonText, setButtonText] = useState<string>("Verify OTP");
   const [wrongOtp, setWrongOtp] = useState<boolean>(false);
   const router = useRouter();
-  const [verifyOtp] = useVerifyOtpMutation();
+  const [verifyOtp, {}] = useVerifyOtpMutation();
+  const [adminLoginVerify, {}] = useAdminLoginVerifyMutation();
+  const email = sessionStorage.getItem("userMail");
+  const pathname = usePathname();
+
+  // useEffect(() => {
+
+  //   return () => {
+  //     if (pathname === "/admin/verify") {
+  //       sessionStorage.removeItem("userMail");
+  //     }
+  //   };
+  // }, [pathname]);
+
+  const loginstorage = sessionStorage.getItem("Login");
+
+  useEffect(() => {
+    return () => {
+      // clear email only in forgot-password flow
+      if (!loginstorage) {
+        sessionStorage.removeItem("userMail");
+      }
+    };
+  }, [loginstorage]);
 
   // ✅ Enable/disable verify button based on input
   useEffect(() => {
-    const allFilled = otp.every((digit) => digit.length === 1);
+    const allFilled = otpCode.every((digit) => digit.length === 1);
     setIsButtonDisabled(!allFilled);
-  }, [otp]);
+  }, [otpCode]);
 
   const handleInputChange = (index: number, value: string) => {
     setWrongOtp(false);
-    const newOtp = [...otp];
+    const newOtp = [...otpCode];
     newOtp[index] = value.slice(0, 1); // only 1 digit
     setOtp(newOtp);
 
     // auto move to next
-    if (value.length === 1 && index < otp.length - 1) {
+    if (value.length === 1 && index < otpCode.length - 1) {
       inputs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
+    if (e.key === "Backspace" && !otpCode[index] && index > 0) {
       inputs.current[index - 1]?.focus();
     }
   };
 
+  console.log(otpCode);
+
   // ✅ Verify with backend
   const handleVerify = async () => {
-    const otpCode = otp.join("");
-
-    try {
-      const verify = await verifyOtp({ otp: otpCode }).unwrap();
-
-      if (verify) {
+    console.log(email);
+    const otp = otpCode.join("");
+    if (loginstorage) {
+      try {
+        const verify = await adminLoginVerify({ otp, email }).unwrap();
+        console.log("✅ Inside TRY, success body:", verify);
+        console.log("👉 Redirecting now...");
+        setCookie("access_token", verify.access);
+        setCookie("refresh_token", verify.refresh);
         setWrongOtp(false);
-        sessionStorage.removeItem("userMail"); // clear email after success
-        router.push("/admin/reset-password");
+        sessionStorage.removeItem("userMail");
+        sessionStorage.removeItem("login");
+        router.push("/admin/dashboard");
+      } catch (err: unknown) {
+        if (typeof err === "object" && err !== null) {
+          console.log("❌ Inside CATCH, error object:", err);
+          // @ts-expect-error: err may have status/data properties from RTK Query
+          console.log("Status:", err.status);
+          // @ts-expect-error: err may have status/data properties from RTK Query
+          console.log("Error data:", err.data);
+        } else {
+          console.log("❌ Inside CATCH, error value:", err);
+        }
+        setWrongOtp(true);
       }
-    } catch (err) {
-      console.log("OTP verification failed", err);
-      setWrongOtp(true);
+    } else {
+      try {
+        const verify = await verifyOtp({ otp, email }).unwrap();
+        console.log("✅ Inside TRY, success body:", verify);
+        console.log("👉 Redirecting now...");
+        setWrongOtp(false);
+        sessionStorage.removeItem("userMail");
+        router.push("/admin/reset-password");
+      } catch (err: unknown) {
+        if (typeof err === "object" && err !== null) {
+          console.log("❌ Inside CATCH, error object:", err);
+          // @ts-expect-error: err may have status/data properties from RTK Query
+          console.log("Status:", err.status);
+          // @ts-expect-error: err may have status/data properties from RTK Query
+          console.log("Error data:", err.data);
+        } else {
+          console.log("❌ Inside CATCH, error value:", err);
+        }
+        setWrongOtp(true);
+      }
     }
   };
-
   // Resend OTP logic
   const countdownDuration = 30; // usually 30 or 60 seconds
   const handleResend = () => {
@@ -91,13 +151,12 @@ export const Verify: React.FC = () => {
   }, [isDisabled, countdown]);
 
   return (
-    <div>
+    <div className="md:min-w-[400px] w-full">
       <h4 className="text-2xl font-semibold text-white text-center">
         Forget Password
       </h4>
       <p className="text-lg text-white text-center">
-        Please input the verification code sent to your email{" "}
-        {sessionStorage.getItem("userMail")}
+        Please input the verification code sent to your email {email}
       </p>
       <div className="grid gap-4 w-full">
         <div className="flex justify-center w-full gap-3">
@@ -110,13 +169,13 @@ export const Verify: React.FC = () => {
                   inputs.current[index] = el;
                 }}
                 type="text"
-                value={otp[index]}
+                value={otpCode[index]}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange(index, e.target.value)
                 }
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 className={`otp-input w-12 h-12 text-center text-xl font-bold ${
-                  otp[index]
+                  otpCode[index]
                     ? "border-2 border-[#F7C56B]"
                     : "border-2 border-white"
                 } rounded-md text-white focus:outline-none focus:border-[#F7C56B]`}

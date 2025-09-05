@@ -7,7 +7,7 @@ interface AuthLayoutProps {
 
 export default function AuthLayOut({ children }: AuthLayoutProps) {
   return (
-    <div className="grid">
+    <div className="grid font-inter">
       <Image
         src="/authbg.jpg"
         alt="loading"

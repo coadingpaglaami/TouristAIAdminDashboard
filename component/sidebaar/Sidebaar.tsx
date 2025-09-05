@@ -91,14 +91,13 @@ export const Sidebaar = ({ isProfile }: SidebaarProps) => {
   const handleLogOut = async () => {
     const refresh = getCookie("refresh_token") || "";
     try {
-      const res = await logout({ refresh_token: refresh });
-      if (res) {
-        removeCookie("access_token");
-        removeCookie("refresh_token");
-        sessionStorage.clear();
-        toast.success("Logged out successfully");
+       const res = await logout({ refresh: refresh }).unwrap();
+      console.log(res);
+      removeCookie("access_token");
+      removeCookie("refresh_token");
+      sessionStorage.clear();
+      toast.success("Logged out successfully");
         router.push("/admin/login");
-      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         toast.error("Failed to log out: " + err.message);
@@ -206,7 +205,7 @@ export const Sidebaar = ({ isProfile }: SidebaarProps) => {
           className="flex items-center justify-center mb-4 gap-2 font-semibold text-lg border-t cursor-pointer border-gray-300 pt-2"
         >
           <LogOut />{" "}
-          <span className="text-[#854C3A] tracking-wider">Log Out</span>
+          <span className="text-[#854C3A] tracking-wider max-md:hidden">Log Out</span>
         </button>
       )}
     </div>

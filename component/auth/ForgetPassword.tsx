@@ -10,7 +10,6 @@ export const ForgetPassword: React.FC = () => {
     email: "",
   });
   const router = useRouter();
-
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -19,18 +18,29 @@ export const ForgetPassword: React.FC = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await forgotPassword(formData.email);
-      if (res) {
-        sessionStorage.setItem("userMail", formData.email);
-        router.push("/admin/verifyotp");
-      }
-    } catch {
+      const res = await forgotPassword(formData.email).unwrap();
+      console.log("✅ Inside TRY, success body:", res);
+      console.log("👉 Redirecting now...");
+      sessionStorage.setItem("userMail", formData.email);
+      console.log(sessionStorage.getItem("userMail"));
+      console.log(formData.email);
+      router.push("/admin/verifyotp");
+    } catch (error: unknown) {
       // Handle error
+      if (typeof error === "object" && error !== null) {
+        console.log("❌ Inside CATCH, error object:", error);
+        // @ts-expect-error: error may have status and data properties
+        console.log("Status:", error.status);
+        // @ts-expect-error: error may have status and data properties
+        console.log("Error data:", error.data);
+      } else {
+        console.log("❌ Inside CATCH, error value:", error);
+      }
     }
   };
 
   return (
-    <div className="min-w-[400px] w-full">
+    <div className="md:min-w-[400px] w-full">
       <h4 className="text-2xl font-semibold text-white text-center w-full">
         Forget Password
       </h4>

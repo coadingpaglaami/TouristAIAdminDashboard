@@ -51,7 +51,7 @@ interface OverviewResponse {
   };
 }
 interface LogOutRequest {
-  refresh_token: string;
+  refresh: string;
 }
 interface LogOutResponse {
   message: string;
@@ -76,10 +76,11 @@ export const baseQuery = fetchBaseQuery({
 
     return headers;
   },
+  credentials: "include",
   validateStatus: (response, body) => {
     console.log("API Response Status:", response.status);
     console.log("API Response Body:", body);
-    return response.status < 500;
+      return response.status >= 200 && response.status < 300;
   },
 });
 
@@ -115,6 +116,13 @@ export const api = createApi({
         body: otp,
       }),
     }),
+    adminLoginVerify: builder.mutation({
+      query: (data) => ({
+        url: "login/verify-otp/",
+        method: "POST",
+        body: data,
+      }),
+    }),
     overview: builder.query<OverviewResponse, void>({
       query: () => "overview/",
     }),
@@ -127,4 +135,5 @@ export const {
   useLogoutMutation,
   useForgotPasswordMutation,
   useVerifyOtpMutation,
+  useAdminLoginVerifyMutation,
 } = api;
