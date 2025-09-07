@@ -1,55 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
+import { OverviewResponse } from "@/interface/Overview";
 const baseURL = "https://ppp7rljm-8000.inc1.devtunnels.ms/admin-api/";
 
-interface User {
-  id: number;
-  email: string;
-  username: string;
-  role: string; // could be a union type if you have fixed roles like 'admin' | 'user' | 'editor'
-  is_staff: boolean;
-}
 
-interface loginResponse {
-  access: string;
-  refresh: string;
-  user: User;
-}
-
-interface loginRequest {
-  email: string;
-  password: string;
-}
-
-interface OverviewResponse {
-  greeting: string;
-  total_users: number;
-  new_users: {
-    weekly: number;
-  };
-  premium_users: number;
-  inactive_users: number;
-  daily_avg_active_user: number;
-  boosting_stats: {
-    total_boosted_hours: number;
-    boosting_engagement_rate: number;
-  };
-  search_activity: {
-    total_searches: number;
-    weekly: number;
-    search_engagement_rate: number;
-  };
-  premium_insights: {
-    active_premium_user: number;
-    renewal_rate: number;
-    churn_rate: number;
-    search_frequency: {
-      name: string;
-      status: string;
-      search_history: number;
-    }[];
-  };
-}
 interface LogOutRequest {
   refresh: string;
 }
@@ -88,7 +41,7 @@ export const api = createApi({
   reducerPath: "api",
   baseQuery,
   endpoints: (builder) => ({
-    login: builder.mutation<loginResponse, loginRequest>({
+    login: builder.mutation({
       query: (logindata) => ({
         url: "login/",
         method: "POST",
@@ -123,8 +76,8 @@ export const api = createApi({
         body: data,
       }),
     }),
-    overview: builder.query<OverviewResponse, void>({
-      query: () => "overview/",
+    overview: builder.query<OverviewResponse, string>({
+      query: (period = "Weekly") => `overview/?period=${period}`,
     }),
   }),
 });

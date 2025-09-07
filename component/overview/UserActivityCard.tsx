@@ -1,4 +1,3 @@
-import { UserActivity } from "@/lib/data";
 import Image from "next/image";
 import {
   Table,
@@ -10,6 +9,12 @@ import {
 } from "@/components/ui/table";
 import React from "react";
 
+interface UserActivity {
+  name: string;
+  image?: string;
+  status: string;
+  search_history: number;
+}
 interface UserActivitiesCardProps {
   data: UserActivity[];
 }
@@ -37,22 +42,18 @@ export const UserActivitiesCard = ({ data }: UserActivitiesCardProps) => {
                   <TableRow className="w-full border-none">
                     <TableCell className="w-1/3 font-medium py-4">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gray-300 rounded-full mr-3 flex items-center justify-center border-2 border-black">
-                          {item.image ? (
+                        <div className="w-10 h-10 rounded-full mr-3 flex items-center justify-center border-2 border-black">
                             <Image
-                              src={item.image}
+                              src={item.image || '/avatar.png'}
                               alt={item.name}
                               height={50}
                               width={50}
                               className="w-10 h-10 rounded-full"
                             />
-                          ) : (
-                            <span className="text-sm">
-                              {item.name.charAt(0)}
-                            </span>
-                          )}
+                          
+                         
                         </div>
-                        <p className="font-medium text-lg tracking-wider">{item.name}</p>
+                        <p className="font-medium text-lg tracking-wider">{item.name.charAt(0).toUpperCase()}{item.name.slice(1)}</p>
                       </div>
                     </TableCell>
                     <TableCell className="w-1/3 text-center py-4">
@@ -75,7 +76,7 @@ export const UserActivitiesCard = ({ data }: UserActivitiesCardProps) => {
                     <TableCell className="py-4">
                       {" "}
                       <div className="text-right text-lg">
-                        <p className=" tracking-wider">{item.numtimes} times</p>
+                        <p className=" tracking-wider">{item.search_history} times</p>
                       </div>
                     </TableCell>
                   </TableRow>

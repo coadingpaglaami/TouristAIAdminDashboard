@@ -3,9 +3,10 @@ import { ArrowUp } from "lucide-react";
 import React from "react";
 interface PlatformStatsCardProps {
   data: PlatformStats[];
+  period: string;
 }
 
-export const PlatformStatsCard = ({ data }: PlatformStatsCardProps) => {
+export const PlatformStatsCard = ({ data, period }: PlatformStatsCardProps) => {
   return (
     <div className="grid lg:grid-cols-3 gap-4 max-md:max-w-[90vw] tracking-wider">
       {data.map((item, index) => (
@@ -52,7 +53,8 @@ export const PlatformStatsCard = ({ data }: PlatformStatsCardProps) => {
                   <ArrowUp className="text-green-500 w-4 h-4" />
                   <span className="text-xs text-green-500 flex flex-row gap-2">
                     {item.comppercentage}%{" "}
-                    <p className="text-gray-300">from last month</p>
+                    <p className="text-gray-300">from last {' '}
+                {period === "Weekly" ?'week': period === "Monthly" ? 'month' : 'year'}</p>
                   </span>
                 </span>
               </div>

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useLoginMutation } from "@/services/api";
-import { setCookie } from "@/lib/cookies";
 import { toast } from "sonner";
 
 interface FormData {
@@ -35,8 +34,9 @@ export const Login = () => {
         email: formData.email,
         password: formData.password,
       }).unwrap();
-      sessionStorage.setItem("userMail",formData.email);
-      sessionStorage.setItem("Login","true");
+      console.log("Login Response:", res);
+      sessionStorage.setItem("userMail", formData.email);
+      sessionStorage.setItem("Login", "true");
       router.push("/admin/verifyotp");
     } catch (error) {
       console.error("Login error:", error);

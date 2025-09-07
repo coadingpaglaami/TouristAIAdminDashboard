@@ -9,9 +9,12 @@ import { getDataByPeriod, TimePeriod } from "@/lib/data";
 import { useOverviewQuery } from "@/services/api";
 
 
+
 export const Overview = () => {
-    const { data: overviewData } = useOverviewQuery();
+ 
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>("Weekly");
+  const { data: overviewData } = useOverviewQuery(selectedPeriod);
+  console.log('Overview Data:', selectedPeriod);
   const data = getDataByPeriod(selectedPeriod);
 
 
@@ -44,23 +47,23 @@ export const Overview = () => {
           {/* User Types - Full width on large screens */}
           <div className="flex flex-col gap-3.5">
             <div className="lg:col-span-4">
-              <UserTypesCard data={data.userTypes} />
+              <UserTypesCard inactiveuser={overviewData?.overview?.inactive_users || 0} newuser={overviewData?.overview?.new_users || 0} premiumuser={overviewData?.overview?.premium_users || 0} totaluser={overviewData?.overview?.total_users || 0} period={selectedPeriod || ''} />
             </div>
 
             {/* Platform Stats */}
             <div className="">
-              <PlatformStatsCard data={data.platformStats} />
+              <PlatformStatsCard data={data.platformStats} period={selectedPeriod || ''} />
             </div>
           </div>
           {/* Category Stats */}
           <div className="flex gap-4 flex-col md:flex-row md:justify-between md:h-[420px]">
             <div className="lg:w-1/2 w-full h-full">
-              <CategoryStatsCard data={data.categoryStats} />
+              <CategoryStatsCard active_premium_user={overviewData?.overview?.premium_insights.active_premium_user || 0} renewal_rate={overviewData?.overview?.premium_insights.renewal_rate || 0} churn_rate={overviewData?.overview?.premium_insights.churn_rate || 0} />
             </div>
 
             {/* User Activities - Full width */}
             <div className="lg:col-span-2 w-full lg:w-1/2 h-full">
-              <UserActivitiesCard data={data.userActivities} />
+              <UserActivitiesCard data={overviewData?.overview?.search_frequency || []} />
             </div>
           </div>
         </div>

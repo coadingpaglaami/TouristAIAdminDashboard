@@ -5,7 +5,7 @@ import {
   useAdminLoginVerifyMutation,
   useVerifyOtpMutation,
 } from "@/services/api";
-import { redirect, usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, {
   useRef,
   useEffect,
@@ -26,7 +26,6 @@ export const Verify: React.FC = () => {
   const [verifyOtp, {}] = useVerifyOtpMutation();
   const [adminLoginVerify, {}] = useAdminLoginVerifyMutation();
   const email = sessionStorage.getItem("userMail");
-  const pathname = usePathname();
 
   // useEffect(() => {
 

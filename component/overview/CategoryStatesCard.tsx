@@ -1,10 +1,17 @@
 import { CategoryStats } from "@/lib/data";
 
 interface CategoryStatsCardProps {
-  data: CategoryStats[];
+  active_premium_user: number;
+  renewal_rate: number;
+  churn_rate: number;
 }
 
-export const CategoryStatsCard = ({ data }: CategoryStatsCardProps) => {
+export const CategoryStatsCard = ({ active_premium_user, renewal_rate, churn_rate }: CategoryStatsCardProps) => {
+  const data: CategoryStats[] = [
+    { name: "Active Premium Users", percentage: active_premium_user },
+    { name: "Renewal Rate", percentage: renewal_rate },
+    { name: "Churn Rate", percentage: churn_rate },
+  ]
   return (
     <div className="bg-white rounded-lg shadow h-full">
       <div className="text-xl font-semibold mb-4 border-b border-gray-300 pb-3">

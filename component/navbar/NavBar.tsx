@@ -39,7 +39,7 @@ interface NavBarProps {
   isprofile?: boolean;
 }
 export const NavBar = ({ isprofile }: NavBarProps) => {
-  const { data: overviewData } = useOverviewQuery();
+  const { data: overviewData } = useOverviewQuery('Weekly');
   const pathname = usePathname();
   const [logout] = useLogoutMutation();
   const router = useRouter();
