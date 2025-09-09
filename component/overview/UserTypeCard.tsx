@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Group, PersonAdd, PersonRemove, Productivity } from "@/svg/OverView";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Overview {
   new_users?: number;
@@ -19,6 +20,7 @@ interface Overview {
 interface UserTypesCardProps {
   overview: Overview;
   period: string;
+  loading: boolean;
 }
 
 interface CardItem {
@@ -29,7 +31,11 @@ interface CardItem {
   increasepercentage: string;
 }
 
-export const UserTypesCard = ({ overview, period }: UserTypesCardProps) => {
+export const UserTypesCard = ({
+  overview,
+  period,
+  loading,
+}: UserTypesCardProps) => {
   const {
     new_users: newuser,
     total_users: totaluser,
@@ -81,11 +87,19 @@ export const UserTypesCard = ({ overview, period }: UserTypesCardProps) => {
         <div key={index} className="border rounded-lg p-4 bg-white">
           <div className="flex flex-col gap-4">
             <span className="text-xl font-semibold tracking-wider text-[#1C1B1F] ">
-              {item.typeuser}
+              {loading ? <Skeleton className="w-32 h-8" /> : item.typeuser}
             </span>
             <div className="flex items-center font-bold text-2xl">
-              <span className="mr-2">{item.icon}</span>
-              <span>{item.numuser.toLocaleString()}</span>
+              <span className="mr-2">
+                {loading ? <Skeleton className="w-8 h-8" /> : item.icon}
+              </span>
+              <span>
+                {loading ? (
+                  <Skeleton className="w-14 h-8" />
+                ) : (
+                  item.numuser.toLocaleString()
+                )}
+              </span>
             </div>
             <span
               className={`text-sm ${
@@ -93,13 +107,17 @@ export const UserTypesCard = ({ overview, period }: UserTypesCardProps) => {
               }`}
             >
               <span className="tracking-[0.1em] text-sm truncate">
-                {item.isIncrease}
-                {item.increasepercentage} from last{" "}
-                {period === "Weekly"
-                  ? "week"
-                  : period === "Monthly"
-                  ? "month"
-                  : "year"}
+                {loading ? (
+                  <Skeleton className="w-full h-4" />
+                ) : (
+                  `${item.isIncrease} ${item.increasepercentage} from last ${
+                    period === "Weekly"
+                      ? "week"
+                      : period === "Monthly"
+                      ? "month"
+                      : "year"
+                  }`
+                )}
               </span>
             </span>
           </div>

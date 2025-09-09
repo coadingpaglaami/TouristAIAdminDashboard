@@ -161,7 +161,7 @@ export const Sidebaar = ({ isProfile }: SidebaarProps) => {
                 <Link
                   key={path}
                   href={path}
-                  className={`p-2 flex items-center gap-2 rounded text-[16px] font-semibold tracking-[0.1em] mx-2 truncate ${
+                  className={`p-2 flex items-center max-lg:justify-center gap-2 rounded text-[16px] font-semibold tracking-[0.1em] mx-2 truncate ${
                     isActive ? "orange text-white" : "text-[#854C3A]"
                   }`}
                 >
@@ -205,7 +205,7 @@ export const Sidebaar = ({ isProfile }: SidebaarProps) => {
           className="flex items-center justify-center mb-4 gap-2 font-semibold text-lg border-t cursor-pointer border-gray-300 pt-2"
         >
           <LogOut />{" "}
-          <span className="text-[#854C3A] tracking-wider max-md:hidden">Log Out</span>
+          <span className="text-[#854C3A] tracking-wider max-lg:hidden">Log Out</span>
         </button>
       )}
     </div>

@@ -5,14 +5,14 @@ import { CategoryStatsCard } from "./CategoryStatesCard";
 import { PlatformStatsCard } from "./PlatformStatesCard";
 import { UserActivitiesCard } from "./UserActivityCard";
 import { UserTypesCard } from "./UserTypeCard";
-import { getDataByPeriod, TimePeriod } from "@/lib/data";
+import {  TimePeriod } from "@/lib/data";
 import { useOverviewQuery } from "@/services/api";
 
 export const Overview = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>("Weekly");
-  const { data: overviewData } = useOverviewQuery(selectedPeriod);
+  const { data: overviewData, isLoading } = useOverviewQuery(selectedPeriod);
   console.log("Overview Data:", selectedPeriod);
-  const data = getDataByPeriod(selectedPeriod);
+  // const data = getDataByPeriod(selectedPeriod);
 
   const periods: TimePeriod[] = ["Weekly", "Monthly", "Yearly"];
 
@@ -46,6 +46,7 @@ export const Overview = () => {
               <UserTypesCard
                 overview={overviewData?.overview || {}}
                 period={selectedPeriod || ""}
+                loading={isLoading}
               />
             </div>
 
@@ -56,6 +57,7 @@ export const Overview = () => {
                 searchStats={overviewData?.overview?.search_activity}
                 engagementStats={overviewData?.overview?.engagement_stats}
                 period={selectedPeriod || ""}
+                loading={isLoading}
               />
             </div>
           </div>
@@ -80,6 +82,7 @@ export const Overview = () => {
             <div className="lg:col-span-2 w-full lg:w-1/2 h-full">
               <UserActivitiesCard
                 data={overviewData?.overview?.search_frequency || []}
+                loading={isLoading}
               />
             </div>
           </div>

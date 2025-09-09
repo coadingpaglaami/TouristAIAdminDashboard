@@ -1,8 +1,7 @@
-import { PlatformStats } from "@/lib/data";
 import { Schedule } from "@/svg/Action";
 import { Group } from "@/svg/OverView";
-import { ArrowUp } from "lucide-react";
 import React from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface BoostingStats {
   total_boosted_hours: number;
@@ -26,6 +25,7 @@ interface BoostingStatesProps {
   searchStats: SearchStats | undefined;
   engagementStats?: EngagementStats | undefined;
   period: string;
+  loading: boolean;
 }
 
 export const PlatformStatsCard = ({
@@ -33,6 +33,7 @@ export const PlatformStatsCard = ({
   searchStats,
   period,
   engagementStats,
+  loading,
 }: BoostingStatesProps) => {
   const {
     total_boosted_hours,
@@ -83,15 +84,21 @@ export const PlatformStatsCard = ({
 
         <div className="flex flex-col gap-2 w-full">
           <span className="flex items-center gap-2.5 text-2xl font-semibold text-[#1C1B1F]">
-            <Group /> {daily_avg_active_user || 0}
+            {/* <Group /> {daily_avg_active_user || 0} */}
+            {loading ? <Skeleton className="w-20 h-8" /> : <Group />}
+            {loading ? <Skeleton className="w-20" /> : daily_avg_active_user}
           </span>
           <div className="flex justify-between p-1">
             <span>Engagement Rate</span>
-            <p className="text-sm text-gray-600">
-              {engagement_rate !== undefined
-                ? `${Math.min(Number(engagement_rate), 100)} %`
-                : "0 %"}
-            </p>
+            <div className="text-sm text-gray-600">
+              {loading ? (
+                <Skeleton className="w-8 h-6" />
+              ) : engagement_rate !== undefined ? (
+                `${Math.min(Number(engagement_rate), 100)} %`
+              ) : (
+                "0 %"
+              )}
+            </div>
           </div>
 
           <div className="w-full bg-gray-200 rounded-full h-2">
@@ -99,10 +106,12 @@ export const PlatformStatsCard = ({
               className="bg-blue-600 h-2 rounded-full"
               style={{
                 width: `${
-                  engagement_rate !== undefined
+                  loading
+                    ? 0
+                    : engagement_rate !== undefined
                     ? Math.min(Number(engagement_rate), 100)
                     : 0
-                }%`
+                }%`,
               }}
             />
           </div>
@@ -114,11 +123,15 @@ export const PlatformStatsCard = ({
             {item.name}
           </span>
           <div className="flex items-center gap-4 mb-4">
-            {item.icon}
+            {loading ? <Skeleton className="w-9 h-9" /> : item.icon}
 
             <span className="flex items-center gap-2">
               <span className="text-xs text-green-500 flex flex-row gap-2">
-                {item.boostsearchengagementchange}{" "}
+                {loading ? (
+                  <Skeleton className="w-6" />
+                ) : (
+                  item.boostsearchengagementchange
+                )}{" "}
                 <span className="text-gray-300">
                   from last{" "}
                   {period === "Weekly"
@@ -133,11 +146,12 @@ export const PlatformStatsCard = ({
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
               <span className="text-sm">{item.nametwo}</span>
-              <p className="text-sm">{item.totalboostsearchrate}</p>
+          <span className="text-sm">{loading ? <Skeleton className="w-8 h-6" /> : item.totalboostsearchrate}</span>
+
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm">{item.engrate}</span>
-              <p className="text-sm">{item.boostsearchengagementrate}</p>
+              <span className="text-sm">{loading ? <Skeleton className="w-8 h-6" /> : item.boostsearchengagementrate}</span>
             </div>
           </div>
         </div>

@@ -1,23 +1,32 @@
 "use client";
 import { NavBar } from "@/component/navbar";
 import { Sidebaar } from "@/component/sidebaar";
-import { ReactNode } from "react";
-import { usePathname } from "next/navigation";
+import { ReactNode  } from "react";
+import { usePathname  } from "next/navigation";
 
-const noLayoutRoutes = [
-  "/admin/profile",
+
+const noLayoutPublicRoutes = [
   "/admin/login",
   "/admin/forget-password",
   "/admin/verifyotp",
   "/admin/reset-password",
   "/admin/success",
-  "/admin/security"
 ];
+
+const noLayoutProtectedRoutes = ["/admin/profile", "/admin/security"];
 
 export default function AdminLayOut({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
-  if (noLayoutRoutes.includes(pathname)) {
+  if (noLayoutPublicRoutes.includes(pathname)) {
+    return <>{children}</>;
+  }
+
+  // Protected no-layout pages (must be logged in)
+  if (
+    noLayoutPublicRoutes.includes(pathname) ||
+    noLayoutProtectedRoutes.includes(pathname)
+  ) {
     return <>{children}</>;
   }
 

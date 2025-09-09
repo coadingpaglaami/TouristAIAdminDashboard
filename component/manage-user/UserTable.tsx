@@ -248,15 +248,9 @@ export const UserTable = ({
   const [page, setPage] = useState(1);
   const [deleteUser, setDeleteUser] = useState<UserTable | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserTable | null>(null); // Added state for selected user in dialog
+  const [bannedUser, setBannedUser] = useState<UserTable | null>(null);
+const [banDuration, setBanDuration] = useState<UserTable["duration"]>("1 Hour"); 
   const rowsPerPage = 7;
-
-  const handleBlockToggle = (id: number) => {
-    setData((prevData) =>
-      prevData.map((user) =>
-        user.id === id ? { ...user, isBanned: !user.isBanned } : user
-      )
-    );
-  };
 
   const handleDelete = () => {
     if (!deleteUser) return;
@@ -268,6 +262,30 @@ export const UserTable = ({
     setDeleteUser(null); // Close the delete dialog after deletion
   };
 
+const handleToggleBanUser = () => {
+  if (!bannedUser) return;
+
+  // Ensure banDuration is one of the valid values in the UserTable type
+  const validDuration: UserTable["duration"] = banDuration;
+
+  // If the user is being banned, we set the ban duration
+  const updatedUser = {
+    ...bannedUser,
+    isBanned: !bannedUser.isBanned,
+    duration: bannedUser.isBanned ? undefined : validDuration, // Set duration only when banning
+  };
+
+  // Update the user data
+  setData((prevData) =>
+    prevData.map((user) =>
+      user.id === bannedUser.id ? updatedUser : user
+    )
+  );
+
+  console.log(bannedUser.isBanned ? "User unbanned:" : "User banned:", bannedUser.name, "for", bannedUser.isBanned ? "no duration" : validDuration);
+  setBannedUser(null); // Close the banned/unbanned dialog after action
+  setBanDuration("1 Hour"); // Reset the duration to default
+};
   const filteredData = useMemo(() => {
     return data.filter((user) => {
       const matchesSearch =
@@ -530,13 +548,91 @@ export const UserTable = ({
                       </Dialog>
 
                       {/* Block / Unblock */}
-                      <button
+                      {/* <button
                         className="p-2 hover:bg-gray-100 rounded opacity-100"
-                        title={item.isBanned ? "Unblock" : "Block"}
-                        onClick={() => handleBlockToggle(item.id)}
+                        title={isBlocked ? "Unblock" : "Block"}
+                        onClick={() => {
+                          if (!isBlocked) {
+                            setBannedUser(item); // Open the dialog for unbanned users to confirm the block
+                          } else {
+                            handleToggleBanUser(); // Directly toggle for banned users
+                          }
+                        }}
                       >
-                        {item.isBanned ? <Block /> : <CheckCircle />}
-                      </button>
+                        {isBlocked ? <Block /> : <CheckCircle />}
+                      </button> */}
+      <Dialog
+              open={!!bannedUser && bannedUser.name === item.name}
+              onOpenChange={(open) =>
+                !open ? setBannedUser(null) : setBannedUser(item)
+              }
+            >
+              <DialogTrigger asChild>
+                <button
+                  className="p-2 hover:bg-gray-100 rounded"
+                  title={isBlocked ? "Unblock" : "Block"}
+                  onClick={() => setBannedUser(item)}
+                >
+                  {isBlocked ? <Block /> : <CheckCircle />}
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    {isBlocked ? "Unban Confirmation" : "Ban Confirmation"}
+                  </DialogTitle>
+                  <DialogDescription>
+                    Are you sure you want to{" "}
+                    {isBlocked ? "unban" : "ban"}{" "}
+                    <span className="font-semibold text-red-600">
+                      {bannedUser?.name}
+                    </span>
+                    ? <br /> This action cannot be undone.
+                  </DialogDescription>
+                </DialogHeader>
+                {/* Show the duration input only when banning */}
+                {!isBlocked && (
+                  <div className="px-6 pt-4 pb-6">
+                    <form className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="duration">Ban Duration</Label>
+                        <Select
+                          value={banDuration}
+                          onValueChange={(value) => setBanDuration(value as UserTable["duration"])}
+                        >
+                          <SelectTrigger id="duration">
+                            <SelectValue placeholder="Select Duration" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1 Hour">1 Hour</SelectItem>
+                            <SelectItem value="6 Hours">6 Hours</SelectItem>
+                            <SelectItem value="12 Hours">12 Hours</SelectItem>
+                            <SelectItem value="1 Day">1 Day</SelectItem>
+                            <SelectItem value="3 Days">3 Days</SelectItem>
+                            <SelectItem value="7 Days">7 Days</SelectItem>
+                            <SelectItem value="15 Days">15 Days</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </form>
+                  </div>
+                )}
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setBannedUser(null)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="orange p-2 rounded-md"
+                    onClick={handleToggleBanUser}
+                  >
+                    {isBlocked ? "Unban" : "Ban"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
                       {/* Delete Dialog */}
                       <Dialog
