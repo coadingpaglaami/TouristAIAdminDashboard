@@ -33,9 +33,6 @@ export const UserActivitiesCard = ({ data }: UserActivitiesCardProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {/* 
-              <TableCell className="w-1/3">Paid</TableCell>
-              <TableCell className="w-1/3 ">Credit Card</TableCell> */}
             {data.map((item, index) => (
               <React.Fragment key={index}>
            

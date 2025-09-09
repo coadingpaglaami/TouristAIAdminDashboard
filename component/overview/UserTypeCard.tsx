@@ -1,13 +1,23 @@
-
-
 import { ReactNode } from "react";
 import { Group, PersonAdd, PersonRemove, Productivity } from "@/svg/OverView";
 
-interface userTypeCard {
-  newuser: number;
-  totaluser: number;
-  premiumuser: number;
-  inactiveuser: number;
+interface Overview {
+  new_users?: number;
+  total_users?: number;
+  premium_users?: number;
+  inactive_users?: number;
+  new_users_change?: string;
+  total_users_change?: string;
+  premium_users_change?: string;
+  inactive_users_change?: string;
+  is_new_users_increase?: boolean;
+  is_total_users_increase?: boolean;
+  is_premium_users_increase?: boolean;
+  is_inactive_users_increase?: boolean;
+}
+
+interface UserTypesCardProps {
+  overview: Overview;
   period: string;
 }
 
@@ -16,44 +26,52 @@ interface CardItem {
   numuser: number;
   icon: ReactNode;
   isIncrease: boolean;
-  increasepercentage: number;
+  increasepercentage: string;
 }
 
-export const UserTypesCard = ({
-  newuser,
-  totaluser,
-  premiumuser,
-  inactiveuser,
-  period,
-}: userTypeCard) => {
+export const UserTypesCard = ({ overview, period }: UserTypesCardProps) => {
+  const {
+    new_users: newuser,
+    total_users: totaluser,
+    premium_users: premiumuser,
+    inactive_users: inactiveuser,
+    new_users_change: newuserChange,
+    total_users_change: totaluserChange,
+    premium_users_change: premiumuserChange,
+    inactive_users_change: inactiveuserChange,
+    is_new_users_increase: isNewUserIncrease,
+    is_total_users_increase: isTotalUserIncrease,
+    is_premium_users_increase: isPremiumUserIncrease,
+    is_inactive_users_increase: isInactiveUserIncrease,
+  } = overview || {};
   const data: CardItem[] = [
     {
       typeuser: "New Users",
-      numuser: newuser,
+      numuser: newuser || 0,
       icon: <Group />,
-      isIncrease: true,
-      increasepercentage: 12,
+      isIncrease: isNewUserIncrease || false,
+      increasepercentage: newuserChange || "",
     },
     {
       typeuser: "Total Users",
-      numuser: totaluser,
+      numuser: totaluser || 0,
       icon: <PersonAdd />,
-      isIncrease: true,
-      increasepercentage: 8,
+      isIncrease: isTotalUserIncrease || false,
+      increasepercentage: totaluserChange || "",
     },
     {
       typeuser: "Premium Users",
-      numuser: premiumuser,
+      numuser: premiumuser || 0,
       icon: <Productivity />,
-      isIncrease: false,
-      increasepercentage: 3,
+      isIncrease: isPremiumUserIncrease || false,
+      increasepercentage: premiumuserChange || "",
     },
     {
       typeuser: "Inactive Users",
-      numuser: inactiveuser,
+      numuser: inactiveuser || 0,
       icon: <PersonRemove />,
-      isIncrease: false,
-      increasepercentage: 5,
+      isIncrease: isInactiveUserIncrease || false,
+      increasepercentage: inactiveuserChange || "",
     },
   ];
 
@@ -62,7 +80,7 @@ export const UserTypesCard = ({
       {data.map((item, index) => (
         <div key={index} className="border rounded-lg p-4 bg-white">
           <div className="flex flex-col gap-4">
-            <span className="text-xl font-semibold tracking-wider text-[#1C1B1F]">
+            <span className="text-xl font-semibold tracking-wider text-[#1C1B1F] ">
               {item.typeuser}
             </span>
             <div className="flex items-center font-bold text-2xl">
@@ -74,10 +92,14 @@ export const UserTypesCard = ({
                 item.isIncrease ? "text-green-600" : "text-red-600"
               }`}
             >
-              <span className="tracking-[0.1em] text-sm">
-                {item.isIncrease ? "↑ " : "↓ "}
-                {item.increasepercentage}% from last {' '}
-                {period === "Weekly" ?'week': period === "Monthly" ? 'month' : 'year'}
+              <span className="tracking-[0.1em] text-sm truncate">
+                {item.isIncrease}
+                {item.increasepercentage} from last{" "}
+                {period === "Weekly"
+                  ? "week"
+                  : period === "Monthly"
+                  ? "month"
+                  : "year"}
               </span>
             </span>
           </div>

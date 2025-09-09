@@ -77,7 +77,7 @@ export const api = createApi({
       }),
     }),
     overview: builder.query<OverviewResponse, string>({
-      query: (period = "Weekly") => `overview/?period=${period}`,
+      query: (period:string) => `overview/?period=${period}`,
     }),
   }),
 });

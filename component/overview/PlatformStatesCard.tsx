@@ -1,101 +1,145 @@
 import { PlatformStats } from "@/lib/data";
+import { Schedule } from "@/svg/Action";
+import { Group } from "@/svg/OverView";
 import { ArrowUp } from "lucide-react";
 import React from "react";
-interface PlatformStatsCardProps {
-  data: PlatformStats[];
+
+interface BoostingStats {
+  total_boosted_hours: number;
+  boosting_engagement_rate: number;
+  boosting_engagement_change: string;
+  is_boosting_increase: boolean;
+}
+interface SearchStats {
+  total_searches: number;
+  search_engagement_rate: number;
+  search_engagement_change: string;
+  is_search_increase: boolean;
+}
+interface EngagementStats {
+  daily_avg_active_user: number;
+  engagement_rate: string;
+}
+
+interface BoostingStatesProps {
+  boostingStats: BoostingStats | undefined;
+  searchStats: SearchStats | undefined;
+  engagementStats?: EngagementStats | undefined;
   period: string;
 }
 
-export const PlatformStatsCard = ({ data, period }: PlatformStatsCardProps) => {
+export const PlatformStatsCard = ({
+  boostingStats,
+  searchStats,
+  period,
+  engagementStats,
+}: BoostingStatesProps) => {
+  const {
+    total_boosted_hours,
+    boosting_engagement_rate,
+    boosting_engagement_change,
+    is_boosting_increase,
+  } = boostingStats || {};
+  const {
+    total_searches,
+    search_engagement_rate,
+    search_engagement_change,
+    is_search_increase,
+  } = searchStats || {};
+  const { daily_avg_active_user, engagement_rate } = engagementStats || {};
+  const data = [
+    {
+      name: "Boosting Stats",
+      totalboostsearchrate: total_boosted_hours || 0,
+      nametwo: "Total Boosted Hours",
+      boostsearchengagementrate: boosting_engagement_rate || 0,
+      engrate: "Boosting Engagement Rate",
+      boostsearchengagementchange: boosting_engagement_change || "",
+      isboostsearchincrease: is_boosting_increase || false,
+      icon: (
+        <span className="orange p-2">
+          <Schedule />
+        </span>
+      ),
+    },
+    {
+      name: "Searching Stats",
+      totalboostsearchrate: total_searches || 0,
+      nametwo: "Total Searches",
+      boostsearchengagementrate: search_engagement_rate || 0,
+      engrate: "Searching Engagement Rate",
+      boostsearchengagementchange: search_engagement_change || "",
+      isboostsearchincrease: is_search_increase || false,
+      icon: <Group />,
+    },
+  ];
+
   return (
     <div className="grid lg:grid-cols-3 gap-4 max-md:max-w-[90vw] tracking-wider">
+      <div className="flex flex-col p-3 border rounded-lg bg-white gap-3">
+        <span className="text-xl font-semibold tracking-wider text-[#1C1B1F]">
+          Daily Avg Active Users
+        </span>
+
+        <div className="flex flex-col gap-2 w-full">
+          <span className="flex items-center gap-2.5 text-2xl font-semibold text-[#1C1B1F]">
+            <Group /> {daily_avg_active_user || 0}
+          </span>
+          <div className="flex justify-between p-1">
+            <span>Engagement Rate</span>
+            <p className="text-sm text-gray-600">
+              {engagement_rate !== undefined
+                ? `${Math.min(Number(engagement_rate), 100)} %`
+                : "0 %"}
+            </p>
+          </div>
+
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-blue-600 h-2 rounded-full"
+              style={{
+                width: `${
+                  engagement_rate !== undefined
+                    ? Math.min(Number(engagement_rate), 100)
+                    : 0
+                }%`
+              }}
+            />
+          </div>
+        </div>
+      </div>
       {data.map((item, index) => (
-        <div
-          key={index}
-          className="flex flex-col p-3 border rounded-lg  bg-white gap-3"
-        >
-          <span className=" text-xl font-semibold tracking-wider text-[#1C1B1F]">
+        <div key={index} className="bg-white p-3 border rounded-lg">
+          <span className="text-lg tracking-wider font-medium">
             {item.name}
           </span>
-          {item.isGraph ? (
-            <div>
-              <div className="flex items-center">
-                <span className="mr-3">{item.icon}</span>
-                <p className="font-bold text-2xl">
-                  {(item.numuser ?? 0).toLocaleString()}
-                </p>
-              </div>
-              {Array.isArray(item.rate) &&
-                item.rate.map((rateItem, rateIndex) => (
-                  <React.Fragment key={rateIndex}>
-                    <div className="flex flex-col gap-2 w-full">
-                      <div className="flex justify-between p-1">
-                        <span>{rateItem.name}</span>
-                        <p className="text-sm text-gray-600">
-                          {rateItem.somenum} %
-                        </p>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full"
-                          style={{ width: `${rateItem.somenum}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </React.Fragment>
-                ))}
-            </div>
-          ) : (
-            <div>
-              <div className="flex items-center gap-4 mb-4">
-                {item.icon}
-                <span className="flex items-center gap-2">
-                  <ArrowUp className="text-green-500 w-4 h-4" />
-                  <span className="text-xs text-green-500 flex flex-row gap-2">
-                    {item.comppercentage}%{" "}
-                    <p className="text-gray-300">from last {' '}
-                {period === "Weekly" ?'week': period === "Monthly" ? 'month' : 'year'}</p>
-                  </span>
+          <div className="flex items-center gap-4 mb-4">
+            {item.icon}
+
+            <span className="flex items-center gap-2">
+              <span className="text-xs text-green-500 flex flex-row gap-2">
+                {item.boostsearchengagementchange}{" "}
+                <span className="text-gray-300">
+                  from last{" "}
+                  {period === "Weekly"
+                    ? "week"
+                    : period === "Monthly"
+                    ? "month"
+                    : "year"}
                 </span>
-              </div>
-              {Array.isArray(item.rate) &&
-                item.rate.map((rateItem, rateIndex) => (
-                  <React.Fragment key={rateIndex}>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm">{rateItem.name}</span>
-                      <p className=" text-sm">
-                        {(rateItem.somenum ?? 0).toLocaleString()}{" "}
-                        {rateItem.suffix}
-                      </p>
-                    </div>
-                  </React.Fragment>
-                ))}
+              </span>
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-4">
+              <span className="text-sm">{item.nametwo}</span>
+              <p className="text-sm">{item.totalboostsearchrate}</p>
             </div>
-          )}
-          {/* {Array.isArray(item.rate) &&
-              item.rate.map((rateItem, rateIndex) => (
-                <div key={rateIndex}>
-                  <div className="flex justify-between p-1">
-                    <div className="flex items-center">
-                      <span>{rateItem.name}</span>
-                      {rateItem.rating !== 0 && (
-                        <span className="ml-2 text-sm text-gray-600 flex items-center gap-1">
-                          {"("}
-                          {rateItem.rating}
-                          {")"} <StarIcon />
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-600">{rateItem.percentage} %</p>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-600 h-2 rounded-full"
-                      style={{ width: `${rateItem.percentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))} */}
+            <div className="flex items-center gap-4">
+              <span className="text-sm">{item.engrate}</span>
+              <p className="text-sm">{item.boostsearchengagementrate}</p>
+            </div>
+          </div>
         </div>
       ))}
     </div>
