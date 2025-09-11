@@ -238,7 +238,7 @@ export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
               <TableHead className="text-xs text-[#969696]">
                 Activity Type
               </TableHead>
-              <TableHead className="text-xs text-[#969696]">Details</TableHead>
+              {/* <TableHead className="text-xs text-[#969696]">Details</TableHead> */}
               <TableHead className="text-xs text-[#969696]">Time</TableHead>
               <TableHead className="text-xs text-[#969696] text-center">
                 Status
@@ -283,11 +283,11 @@ export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
                     </span>
                   </TableCell>
 
-                  <TableCell
+                  {/* <TableCell
                     className={isBlocked ? "opacity-30" : "opacity-100"}
                   >
                     {item.Details}
-                  </TableCell>
+                  </TableCell> */}
 
                   <TableCell
                     className={isBlocked ? "opacity-30" : "opacity-100"}

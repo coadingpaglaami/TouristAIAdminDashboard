@@ -95,7 +95,7 @@ export const UserTypesCard = ({
               </span>
               <span>
                 {loading ? (
-                  <Skeleton className="w-14 h-8" />
+                  <Skeleton className="w- h-8" />
                 ) : (
                   item.numuser.toLocaleString()
                 )}
@@ -110,7 +110,7 @@ export const UserTypesCard = ({
                 {loading ? (
                   <Skeleton className="w-full h-4" />
                 ) : (
-                  `${item.isIncrease} ${item.increasepercentage} from last ${
+                  ` ${item.increasepercentage} from last ${
                     period === "Weekly"
                       ? "week"
                       : period === "Monthly"
