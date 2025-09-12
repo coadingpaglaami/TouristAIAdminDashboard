@@ -8,10 +8,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ReactNode, useMemo, useState } from "react";
+import { useState } from "react";
 import Image from "next/image"; // Example action icon
-import { Chevron, ChevronNext, RemoveIcon } from "@/svg/Action";
-import { Visible } from "@/svg/OverView";
+import { Chevron, ChevronNext, Delete } from "@/svg/Action";
 import {
   Dialog,
   DialogContent,
@@ -20,130 +19,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-
-interface ActivityTable {
-  image: string;
-  name: string;
-  activity: "Upload" | "Clicked";
-  Details: ReactNode;
-  time: string;
-  status: "Free" | "Premium";
-  photo: string;
-}
-
-const generateDummyData = (count: number): ActivityTable[] => {
-  const images = [
-    "/table 1.jpg",
-    "/table 2.jpg",
-    "/table 3.jpg",
-    "/table 4.jpg",
-    "/table 5.jpg",
-    "/table 6.jpg",
-    "/table 7.jpg",
-    "/table 8.jpg",
-    "/table 9.jpg",
-  ];
-  const names = [
-    "Sujon",
-    "Shihab",
-    "Farhan",
-    "Shaon",
-    "Chailau",
-    "Atik",
-    "Mijan",
-    "Hossain",
-  ];
-  const details = [
-    <span key="detail-0" className="text-sm">
-      Uploaded photo of {'"'}
-      <span className="text-[#FF7A00] font-semibold">Sunset Beach</span>
-      {'"'}
-    </span>,
-    <span key="detail-1" className="text-sm">
-      Clicked on {'"'}
-      <span className="text-[#FF7A00] font-semibold">recommended place</span>
-      {'"'}
-    </span>,
-    <span key="detail-2" className="text-sm">
-      Uploaded {'"'}
-      <span className="text-[#FF7A00] font-semibold">travel documents</span>
-      {'"'}
-    </span>,
-    <span key="detail-3" className="text-sm">
-      Clicked on {'"'}
-      <span className="text-[#FF7A00] font-semibold">premium feature</span>
-      {'"'}
-    </span>,
-    <span key="detail-4" className="text-sm">
-      Uploaded {'"'}
-      <span className="text-[#FF7A00] font-semibold">profile picture</span>
-      {'"'}
-    </span>,
-    <span key="detail-5" className="text-sm">
-      Clicked on {'"'}
-      <span className="text-[#FF7A00] font-semibold">itinerary details</span>
-      {'"'}
-    </span>,
-    <span key="detail-6" className="text-sm">
-      Uploaded {'"'}
-      <span className="text-[#FF7A00] font-semibold">review for a place</span>
-      {'"'}
-    </span>,
-    <span key="detail-7" className="text-sm">
-      Clicked on {'"'}
-      <span className="text-[#FF7A00] font-semibold">user dashboard</span>
-      {'"'}
-    </span>,
-  ];
-  const photos = [
-    "/photo 1.png",
-    "/photo 2.png",
-    "/photo 3.png",
-    "/photo 4.png",
-    "/photo 5.png",
-    "/photo 6.png",
-    "/photo 7.png",
-    "/potrait.jpg",
-  ];
-  const activities: Array<"Upload" | "Clicked"> = [
-    "Upload",
-    "Clicked",
-    "Upload",
-    "Clicked",
-    "Upload",
-    "Clicked",
-    "Upload",
-    "Clicked",
-  ];
-  const statuses: Array<"Free" | "Premium"> = [
-    "Free",
-    "Premium",
-    "Free",
-    "Premium",
-    "Free",
-    "Premium",
-    "Free",
-  ];
-
-  // Helper to generate a random "time ago" string
-  const getRandomTimeAgo = () => {
-    const minutes = Math.floor(Math.random() * 120); // up to 2 hours
-    if (minutes === 0) return "just now";
-    if (minutes < 60) return `${minutes} minutes ago`;
-    const hours = Math.floor(minutes / 60);
-    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-  };
-
-  return Array.from({ length: count }, (_, i) => ({
-    image: images[i % images.length],
-    name: names[i % names.length],
-    activity: activities[i % activities.length],
-    Details: details[i % details.length],
-    time: getRandomTimeAgo(),
-    status: statuses[i % statuses.length],
-    photo: photos[i % photos.length],
-  }));
-};
+import { ActivityResult } from "@/interface/UserActivity";
+import { useDeleteContenMutation } from "@/services/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Helper for pagination numbers
 function getPagination(current: number, total: number) {
@@ -157,18 +35,14 @@ function getPagination(current: number, total: number) {
       i === 1 ||
       i === total ||
       (i >= current - delta && i <= current + delta)
-    ) {
+    )
       range.push(i);
-    }
   }
 
   for (const i of range) {
     if (l) {
-      if (i - l === 2) {
-        rangeWithDots.push(l + 1);
-      } else if (i - l !== 1) {
-        rangeWithDots.push("...");
-      }
+      if (i - l === 2) rangeWithDots.push(l + 1);
+      else if (i - l !== 1) rangeWithDots.push("...");
     }
     rangeWithDots.push(i);
     l = i;
@@ -176,54 +50,42 @@ function getPagination(current: number, total: number) {
   return rangeWithDots;
 }
 interface ActivityTableProps {
-  search: string;
-  activity: string | undefined;
+  data: ActivityResult[];
+  count: number;
+  isLoading: boolean;
+  page: number;
+  setPage: (page: number) => void;
+  perPage: number;
 }
-export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
-  const data = useMemo(() => generateDummyData(80), []);
-  const [page, setPage] = useState(1);
-  const perPage = 7;
-  const [blocked, setBlocked] = useState<{ [key: number]: boolean }>({});
-
-  // Filter data based on search, activity, and status
-  const filteredData = useMemo(() => {
-    return data.filter((item) => {
-      // Filter by search (user name)
-      const isSearchMatch = item.name
-        .toLowerCase()
-        .includes(search.toLowerCase());
-
-      // Filter by activity (if it's not "all")
-      const isActivityMatch =
-        activity && activity !== "all" ? item.activity === activity : true;
-
-      // Filter by status (if it's not "all")
-
-      return isSearchMatch && isActivityMatch;
-    });
-  }, [data, search, activity]);
-
-  const totalPages = Math.ceil(filteredData.length / perPage);
-
-  // Paginate filtered data
-  const paginatedData = useMemo(
-    () => filteredData.slice((page - 1) * perPage, page * perPage),
-    [filteredData, page]
-  );
-
-  const handleBlockToggle = (idx: number) => {
-    setBlocked((prev) => ({
-      ...prev,
-      [idx]: !prev[idx],
-    }));
+export const ActivityTable = ({
+  data,
+  isLoading,
+  page,
+  setPage,
+  perPage,
+  count,
+}: ActivityTableProps) => {
+  const [deleteUser, setDeleteUser] = useState<ActivityResult | null>(null);
+  // RTK Query mutation
+  const [deleteConten, { isLoading: isDeleting }] = useDeleteContenMutation();
+  // const [blocked, setBlocked] = useState<{ [key: number]: boolean }>({});
+  const handleDelete = async (id?: number) => {
+    console.log("Deleting user with id:", id);
+    if (!id) return;
+    try {
+      await deleteConten(id).unwrap(); // call API
+      setDeleteUser(null); // close dialog
+      // ✅ Optionally: refetch table data or update local state
+      // Example: refetch or remove item from local state
+      // setData(prev => prev.filter(item => item.id !== id));
+    } catch (err) {
+      console.error("Failed to delete:", err);
+    }
   };
-
-  const handleUnblock = (idx: number) => {
-    setBlocked((prev) => ({
-      ...prev,
-      [idx]: false,
-    }));
-  };
+  if (isLoading) {
+    return <div className="p-4">Loading...</div>;
+  }
+  const totalPages = Math.ceil(count / perPage);
 
   const paginationNumbers = getPagination(page, totalPages);
 
@@ -248,115 +110,161 @@ export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
             </TableRow>
           </TableHeader>
           <TableBody className="tracking-wider overflow-x-scroll">
-            {paginatedData.map((item, index) => {
-              const globalIdx = (page - 1) * perPage + index;
-              const isBlocked = blocked[globalIdx];
-              return (
-                <TableRow key={index} className="border-none">
-                  <TableCell
-                    className={isBlocked ? "opacity-30" : "opacity-100"}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="relative w-8 h-8 rounded-full p-2">
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          className="  border border-gray-200 object-cover rounded-full"
-                        />
-                      </div>
-                      <span className="font-medium">{item.name}</span>
-                    </div>
-                  </TableCell>
+            {isLoading
+              ? Array.from({ length: perPage }).map((_, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell>
+                      <Skeleton className="h-6 w-24 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-6 w-16 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-6 w-12 rounded" />
+                    </TableCell>
+                    <TableCell className="flex justify-center">
+                      <Skeleton className="h-6 w-14 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-8 w-8 rounded-full" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-6 w-6 rounded" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              : data.map((item, index) => {
+                  return (
+                    <TableRow key={index} className="border-none">
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <div className="relative w-8 h-8 rounded-full p-2">
+                            <Image
+                              src={
+                                item.user.profile_picture_url || "/avatar.png"
+                              }
+                              alt={item.user.username}
+                              fill
+                              className="  border border-gray-200 object-cover rounded-full"
+                            />
+                          </div>
+                          <span className="font-medium">
+                            {item.user.username}
+                          </span>
+                        </div>
+                      </TableCell>
 
-                  <TableCell
-                    className={isBlocked ? "opacity-30" : "opacity-100"}
-                  >
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        item.activity === "Upload"
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-300 text-gray-700"
-                      }`}
-                    >
-                      {item.activity}
-                    </span>
-                  </TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            item.activity_type === "Upload"
+                              ? "bg-green-500 text-white"
+                              : "bg-gray-300 text-gray-700"
+                          }`}
+                        >
+                          {item.activity_type}
+                        </span>
+                      </TableCell>
 
-                  {/* <TableCell
-                    className={isBlocked ? "opacity-30" : "opacity-100"}
-                  >
-                    {item.Details}
-                  </TableCell> */}
+                      {/* <TableCell>
+                {item.Details}
+                </TableCell> */}
 
-                  <TableCell
-                    className={isBlocked ? "opacity-30" : "opacity-100"}
-                  >
-                    {item.time}
-                  </TableCell>
+                      <TableCell>{item.time}</TableCell>
 
-                  <TableCell
-                    className={isBlocked ? "opacity-30" : "opacity-100"}
-                  >
-                    <div className="flex justify-center items-center">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          item.status === "Premium"
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-300 text-gray-700"
-                        }`}
-                      >
-                        {item.status}
-                      </span>
-                    </div>
-                  </TableCell>
+                      <TableCell>
+                        <div className="flex justify-center items-center">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              item.status === "Premium"
+                                ? "bg-green-500 text-white"
+                                : "bg-gray-300 text-gray-700"
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+                        </div>
+                      </TableCell>
 
-                  <TableCell
-                    className={isBlocked ? "opacity-30" : "opacity-100"}
-                  >
+                      <TableCell>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button className="p-0 border-0 bg-transparent hover:bg-transparent focus:ring-0 ">
+                              <Image
+                                src={item.photo}
+                                alt="photo"
+                                height={32}
+                                width={32}
+                                className="w-8 h-8 rounded object-cover"
+                              />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="lg:max-w-2xl flex justify-center items-center p-0">
+                            <DialogTitle className="sr-only">
+                              <VisuallyHidden>Profile photo</VisuallyHidden>
+                            </DialogTitle>
+                            <Image
+                              src={item.photo}
+                              alt="photo"
+                              height={400}
+                              width={400}
+                              className="rounded object-cover max-h-[60vh] w-full  max-w-full"
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      </TableCell>
 
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button className="p-0 border-0 bg-transparent hover:bg-transparent focus:ring-0 " disabled={isBlocked}>
-                          <Image
-                            src={item.photo}
-                            alt="photo"
-                            height={32}
-                            width={32}
-                            className="w-8 h-8 rounded object-cover"
-                          />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="lg:max-w-2xl flex justify-center items-center p-0">
-                        <DialogTitle className="sr-only">
-                          <VisuallyHidden>Profile photo</VisuallyHidden>
-                        </DialogTitle>
-                        <Image
-                          src={item.photo}
-                          alt="photo"
-                          height={400}
-                          width={400}
-                          className="rounded object-cover max-h-[60vh] w-full  max-w-full"
-                        />
-                      </DialogContent>
-                    </Dialog>
-                  </TableCell>
+                      <TableCell>
+                        <Dialog
+                          open={!!deleteUser && deleteUser.id === item.id}
+                          onOpenChange={(open) => {
+                            if (!open) setDeleteUser(null);
+                          }}
+                        >
+                          <button
+                            className="p-2 hover:bg-gray-100 rounded"
+                            title="Delete"
+                            onClick={() => setDeleteUser(item)}
+                          >
+                            <Delete />
+                          </button>
 
-                  <TableCell>
-                    <button
-                      className="p-2 hover:bg-gray-100 rounded"
-                      onClick={() =>
-                        isBlocked
-                          ? handleUnblock(globalIdx)
-                          : handleBlockToggle(globalIdx)
-                      }
-                    >
-                      {isBlocked ? <Visible /> : <RemoveIcon />}
-                    </button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+                          <DialogContent>
+                            <div className="p-4">
+                              <h3 className="text-lg font-semibold mb-2">
+                                Delete Confirmation
+                              </h3>
+                              <p className="text-sm text-gray-700 mb-4">
+                                Are you sure you want to delete{" "}
+                                <span className="font-semibold text-red-600">
+                                  {deleteUser?.user.username}
+                                </span>
+                                ?
+                                <br />
+                                This action cannot be undone.
+                              </p>
+                              <div className="flex justify-end gap-2">
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setDeleteUser(null)}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  className="bg-orange-500 text-white"
+                                  onClick={() => handleDelete(deleteUser?.id)}
+                                  disabled={isDeleting}
+                                >
+                                  {isDeleting ? "Deleting..." : "Delete"}
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
           </TableBody>
         </Table>
       </div>
@@ -365,13 +273,12 @@ export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
       <div className="flex md:items-center md:flex-row md:justify-between flex-col mt-4">
         <div className="text-sm text-gray-600">
           Showing {(page - 1) * perPage + 1} to{" "}
-          {Math.min(page * perPage, filteredData.length)} from{" "}
-          {filteredData.length} records
+          {Math.min(page * perPage, count)} from {count} records
         </div>
         <div className="flex items-center gap-1">
           <button
             className="p-3.5 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            onClick={() => setPage(Math.max(1, page - 1))}
             disabled={page === 1}
           >
             <Chevron />
@@ -397,7 +304,7 @@ export const ActivityTable = ({ search, activity }: ActivityTableProps) => {
           )}
           <button
             className="p-3.5 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            onClick={() => setPage(Math.min(totalPages, page + 1))}
             disabled={page === totalPages}
           >
             <ChevronNext />
