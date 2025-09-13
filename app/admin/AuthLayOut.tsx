@@ -14,7 +14,7 @@ export default function AuthLayOut({
     <Provider store={store}>
       <AdminLayOut>
         {children}
-        <Toaster />
+        <Toaster position="top-center" />
       </AdminLayOut>
     </Provider>
   );

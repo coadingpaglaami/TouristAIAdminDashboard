@@ -75,16 +75,11 @@ export const ActivityTable = ({
     try {
       await deleteConten(id).unwrap(); // call API
       setDeleteUser(null); // close dialog
-      // ✅ Optionally: refetch table data or update local state
-      // Example: refetch or remove item from local state
-      // setData(prev => prev.filter(item => item.id !== id));
     } catch (err) {
       console.error("Failed to delete:", err);
     }
   };
-  if (isLoading) {
-    return <div className="p-4">Loading...</div>;
-  }
+
   const totalPages = Math.ceil(count / perPage);
 
   const paginationNumbers = getPagination(page, totalPages);

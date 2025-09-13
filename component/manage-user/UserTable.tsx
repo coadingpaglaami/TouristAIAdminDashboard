@@ -42,165 +42,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-interface UserTable {
-  id: number;
-  image: string;
-  name: string;
-  status: "Inactive" | "Active";
-  subscription: "Free" | "Premium" | "Expired";
-  email: string;
-  lastactive: string;
-  duration?:
-    | "1 Hour"
-    | "6 Hours"
-    | "12 Hours"
-    | "1 Day"
-    | "3 Days"
-    | "7 Days"
-    | "15 Days";
-  isBanned: boolean;
-}
-
-const generateDummyData = (count: number): UserTable[] => {
-  const images = [
-    "/table 1.jpg",
-    "/table 2.jpg",
-    "/table 3.jpg",
-    "/table 4.jpg",
-    "/table 5.jpg",
-    "/table 6.jpg",
-    "/table 7.jpg",
-    "/table 8.jpg",
-    "/table 9.jpg",
-  ];
-  const names = [
-    "Sujon",
-    "Shihab",
-    "Farhan",
-    "Shaon",
-    "Chailau",
-    "Atik",
-    "Mijan",
-    "Hossain",
-    "Jubayer",
-    "Alamin",
-    "Ankan",
-    "Ayon",
-  ];
-  const emails = [
-    "sujon@email.com",
-    "shihab@email.com",
-    "farhan@email.com",
-    "shaon@email.com",
-    "chailau@email.com",
-    "atik@email.com",
-    "mijan@email.com",
-    "hossain@email.com",
-    "sujon123@email.com",
-    "shihab.dev@email.com",
-    "farhan.ai@email.com",
-    "shaon.tourist@email.com",
-    "chailau2024@email.com",
-    "atik.tour@email.com",
-    "mijan.hasan@email.com",
-    "hossain.tai@email.com",
-    "sujon.tester@email.com",
-    "shihab.user@email.com",
-    "farhan.tourist@email.com",
-    "shaon.active@email.com",
-  ];
-  const subscription: Array<"Free" | "Premium" | "Expired"> = [
-    "Free",
-    "Premium",
-    "Expired",
-    "Free",
-    "Premium",
-    "Expired",
-    "Free",
-    "Premium",
-    "Expired",
-    "Free",
-    "Premium",
-    "Expired",
-    "Free",
-    "Premium",
-    "Expired",
-    "Free",
-    "Premium",
-    "Expired",
-    "Free",
-    "Premium",
-  ];
-  const statuses: Array<"Inactive" | "Active"> = [
-    "Active",
-    "Inactive",
-    "Active",
-    "Inactive",
-    "Active",
-    "Inactive",
-    "Active",
-    "Inactive",
-    "Active",
-    "Inactive",
-    "Active",
-    "Inactive",
-    "Active",
-    "Inactive",
-    "Active",
-    "Inactive",
-    "Active",
-    "Inactive",
-  ];
-
-  const durations: Array<UserTable["duration"]> = [
-    "1 Hour",
-    "6 Hours",
-    "12 Hours",
-    "1 Day",
-    "3 Days",
-    "7 Days",
-    "15 Days",
-  ];
-
-  const getRandomTimeAgo = () => {
-    const random = Math.random();
-
-    if (random < 0.33) {
-      const minutes = Math.floor(Math.random() * 120);
-      if (minutes === 0) return "just now";
-      if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-      const hours = Math.floor(minutes / 60);
-      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-    } else if (random < 0.66) {
-      const hour = Math.floor(Math.random() * 24);
-      const minute = Math.floor(Math.random() * 60);
-      const ampm = hour >= 12 ? "PM" : "AM";
-      const hour12 = hour % 12 === 0 ? 12 : hour % 12;
-      const minStr = minute.toString().padStart(2, "0");
-      return `Today, ${hour12}.${minStr} ${ampm}`;
-    } else {
-      const hour = Math.floor(Math.random() * 24);
-      const minute = Math.floor(Math.random() * 60);
-      const ampm = hour >= 12 ? "PM" : "AM";
-      const hour12 = hour % 12 === 0 ? 12 : hour % 12;
-      const minStr = minute.toString().padStart(2, "0");
-      return `Yesterday, ${hour12}.${minStr} ${ampm}`;
-    }
-  };
-
-  return Array.from({ length: count }, (_, i) => ({
-    id: i + 1,
-    image: images[i % images.length],
-    name: names[i % names.length],
-    status: statuses[i % statuses.length],
-    subscription: subscription[i % subscription.length],
-    email: emails[i % emails.length],
-    lastactive: getRandomTimeAgo(),
-    duration: durations[Math.floor(Math.random() * durations.length)],
-    isBanned: Math.random() < 0.2, // 20% chance to be banned
-  }));
-};
+import { User } from "@/interface/ManageUser";
+import {
+  useBanUserMutation,
+  useDeleteUserMutation,
+  useEditUserMutation,
+  useUnbanUserMutation,
+} from "@/services/api";
+import { de } from "date-fns/locale";
 
 function getPagination(current: number, total: number) {
   const delta = 2;
@@ -233,94 +82,69 @@ function getPagination(current: number, total: number) {
 }
 
 interface UserTableProps {
-  search?: string;
-  subscriptionFilter?: string;
-  bannedFilter?: string;
+  data: User[];
+  count: number;
+  isLoading: boolean;
+  page: number;
+  setPage: (page: number) => void;
+  perPage: number;
 }
 
 export const UserTable = ({
-  search = "",
-  subscriptionFilter = "all",
-  bannedFilter = "all",
+  data,
+  count,
+  isLoading,
+  page,
+  setPage,
+  perPage,
 }: UserTableProps) => {
-  const [data, setData] = useState<UserTable[]>(generateDummyData(80));
-  // const [blocked, setBlocked] = useState<{ [key: number]: boolean }>({});
-  const [page, setPage] = useState(1);
-  const [deleteUser, setDeleteUser] = useState<UserTable | null>(null);
-  const [selectedUser, setSelectedUser] = useState<UserTable | null>(null); // Added state for selected user in dialog
-  const [bannedUser, setBannedUser] = useState<UserTable | null>(null);
-  const [banDuration, setBanDuration] =
-    useState<UserTable["duration"]>("1 Hour");
-  const rowsPerPage = 7;
+  const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [bannedUser, setBannedUser] = useState<User | null>(null);
+  const [banDuration, setBanDuration] = useState("1h");
+  const [duration, setDuration] = useState("1h");
+  const totalPages = Math.ceil(count / perPage);
+  const [editUserInfo, { isLoading: isEditing }] = useEditUserMutation();
+  const [deleteUserInfo, { isLoading: isDeleting }] = useDeleteUserMutation();
+  const [banUserInfo, { isLoading: isBanning }] = useBanUserMutation();
+  const [unbanUserInfo, { isLoading: isUnbanning }] = useUnbanUserMutation();
 
-  const handleDelete = () => {
-    if (!deleteUser) return;
-    // Remove the user from the data list
-    setData((prevData) =>
-      prevData.filter((user) => user.name !== deleteUser.name)
-    );
-    console.log("Deleting user:", deleteUser.name);
-    setDeleteUser(null); // Close the delete dialog after deletion
+  const handleDelete = async (id?: number) => {
+    console.log("Deleting user with id:", id);
+    if (!id) return;
+    try {
+      await deleteUserInfo(id).unwrap(); // call API
+      setDeleteUser(null); // close dialog
+    } catch (err) {
+      console.error("Failed to delete:", err);
+    }
   };
-
-  const handleToggleBanUser = () => {
-    if (!bannedUser) return;
-
-    // Ensure banDuration is one of the valid values in the UserTable type
-    const validDuration: UserTable["duration"] = banDuration;
-
-    // If the user is being banned, we set the ban duration
-    const updatedUser = {
-      ...bannedUser,
-      isBanned: !bannedUser.isBanned,
-      duration: bannedUser.isBanned ? undefined : validDuration, // Set duration only when banning
-    };
-
-    // Update the user data
-    setData((prevData) =>
-      prevData.map((user) => (user.id === bannedUser.id ? updatedUser : user))
-    );
-
-    console.log(
-      bannedUser.isBanned ? "User unbanned:" : "User banned:",
-      bannedUser.name,
-      "for",
-      bannedUser.isBanned ? "no duration" : validDuration
-    );
-    setBannedUser(null); // Close the banned/unbanned dialog after action
-    setBanDuration("1 Hour"); // Reset the duration to default
+  const handleEdit = async (id?: number, duration?: string) => {
+    if (!id) return;
+    try {
+      await editUserInfo({ id, duration: duration || "" }).unwrap();
+      setSelectedUser(null);
+    } catch (err) {
+      console.error("Failed to edit:", err);
+    }
   };
-  const filteredData = useMemo(() => {
-    return data.filter((user) => {
-      const matchesSearch =
-        search === "" ||
-        user.name.toLowerCase().includes(search.toLowerCase()) ||
-        user.email.toLowerCase().includes(search.toLowerCase());
-
-      const matchesSubscription =
-        subscriptionFilter === "all" ||
-        user.subscription === subscriptionFilter;
-
-      const matchesBanned =
-        bannedFilter === "all" ||
-        (bannedFilter === "Banned" && user.isBanned) ||
-        (bannedFilter === "Unbanned" && !user.isBanned);
-
-      return matchesSearch && matchesSubscription && matchesBanned;
-    });
-  }, [data, search, subscriptionFilter, bannedFilter]);
-
-  // Update pagination to use filteredData instead of data
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-  const paginatedData = filteredData.slice(
-    (page - 1) * rowsPerPage,
-    page * rowsPerPage
-  );
-
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setPage(1);
-  }, [search, subscriptionFilter, bannedFilter]);
+  const handleBannedUser = (id?: number, duration?: string) => async () => {
+    if (!id) return;
+    try {
+      await banUserInfo({ id, duration: duration || "" }).unwrap();
+    } catch (err) {
+      console.error("Failed to edit:", err);
+    }
+  };
+  const handleUnbanUser = (id?: number) => async () => {
+    if (!id) return;
+    try {
+      await unbanUserInfo(id).unwrap();
+      setBannedUser(null);
+    } catch (err) {
+      console.error("Failed to unban:", err);
+    }
+  };
 
   const paginationNumbers = getPagination(page, totalPages);
 
@@ -383,9 +207,9 @@ export const UserTable = ({
             </TableRow>
           </TableHeader>
           <TableBody className="tracking-wider">
-            {paginatedData.map((item, idx) => {
-              const globalIdx = (page - 1) * rowsPerPage + idx;
-              const isBlocked = item.isBanned;
+            {data.map((item, idx) => {
+              const globalIdx = (page - 1) * perPage + idx;
+              const isBlocked = item.actions.can_ban === false; // Example condition
               return (
                 <TableRow
                   key={globalIdx}
@@ -398,13 +222,13 @@ export const UserTable = ({
                     <div className="flex items-center gap-2">
                       <div className="relative w-8 h-8 rounded-full p-2">
                         <Image
-                          src={item.image}
-                          alt={item.name}
+                          src={item.user.avatar || "/default-avatar.png"}
+                          alt={item.user.username}
                           fill
                           className="  border border-gray-200 object-cover rounded-full"
                         />
                       </div>
-                      <div className="font-medium">{item.name}</div>
+                      <div className="font-medium">{item.user.username}</div>
                     </div>
                   </TableCell>
                   {/* Status */}
@@ -416,12 +240,12 @@ export const UserTable = ({
                     <div className="flex justify-center items-center">
                       <div
                         className={`text-xs font-semibold px-2 py-0.5 rounded-full  max-w-20 w-fit ${
-                          item.status === "Active"
+                          item.status.text === "Active"
                             ? "bg-green-500 text-white"
                             : "bg-gray-200 text-gray-500"
                         }`}
                       >
-                        {item.status}
+                        {item.status.text}
                       </div>
                     </div>
                   </TableCell>
@@ -432,14 +256,12 @@ export const UserTable = ({
                     <div className="flex justify-center items-center">
                       <div
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          item.subscription === "Expired"
-                            ? "bg-[#FF7A00] text-white"
-                            : item.subscription === "Premium"
+                          item.subscription.text === "Premium"
                             ? "bg-green-500 text-white"
                             : "bg-gray-200 text-gray-700"
                         }`}
                       >
-                        {item.subscription}
+                        {item.subscription.text}
                       </div>
                     </div>
                   </TableCell>
@@ -453,14 +275,14 @@ export const UserTable = ({
                   <TableCell
                     className={isBlocked ? "opacity-50" : "opacity-100"}
                   >
-                    {item.lastactive}
+                    {item.last_active}
                   </TableCell>
                   {/* Action */}
                   <TableCell>
                     <div className="flex gap-2 items-center">
                       {/* Edit Dialog */}
                       <Dialog
-                        open={!!selectedUser && selectedUser.name === item.name}
+                        open={!!selectedUser && selectedUser.id === item.id}
                         onOpenChange={(open) =>
                           !open ? setSelectedUser(null) : setSelectedUser(item)
                         }
@@ -482,23 +304,23 @@ export const UserTable = ({
                           </DialogHeader>
                           <div className="flex items-center gap-2 p-6">
                             <Image
-                              src={item.image}
-                              alt={item.name}
+                              src={item.user.avatar || "/default-avatar.png"}
+                              alt={item.user.username}
                               height={32}
                               width={32}
                               className="w-8 h-8 rounded-full"
                             />
-                            <div className="font-medium">{item.name}</div>
+                            <div className="font-medium">
+                              {item.user.username}
+                            </div>
                             <div
                               className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                item.subscription === "Expired"
-                                  ? "bg-[#FF7A00] text-white"
-                                  : item.subscription === "Premium"
+                                item.subscription.text === "Premium"
                                   ? "bg-green-500 text-white"
                                   : "bg-gray-200 text-gray-700"
                               }`}
                             >
-                              {item.subscription}
+                              {item.subscription.text}
                             </div>
                           </div>
                           <div className="px-6 pt-4 pb-6">
@@ -506,34 +328,22 @@ export const UserTable = ({
                               <div className="space-y-2">
                                 <Label htmlFor="status">Duration</Label>
                                 <Select
-                                  defaultValue={item.duration || "1 Hour"}
+                                  onValueChange={setDuration}
+                                  value={duration}
                                 >
                                   <SelectTrigger id="status">
                                     <SelectValue placeholder="Select status" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="1 Hour">
-                                      1 Hour
-                                    </SelectItem>
-                                    <SelectItem value="2 Hours">
-                                      2 Hours
-                                    </SelectItem>
-                                    <SelectItem value="6 Hours">
-                                      6 Hours
-                                    </SelectItem>
-                                    <SelectItem value="12 Hours">
+                                    <SelectItem value="1h">1 Hour</SelectItem>
+                                    <SelectItem value="2h ">2 Hours</SelectItem>
+                                    <SelectItem value="6h">6 Hours</SelectItem>
+                                    <SelectItem value="12h">
                                       12 Hours
                                     </SelectItem>
-                                    <SelectItem value="1 Day">1 Day</SelectItem>
-                                    <SelectItem value="3 Days">
-                                      3 Days
-                                    </SelectItem>
-                                    <SelectItem value="7 Days">
-                                      7 Days
-                                    </SelectItem>
-                                    <SelectItem value="15 Days">
-                                      15 Days
-                                    </SelectItem>
+                                    <SelectItem value="24h">1 Day</SelectItem>
+                                    <SelectItem value="3d">3 Days</SelectItem>
+                                    <SelectItem value="7d">7 Days</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -546,27 +356,21 @@ export const UserTable = ({
                             >
                               Cancel
                             </Button>
-                            <Button className="orange">Activate</Button>
+                            <Button
+                              className="orange"
+                              onClick={() =>
+                                handleEdit(selectedUser?.id, duration)
+                              }
+                              disabled={isEditing}
+                            >
+                              Activate
+                            </Button>
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
 
-                      {/* Block / Unblock */}
-                      {/* <button
-                        className="p-2 hover:bg-gray-100 rounded opacity-100"
-                        title={isBlocked ? "Unblock" : "Block"}
-                        onClick={() => {
-                          if (!isBlocked) {
-                            setBannedUser(item); // Open the dialog for unbanned users to confirm the block
-                          } else {
-                            handleToggleBanUser(); // Directly toggle for banned users
-                          }
-                        }}
-                      >
-                        {isBlocked ? <Block /> : <CheckCircle />}
-                      </button> */}
                       <Dialog
-                        open={!!bannedUser && bannedUser.name === item.name}
+                        open={!!bannedUser && bannedUser.id === item.id}
                         onOpenChange={(open) =>
                           !open ? setBannedUser(null) : setBannedUser(item)
                         }
@@ -591,7 +395,7 @@ export const UserTable = ({
                               Are you sure you want to{" "}
                               {isBlocked ? "unban" : "ban"}{" "}
                               <span className="font-semibold text-red-600">
-                                {bannedUser?.name}
+                                {item?.user.username}
                               </span>
                               ? <br /> This action cannot be undone.
                             </DialogDescription>
@@ -604,37 +408,23 @@ export const UserTable = ({
                                   <Label htmlFor="duration">Ban Duration</Label>
                                   <Select
                                     value={banDuration}
-                                    onValueChange={(value) =>
-                                      setBanDuration(
-                                        value as UserTable["duration"]
-                                      )
-                                    }
+                                    onValueChange={setBanDuration}
                                   >
                                     <SelectTrigger id="duration">
                                       <SelectValue placeholder="Select Duration" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="1 Hour">
-                                        1 Hour
-                                      </SelectItem>
-                                      <SelectItem value="6 Hours">
+                                      <SelectItem value="1h">1 Hour</SelectItem>
+                                      <SelectItem value="6h">
                                         6 Hours
                                       </SelectItem>
-                                      <SelectItem value="12 Hours">
+                                      <SelectItem value="12h">
                                         12 Hours
                                       </SelectItem>
-                                      <SelectItem value="1 Day">
-                                        1 Day
-                                      </SelectItem>
-                                      <SelectItem value="3 Days">
-                                        3 Days
-                                      </SelectItem>
-                                      <SelectItem value="7 Days">
-                                        7 Days
-                                      </SelectItem>
-                                      <SelectItem value="15 Days">
-                                        15 Days
-                                      </SelectItem>
+                                      <SelectItem value="24h">1 Day</SelectItem>
+                                      <SelectItem value="2d">2 Days</SelectItem>
+                                      <SelectItem value="5d">5 Days</SelectItem>
+                                      <SelectItem value="7d">7 Days</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
@@ -650,7 +440,15 @@ export const UserTable = ({
                             </Button>
                             <Button
                               className="orange p-2 rounded-md"
-                              onClick={handleToggleBanUser}
+                              onClick={
+                                isBlocked
+                                  ? handleUnbanUser(bannedUser?.id)
+                                  : handleBannedUser(
+                                      bannedUser?.id,
+                                      banDuration
+                                    )
+                              }
+                              disabled={isBlocked ? isBanning || isUnbanning : isBanning}
                             >
                               {isBlocked ? "Unban" : "Ban"}
                             </Button>
@@ -660,7 +458,7 @@ export const UserTable = ({
 
                       {/* Delete Dialog */}
                       <Dialog
-                        open={!!deleteUser && deleteUser.name === item.name}
+                        open={!!deleteUser && deleteUser.id === item.id}
                         onOpenChange={(open) =>
                           !open ? setDeleteUser(null) : setDeleteUser(item)
                         }
@@ -680,7 +478,7 @@ export const UserTable = ({
                             <DialogDescription>
                               Are you sure you want to delete{" "}
                               <span className="font-semibold text-red-600">
-                                {deleteUser?.name}
+                                {deleteUser?.user.username}
                               </span>
                               ? <br /> This action cannot be undone.
                             </DialogDescription>
@@ -694,7 +492,8 @@ export const UserTable = ({
                             </Button>
                             <Button
                               className="orange p-2 rounded-md"
-                              onClick={handleDelete}
+                              onClick={() => handleDelete(deleteUser?.id)}
+                              disabled={isDeleting}
                             >
                               Delete
                             </Button>
@@ -712,14 +511,13 @@ export const UserTable = ({
       {/* Pagination Controls */}
       <div className="flex items-center md:justify-between md:flex-row flex-col mt-4">
         <div className="text-sm text-gray-600">
-          Showing {(page - 1) * rowsPerPage + 1} to{" "}
-          {Math.min(page * rowsPerPage, filteredData.length)} from{" "}
-          {filteredData.length} records
+          Showing {(page - 1) * perPage + 1} to{" "}
+          {Math.min(page * perPage, count)} from {count} records
         </div>
         <div className="flex items-center gap-1">
           <button
             className="p-3.5 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            onClick={() => setPage(Math.max(1, page - 1))}
             disabled={page === 1}
           >
             <Chevron />
@@ -749,7 +547,7 @@ export const UserTable = ({
           )}
           <button
             className="p-3.5 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            onClick={() => setPage(Math.min(totalPages, page + 1))}
             disabled={page === totalPages}
           >
             <ChevronNext />

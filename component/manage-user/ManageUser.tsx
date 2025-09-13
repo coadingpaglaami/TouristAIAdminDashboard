@@ -2,7 +2,7 @@
 import { SearchIcon } from "@/svg/Action";
 import { UserTable } from "./UserTable";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -12,11 +12,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useManageUserQuery } from "@/services/api";
+
+function useDebounce(value: string, delay = 300) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debounced;
+}
 
 export const ManageUser = () => {
   const [search, setSearch] = useState("");
   const [subscription, setSubscription] = useState<string>("all");
   const [banned, setBanned] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const perPage = 7;
+  const debouncedSearch = useDebounce(search, 300);
+  const { data, isLoading } = useManageUserQuery({
+    limit: perPage,
+    page,
+    search: debouncedSearch,
+    bann: banned,
+    subscription,
+  });
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
 
   return (
     <div className="flex flex-col gap-8 py-10 px-4 max-md:max-w-screen overflow-hidden">
@@ -28,7 +52,7 @@ export const ManageUser = () => {
               placeholder="Search..."
               type="search"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
             />
             <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
               <SearchIcon />
@@ -46,7 +70,6 @@ export const ManageUser = () => {
                 <SelectItem value="all">All Subscription</SelectItem>
                 <SelectItem value="Free">Free</SelectItem>
                 <SelectItem value="Premium">Premium</SelectItem>
-                <SelectItem value="Expired">Expired</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -66,9 +89,12 @@ export const ManageUser = () => {
         </div>
       </div>
       <UserTable
-        search={search}
-        subscriptionFilter={subscription}
-        bannedFilter={banned}
+        data={data?.results.results ?? []}
+        count={data?.count ?? 0}
+        isLoading={isLoading}
+        page={page}
+        setPage={setPage}
+        perPage={perPage}
       />
     </div>
   );

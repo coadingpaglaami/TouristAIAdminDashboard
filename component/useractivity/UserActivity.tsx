@@ -34,6 +34,7 @@ export const UserActivity = () => {
     page,
     limit: perPage,
     search: debouncedSearch,
+    type:activity
   });
 
   const handleSearchChange = (value: string) => {
