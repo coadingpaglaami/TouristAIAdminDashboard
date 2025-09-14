@@ -13,63 +13,22 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 
+interface BarChartReturnProps {
+  range: "weekly" | "monthly" | "yearly";
+  setRange: (range: "weekly" | "monthly" | "yearly") => void;
+  returningUsers: {
+    weekly: { label: string; count: number }[];
+    monthly: { label: string; count: number }[];
+    yearly: { label: string; count: number }[];
+  };
+}
+
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, ChartTitle, Tooltip, Legend);
 
-type ChartRange = "week" | "month" | "year";
 
-interface WeekData {
-  day: string;
-  returningUser: number;
-}
 
-interface MonthData {
-  week: string;
-  returningUser: number;
-}
 
-interface YearData {
-  month: string;
-  returningUser: number;
-}
-
-const chartDataWeek: WeekData[] = [
-  { day: "Mon", returningUser: 32 },
-  { day: "Tue", returningUser: 45 },
-  { day: "Wed", returningUser: 51 },
-  { day: "Thu", returningUser: 38 },
-  { day: "Fri", returningUser: 60 },
-  { day: "Sat", returningUser: 49 },
-  { day: "Sun", returningUser: 41 },
-];
-
-const chartDataMonth: MonthData[] = [
-  { week: "Week 1", returningUser: 186 },
-  { week: "Week 2", returningUser: 305 },
-  { week: "Week 3", returningUser: 237 },
-  { week: "Week 4", returningUser: 73 },
-];
-
-const chartDataYear: YearData[] = [
-  { month: "Jan", returningUser: 210 },
-  { month: "Feb", returningUser: 180 },
-  { month: "Mar", returningUser: 250 },
-  { month: "Apr", returningUser: 220 },
-  { month: "May", returningUser: 270 },
-  { month: "Jun", returningUser: 230 },
-  { month: "Jul", returningUser: 260 },
-  { month: "Aug", returningUser: 240 },
-  { month: "Sep", returningUser: 200 },
-  { month: "Oct", returningUser: 215 },
-  { month: "Nov", returningUser: 225 },
-  { month: "Dec", returningUser: 195 },
-];
-
-const chartDataMap: Record<ChartRange, WeekData[] | MonthData[] | YearData[]> = {
-  week: chartDataWeek,
-  month: chartDataMonth,
-  year: chartDataYear,
-};
 
 // const xAxisKeyMap: Record<ChartRange, string> = {
 //   week: "day",
@@ -77,22 +36,30 @@ const chartDataMap: Record<ChartRange, WeekData[] | MonthData[] | YearData[]> = 
 //   year: "month",
 // };
 
-export const BarChartReturn = () => {
-  const [range, setRange] = useState<ChartRange>("year");
-  const chartData = chartDataMap[range];
+export const BarChartReturn = ({ range, setRange, returningUsers }: BarChartReturnProps) => {
+  // const [range, setRange] = useState<ChartRange>("year");
+  // const chartData = chartDataMap[range];
+    const chartData =
+    range === "weekly"
+      ? returningUsers.weekly
+      : range === "monthly"
+      ? returningUsers.monthly
+      : returningUsers.yearly;
   // const xAxisKey = xAxisKeyMap[range];
 
   // Prepare data for Chart.js
-  const labels = chartData.map((item) => {
-    if (range === "week") {
-      return (item as WeekData).day;
-    } else if (range === "month") {
-      return (item as MonthData).week;
-    } else {
-      return (item as YearData).month;
-    }
-  });
-  const dataValues = chartData.map((item) => item.returningUser);
+   const labels = chartData.map((item) => item.label);
+  // const labels = chartData.map((item) => {
+  //   if (range === "week") {
+  //     return (item as WeekData).day;
+  //   } else if (range === "month") {
+  //     return (item as MonthData).week;
+  //   } else {
+  //     return (item as YearData).month;
+  //   }
+  // });
+  // const dataValues = chartData.map((item) => item.returningUser);
+    const dataValues = chartData.map((item) => item.count);
 
   const data = {
     labels,
@@ -162,9 +129,9 @@ export const BarChartReturn = () => {
           <CardTitle className="flex justify-end mt-2">
             <div className="flex items-center gap-1 md:gap-2">
               <button
-                onClick={() => setRange("week")}
+                onClick={() => setRange("weekly")}
                 className={`p-1 md:p-2 text-xs md:text-sm rounded-full tracking-wider font-light ${
-                  range === "week"
+                  range === "weekly"
                     ? "bg-[#F7C56B] text-white"
                     : "border border-[#1C1B1F]"
                 }`}
@@ -172,9 +139,9 @@ export const BarChartReturn = () => {
                 Weekly
               </button>
               <button
-                onClick={() => setRange("month")}
+                onClick={() => setRange("monthly")}
                 className={`p-1 md:p-2 text-xs md:text-sm rounded-full tracking-wider font-light ${
-                  range === "month"
+                  range === "monthly"
                     ? "bg-[#F7C56B] text-white"
                     : "border border-[#1C1B1F]"
                 }`}
@@ -182,9 +149,9 @@ export const BarChartReturn = () => {
                 Monthly
               </button>
               <button
-                onClick={() => setRange("year")}
+                onClick={() => setRange("yearly")}
                 className={`p-1 md:p-2 text-xs md:text-sm rounded-full tracking-wider font-light ${
-                  range === "year"
+                  range === "yearly"
                     ? "bg-[#F7C56B] text-white"
                     : "border border-[#1C1B1F]"
                 }`}

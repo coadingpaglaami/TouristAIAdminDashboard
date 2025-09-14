@@ -82,8 +82,8 @@ export const Verify: React.FC = () => {
         const verify = await adminLoginVerify({ otp, email }).unwrap();
         console.log("✅ Inside TRY, success body:", verify);
         console.log("👉 Redirecting now...");
-        setCookie("access_token", verify.access);
-        setCookie("refresh_token", verify.refresh);
+        setCookie("access_token", verify.access, 60000);
+        setCookie("refresh_token", verify.refresh, 5184000000);
         setWrongOtp(false);
         sessionStorage.removeItem("userMail");
         sessionStorage.removeItem("login");

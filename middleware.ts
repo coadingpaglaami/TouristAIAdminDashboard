@@ -8,13 +8,14 @@ const publicRoutes = [
   "/admin/success",
 ];
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const token = req.cookies.get("access_token")?.value;
+  const accessToken = req.cookies.get("access_token")?.value;
+  const refreshToken = req.cookies.get("refresh_token")?.value;
 
   // Case 1: Public routes (login, etc.)
   if (publicRoutes.includes(pathname)) {
-    if (token) {
+    if (accessToken) {
       // Already logged in → redirect away
       return NextResponse.redirect(new URL("/admin/dashboard", req.url));
     }
@@ -23,7 +24,40 @@ export function middleware(req: NextRequest) {
 
   // Case 2: Protected admin routes (require token)
   if (pathname.startsWith("/admin")) {
-    if (!token) {
+    if (!accessToken) {
+      if (refreshToken) {
+        try {
+          const res = await fetch(
+            "https://ppp7rljm-8000.inc1.devtunnels.ms/admin-api/token/refresh/",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ refresh: refreshToken }),
+            }
+          );
+          if (res.ok) {
+            const data = await res.json();
+            const newAccessToken = data.access;
+            const response = NextResponse.next();
+
+            response.cookies.set("access_token", newAccessToken, {
+              path: "/",
+              maxAge: 600,
+            });
+            return response;
+          } else {
+            return  NextResponse.redirect(
+              new URL("/admin/login", req.url)
+            );
+          }
+        } catch (error) {
+          console.log("Error refreshing token:", error);
+          const response = NextResponse.redirect(
+            new URL("/admin/login", req.url)
+          );
+          return response;
+        }
+      }
       return NextResponse.redirect(new URL("/admin/login", req.url));
     }
   }
@@ -34,4 +68,4 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   matcher: ["/admin/:path*"],
-}
+};

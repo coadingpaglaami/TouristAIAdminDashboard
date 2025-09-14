@@ -5,11 +5,11 @@ export const removeCookie = (name: string) => {
   document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Strict`;
 };
  
-export const setCookie = (name: string, value: string) => {
+export const setCookie = (name: string, value: string, expirTime?:number) => {
   if (typeof window === "undefined") return;
  
   const expires = new Date();
-  expires.setTime(expires.getTime() + 5 * 60 * 60 * 1000);
+  expires.setTime(expires.getTime() + (expirTime || 0));
   document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
 };
  

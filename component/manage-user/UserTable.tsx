@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useEffect, useMemo, useState } from "react";
+import {  useState } from "react";
 import Image from "next/image";
 import {
   Delete,
@@ -49,7 +49,8 @@ import {
   useEditUserMutation,
   useUnbanUserMutation,
 } from "@/services/api";
-import { de } from "date-fns/locale";
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function getPagination(current: number, total: number) {
   const delta = 2;
@@ -123,8 +124,12 @@ export const UserTable = ({
     if (!id) return;
     try {
       await editUserInfo({ id, duration: duration || "" }).unwrap();
+      toast.success(`${selectedUser?.user.username} updated for ${duration}`, {
+        richColors: true,
+      });
       setSelectedUser(null);
     } catch (err) {
+      toast.error("Failed to edit user", { richColors: true });
       console.error("Failed to edit:", err);
     }
   };
@@ -132,7 +137,13 @@ export const UserTable = ({
     if (!id) return;
     try {
       await banUserInfo({ id, duration: duration || "" }).unwrap();
+      toast.success(`${bannedUser?.user.username} banned for ${duration}`, {
+        richColors: true,
+      });
+      setDuration("1h");
+      setBannedUser(null);
     } catch (err) {
+      toast.error("Failed to ban user", { richColors: true });
       console.error("Failed to edit:", err);
     }
   };
@@ -140,8 +151,12 @@ export const UserTable = ({
     if (!id) return;
     try {
       await unbanUserInfo(id).unwrap();
+      toast.success(`${bannedUser?.user.username} has been unbanned`, {
+        richColors: true,
+      });
       setBannedUser(null);
     } catch (err) {
+      toast.error("Failed to unban user", { richColors: true });
       console.error("Failed to unban:", err);
     }
   };
@@ -207,304 +222,380 @@ export const UserTable = ({
             </TableRow>
           </TableHeader>
           <TableBody className="tracking-wider">
-            {data.map((item, idx) => {
-              const globalIdx = (page - 1) * perPage + idx;
-              const isBlocked = item.actions.can_ban === false; // Example condition
-              return (
-                <TableRow
-                  key={globalIdx}
-                  className="border-none transition-opacity"
-                >
-                  {/* User */}
-                  <TableCell
-                    className={isBlocked ? "opacity-50" : "opacity-100"}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="relative w-8 h-8 rounded-full p-2">
-                        <Image
-                          src={item.user.avatar || "/default-avatar.png"}
-                          alt={item.user.username}
-                          fill
-                          className="  border border-gray-200 object-cover rounded-full"
-                        />
+            {isLoading
+              ? [...Array(7)].map((_, idx) => (
+                  <TableRow key={idx} className="border-none">
+                    {/* User (avatar + name) */}
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="w-8 h-8 rounded-full" />
+                        <Skeleton className="h-4 w-24 rounded-md" />
                       </div>
-                      <div className="font-medium">{item.user.username}</div>
-                    </div>
-                  </TableCell>
-                  {/* Status */}
-                  <TableCell
-                    className={
-                      isBlocked ? "opacity-50" : "opacity-100 " + "align-middle"
-                    }
-                  >
-                    <div className="flex justify-center items-center">
-                      <div
-                        className={`text-xs font-semibold px-2 py-0.5 rounded-full  max-w-20 w-fit ${
-                          item.status.text === "Active"
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-200 text-gray-500"
-                        }`}
-                      >
-                        {item.status.text}
+                    </TableCell>
+
+                    {/* Status */}
+                    <TableCell>
+                      <div className="flex justify-center">
+                        <Skeleton className="h-5 w-16 rounded-full" />
                       </div>
-                    </div>
-                  </TableCell>
-                  {/* Subscription */}
-                  <TableCell
-                    className={isBlocked ? "opacity-50" : "opacity-100"}
-                  >
-                    <div className="flex justify-center items-center">
-                      <div
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          item.subscription.text === "Premium"
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-200 text-gray-700"
-                        }`}
-                      >
-                        {item.subscription.text}
+                    </TableCell>
+
+                    {/* Subscription */}
+                    <TableCell>
+                      <div className="flex justify-center">
+                        <Skeleton className="h-5 w-20 rounded-full" />
                       </div>
-                    </div>
-                  </TableCell>
-                  {/* Email */}
-                  <TableCell
-                    className={isBlocked ? "opacity-50" : "opacity-100"}
-                  >
-                    {item.email}
-                  </TableCell>
-                  {/* Last Active */}
-                  <TableCell
-                    className={isBlocked ? "opacity-50" : "opacity-100"}
-                  >
-                    {item.last_active}
-                  </TableCell>
-                  {/* Action */}
-                  <TableCell>
-                    <div className="flex gap-2 items-center">
-                      {/* Edit Dialog */}
-                      <Dialog
-                        open={!!selectedUser && selectedUser.id === item.id}
-                        onOpenChange={(open) =>
-                          !open ? setSelectedUser(null) : setSelectedUser(item)
-                        }
+                    </TableCell>
+
+                    {/* Email */}
+                    <TableCell>
+                      <Skeleton className="h-4 w-40 rounded-md" />
+                    </TableCell>
+
+                    {/* Last Active */}
+                    <TableCell>
+                      <Skeleton className="h-4 w-28 rounded-md" />
+                    </TableCell>
+
+                    {/* Actions (3 buttons: edit, ban/unban, delete) */}
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Skeleton className="w-8 h-8 rounded-md" />
+                        <Skeleton className="w-8 h-8 rounded-md" />
+                        <Skeleton className="w-8 h-8 rounded-md" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              : data.map((item, idx) => {
+                  const globalIdx = (page - 1) * perPage + idx;
+                  const isBlocked = item.actions.can_ban === false; // Example condition
+                  return (
+                    <TableRow
+                      key={globalIdx}
+                      className="border-none transition-opacity"
+                    >
+                      {/* User */}
+                      <TableCell
+                        className={isBlocked ? "opacity-50" : "opacity-100"}
                       >
-                        <DialogTrigger asChild>
-                          <button
-                            className="p-2 hover:bg-gray-100 rounded"
-                            title="Edit"
-                            onClick={() => setSelectedUser(item)}
-                          >
-                            <Edit />
-                          </button>
-                        </DialogTrigger>
-                        <DialogContent className="p-0">
-                          <DialogHeader className="border-b border-gray-300">
-                            <DialogTitle className="p-4">
-                              Change user subscription status
-                            </DialogTitle>
-                          </DialogHeader>
-                          <div className="flex items-center gap-2 p-6">
+                        <div className="flex items-center gap-2">
+                          <div className="relative w-8 h-8 rounded-full p-2">
                             <Image
-                              src={item.user.avatar || "/default-avatar.png"}
+                              src={item.user.avatar || "/avatar.png"}
                               alt={item.user.username}
-                              height={32}
-                              width={32}
-                              className="w-8 h-8 rounded-full"
+                              fill
+                              className="  border border-gray-200 object-cover rounded-full"
                             />
-                            <div className="font-medium">
-                              {item.user.username}
-                            </div>
-                            <div
-                              className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                item.subscription.text === "Premium"
-                                  ? "bg-green-500 text-white"
-                                  : "bg-gray-200 text-gray-700"
-                              }`}
-                            >
-                              {item.subscription.text}
-                            </div>
                           </div>
-                          <div className="px-6 pt-4 pb-6">
-                            <form className="space-y-4">
-                              <div className="space-y-2">
-                                <Label htmlFor="status">Duration</Label>
-                                <Select
-                                  onValueChange={setDuration}
-                                  value={duration}
-                                >
-                                  <SelectTrigger id="status">
-                                    <SelectValue placeholder="Select status" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="1h">1 Hour</SelectItem>
-                                    <SelectItem value="2h ">2 Hours</SelectItem>
-                                    <SelectItem value="6h">6 Hours</SelectItem>
-                                    <SelectItem value="12h">
-                                      12 Hours
-                                    </SelectItem>
-                                    <SelectItem value="24h">1 Day</SelectItem>
-                                    <SelectItem value="3d">3 Days</SelectItem>
-                                    <SelectItem value="7d">7 Days</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </form>
+                          <div className="font-medium">
+                            {item.user.username.charAt(0).toUpperCase() + item.user.username.slice(1).toLowerCase()}
                           </div>
-                          <DialogFooter className="p-4">
-                            <Button
-                              variant="outline"
-                              onClick={() => setSelectedUser(null)}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              className="orange"
-                              onClick={() =>
-                                handleEdit(selectedUser?.id, duration)
-                              }
-                              disabled={isEditing}
-                            >
-                              Activate
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-
-                      <Dialog
-                        open={!!bannedUser && bannedUser.id === item.id}
-                        onOpenChange={(open) =>
-                          !open ? setBannedUser(null) : setBannedUser(item)
+                        </div>
+                      </TableCell>
+                      {/* Status */}
+                      <TableCell
+                        className={
+                          isBlocked
+                            ? "opacity-50"
+                            : "opacity-100 " + "align-middle"
                         }
                       >
-                        <DialogTrigger asChild>
-                          <button
-                            className="p-2 hover:bg-gray-100 rounded"
-                            title={isBlocked ? "Unban" : "Ban"}
-                            onClick={() => setBannedUser(item)}
+                        <div className="flex justify-center items-center">
+                          <div
+                            className={`text-xs font-semibold px-2 py-0.5 rounded-full  max-w-20 w-fit ${
+                              item.status.text === "Active"
+                                ? "bg-green-500 text-white"
+                                : "bg-gray-200 text-gray-500"
+                            }`}
                           >
-                            {isBlocked ? <Block /> : <CheckCircle />}
-                          </button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>
-                              {isBlocked
-                                ? "Unban Confirmation"
-                                : "Ban Confirmation"}
-                            </DialogTitle>
-                            <DialogDescription>
-                              Are you sure you want to{" "}
-                              {isBlocked ? "unban" : "ban"}{" "}
-                              <span className="font-semibold text-red-600">
-                                {item?.user.username}
-                              </span>
-                              ? <br /> This action cannot be undone.
-                            </DialogDescription>
-                          </DialogHeader>
-                          {/* Show the duration input only when banning */}
-                          {!isBlocked && (
-                            <div className="px-6 pt-4 pb-6">
-                              <form className="space-y-4">
-                                <div className="space-y-2">
-                                  <Label htmlFor="duration">Ban Duration</Label>
-                                  <Select
-                                    value={banDuration}
-                                    onValueChange={setBanDuration}
-                                  >
-                                    <SelectTrigger id="duration">
-                                      <SelectValue placeholder="Select Duration" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="1h">1 Hour</SelectItem>
-                                      <SelectItem value="6h">
-                                        6 Hours
-                                      </SelectItem>
-                                      <SelectItem value="12h">
-                                        12 Hours
-                                      </SelectItem>
-                                      <SelectItem value="24h">1 Day</SelectItem>
-                                      <SelectItem value="2d">2 Days</SelectItem>
-                                      <SelectItem value="5d">5 Days</SelectItem>
-                                      <SelectItem value="7d">7 Days</SelectItem>
-                                    </SelectContent>
-                                  </Select>
+                            {item.status.text}
+                          </div>
+                        </div>
+                      </TableCell>
+                      {/* Subscription */}
+                      <TableCell
+                        className={isBlocked ? "opacity-50" : "opacity-100"}
+                      >
+                        <div className="flex justify-center items-center">
+                          <div
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              item.subscription.text === "Premium"
+                                ? "bg-green-500 text-white"
+                                : "bg-gray-200 text-gray-700"
+                            }`}
+                          >
+                            {item.subscription.text}
+                          </div>
+                        </div>
+                      </TableCell>
+                      {/* Email */}
+                      <TableCell
+                        className={isBlocked ? "opacity-50" : "opacity-100"}
+                      >
+                        {item.email}
+                      </TableCell>
+                      {/* Last Active */}
+                      <TableCell
+                        className={isBlocked ? "opacity-50" : "opacity-100"}
+                      >
+                        {item.last_active}
+                      </TableCell>
+                      {/* Action */}
+                      <TableCell>
+                        <div className="flex gap-2 items-center">
+                          {/* Edit Dialog */}
+                          <Dialog
+                            open={!!selectedUser && selectedUser.id === item.id}
+                            onOpenChange={(open) =>
+                              !open
+                                ? setSelectedUser(null)
+                                : setSelectedUser(item)
+                            }
+                          >
+                            <DialogTrigger asChild>
+                              <button
+                                className="p-2 hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Edit"
+                                onClick={() => setSelectedUser(item)}
+                                disabled={isBlocked}
+                                
+                              >
+                                <Edit />
+                              </button>
+                            </DialogTrigger>
+                            <DialogContent className="p-0">
+                              <DialogHeader className="border-b border-gray-300">
+                                <DialogTitle className="p-4">
+                                  Change user subscription status
+                                </DialogTitle>
+                              </DialogHeader>
+                              <div className="flex items-center gap-2 p-6">
+                                <Image
+                                  src={
+                                    item.user.avatar || "/default-avatar.png"
+                                  }
+                                  alt={item.user.username}
+                                  height={32}
+                                  width={32}
+                                  className="w-8 h-8 rounded-full"
+                                />
+                                <div className="font-medium">
+                                  {item.user.username}
                                 </div>
-                              </form>
-                            </div>
-                          )}
-                          <DialogFooter>
-                            <Button
-                              variant="outline"
-                              onClick={() => setBannedUser(null)}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              className="orange p-2 rounded-md"
-                              onClick={
-                                isBlocked
-                                  ? handleUnbanUser(bannedUser?.id)
-                                  : handleBannedUser(
-                                      bannedUser?.id,
-                                      banDuration
-                                    )
-                              }
-                              disabled={isBlocked ? isBanning || isUnbanning : isBanning}
-                            >
-                              {isBlocked ? "Unban" : "Ban"}
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
+                                <div
+                                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                    item.subscription.text === "Premium"
+                                      ? "bg-green-500 text-white"
+                                      : "bg-gray-200 text-gray-700"
+                                  }`}
+                                >
+                                  {item.subscription.text}
+                                </div>
+                              </div>
+                              <div className="px-6 pt-4 pb-6">
+                                <form className="space-y-4">
+                                  <div className="space-y-2">
+                                    <Label htmlFor="status">Duration</Label>
+                                    <Select
+                                      onValueChange={setDuration}
+                                      value={duration}
+                                    >
+                                      <SelectTrigger id="status">
+                                        <SelectValue placeholder="Select status" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="1h">
+                                          1 Hour
+                                        </SelectItem>
+                                        <SelectItem value="6h">
+                                          6 Hours
+                                        </SelectItem>
+                                        <SelectItem value="12h">
+                                          12 Hours
+                                        </SelectItem>
+                                        <SelectItem value="24h">
+                                          1 Day
+                                        </SelectItem>
+                                        <SelectItem value="3d">
+                                          3 Days
+                                        </SelectItem>
+                                        <SelectItem value="7d">
+                                          7 Days
+                                        </SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </form>
+                              </div>
+                              <DialogFooter className="p-4">
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setSelectedUser(null)}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  className="orange"
+                                  onClick={() =>
+                                    handleEdit(selectedUser?.id, duration)
+                                  }
+                                  disabled={isEditing}
+                                >
+                                  Activate
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
 
-                      {/* Delete Dialog */}
-                      <Dialog
-                        open={!!deleteUser && deleteUser.id === item.id}
-                        onOpenChange={(open) =>
-                          !open ? setDeleteUser(null) : setDeleteUser(item)
-                        }
-                      >
-                        <DialogTrigger asChild>
-                          <button
-                            className="p-2 hover:bg-gray-100 rounded"
-                            title="Delete"
-                            onClick={() => setDeleteUser(item)}
+                          <Dialog
+                            open={!!bannedUser && bannedUser.id === item.id}
+                            onOpenChange={(open) =>
+                              !open ? setBannedUser(null) : setBannedUser(item)
+                            }
                           >
-                            <Delete />
-                          </button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Delete Confirmation</DialogTitle>
-                            <DialogDescription>
-                              Are you sure you want to delete{" "}
-                              <span className="font-semibold text-red-600">
-                                {deleteUser?.user.username}
-                              </span>
-                              ? <br /> This action cannot be undone.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <DialogFooter>
-                            <Button
-                              variant="outline"
-                              onClick={() => setDeleteUser(null)}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              className="orange p-2 rounded-md"
-                              onClick={() => handleDelete(deleteUser?.id)}
-                              disabled={isDeleting}
-                            >
-                              Delete
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+                            <DialogTrigger asChild>
+                              <button
+                                className="p-2 hover:bg-gray-100 rounded"
+                                title={isBlocked ? "Unban" : "Ban"}
+                                onClick={() => setBannedUser(item)}
+                              >
+                                {isBlocked ? <Block /> : <CheckCircle />}
+                              </button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>
+                                  {isBlocked
+                                    ? "Unban Confirmation"
+                                    : "Ban Confirmation"}
+                                </DialogTitle>
+                                <DialogDescription>
+                                  Are you sure you want to{" "}
+                                  {isBlocked ? "unban" : "ban"}{" "}
+                                  <span className="font-semibold text-red-600">
+                                    {item?.user.username}
+                                  </span>
+                                  ? <br /> This action cannot be undone.
+                                </DialogDescription>
+                              </DialogHeader>
+                              {/* Show the duration input only when banning */}
+                              {!isBlocked && (
+                                <div className="px-6 pt-4 pb-6">
+                                  <form className="space-y-4">
+                                    <div className="space-y-2">
+                                      <Label htmlFor="duration">
+                                        Ban Duration
+                                      </Label>
+                                      <Select
+                                        value={banDuration}
+                                        onValueChange={setBanDuration}
+                                      >
+                                        <SelectTrigger id="duration">
+                                          <SelectValue placeholder="Select Duration" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="1h">
+                                            1 Hour
+                                          </SelectItem>
+                                          <SelectItem value="6h">
+                                            6 Hours
+                                          </SelectItem>
+                                          <SelectItem value="12h">
+                                            12 Hours
+                                          </SelectItem>
+                                          <SelectItem value="24h">
+                                            1 Day
+                                          </SelectItem>
+                                          <SelectItem value="2d">
+                                            2 Days
+                                          </SelectItem>
+                                          <SelectItem value="5d">
+                                            5 Days
+                                          </SelectItem>
+                                          <SelectItem value="7d">
+                                            7 Days
+                                          </SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                  </form>
+                                </div>
+                              )}
+                              <DialogFooter>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setBannedUser(null)}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  className="orange p-2 rounded-md"
+                                  onClick={
+                                    item.actions.can_ban === false
+                                      ? handleUnbanUser(bannedUser?.id)
+                                      : handleBannedUser(
+                                          bannedUser?.id,
+                                          banDuration
+                                        )
+                                  }
+                                  disabled={isBlocked ? isBanning : isUnbanning}
+                                >
+                                  {isBlocked ? "Unban" : "Ban"}
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+
+                          {/* Delete Dialog */}
+                          <Dialog
+                            open={!!deleteUser && deleteUser.id === item.id}
+                            onOpenChange={(open) =>
+                              !open ? setDeleteUser(null) : setDeleteUser(item)
+                            }
+                          >
+                            <DialogTrigger asChild>
+                              <button
+                                className="p-2 hover:bg-gray-100 rounded"
+                                title="Delete"
+                                onClick={() => setDeleteUser(item)}
+                              >
+                                <Delete />
+                              </button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Delete Confirmation</DialogTitle>
+                                <DialogDescription>
+                                  Are you sure you want to delete{" "}
+                                  <span className="font-semibold text-red-600">
+                                    {deleteUser?.user.username}
+                                  </span>
+                                  ? <br /> This action cannot be undone.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <DialogFooter>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setDeleteUser(null)}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  className="orange p-2 rounded-md"
+                                  onClick={() => handleDelete(deleteUser?.id)}
+                                  disabled={isDeleting}
+                                >
+                                  Delete
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
           </TableBody>
         </Table>
       </div>

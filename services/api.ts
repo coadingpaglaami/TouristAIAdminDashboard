@@ -1,7 +1,15 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import {
+
+  createApi,
+
+  fetchBaseQuery,
+
+} from "@reduxjs/toolkit/query/react";
 import { OverviewResponse } from "@/interface/Overview";
 import { UserActivityResponse } from "@/interface/UserActivity";
 import { ManageUsersResponse } from "@/interface/ManageUser";
+import { Analytics } from "@/component/analytics";
+import { AnalyticsResponse } from "@/interface/Analytics";
 const baseURL = "https://ppp7rljm-8000.inc1.devtunnels.ms/admin-api/";
 
 interface LogOutRequest {
@@ -21,9 +29,15 @@ interface ManageUserProps {
   limit: number;
   page: number;
   search?: string;
-  bann?: string;
-  unbann?: string;
   subscription?: string;
+  banned?: boolean;
+}
+interface AnalyticsProps {
+  period: string;
+  leaderboard_count: number;
+  start_date?: string; // ISO date string
+  end_date?: string;   // ISO date string
+
 }
 
 export const baseQuery = fetchBaseQuery({
@@ -52,7 +66,6 @@ export const baseQuery = fetchBaseQuery({
     return response.status >= 200 && response.status < 300;
   },
 });
-
 export const api = createApi({
   reducerPath: "api",
   baseQuery,
@@ -113,10 +126,10 @@ export const api = createApi({
       invalidatesTags: ["User"],
     }),
     manageUser: builder.query<ManageUsersResponse, ManageUserProps>({
-      query: ({ limit, page, search, bann, unbann, subscription }) => ({
+      query: ({ limit, page, search, banned, subscription }) => ({
         url: `manage-users/?limit=${limit}&page=${page}${
           search ? `&search=${search}` : ``
-        }${bann ? `&bann=${bann}` : ``}${unbann ? `&unbann=${unbann}` : ``}${
+        }${banned ? `&banned=${banned}` : ``}${
           subscription ? `&subscription=${subscription}` : ``
         }`,
         method: "GET",
@@ -152,6 +165,12 @@ export const api = createApi({
         method: "PATCH",
       }),
       invalidatesTags: ["User"],
+    }),
+    analytics:builder.query<AnalyticsResponse, AnalyticsProps>({
+      query:({period,leaderboard_count,start_date,end_date}:AnalyticsProps)=>({
+        url:`analytics/?period=${period}${leaderboard_count?`&leaderboard_count=${leaderboard_count}`:""}${start_date?`&start_date=${start_date}`:""}${end_date?`&end_date=${end_date}`:""}`,
+        method:"GET"
+      })
     })
   }),
 });
@@ -170,4 +189,5 @@ export const {
   useEditUserMutation,
   useBanUserMutation,
   useUnbanUserMutation,
+  useAnalyticsQuery,
 } = api;

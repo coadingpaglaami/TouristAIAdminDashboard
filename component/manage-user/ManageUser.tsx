@@ -26,21 +26,34 @@ function useDebounce(value: string, delay = 300) {
 export const ManageUser = () => {
   const [search, setSearch] = useState("");
   const [subscription, setSubscription] = useState<string>("all");
-  const [banned, setBanned] = useState<string>("all");
+  const [banned, setBanned] = useState<boolean | null>(null);
   const [page, setPage] = useState(1);
   const perPage = 7;
   const debouncedSearch = useDebounce(search, 300);
-  const { data, isLoading } = useManageUserQuery({
+  const [isSearchingOrFiltering, setIsSearchingOrFiltering] = useState(false);
+  const { data, isFetching  } = useManageUserQuery({
     limit: perPage,
     page,
     search: debouncedSearch,
-    bann: banned,
+    banned: banned === null ? undefined : banned,
     subscription,
   });
   const handleSearchChange = (value: string) => {
     setSearch(value);
+    setIsSearchingOrFiltering(true);
     setPage(1);
   };
+  const handleSubscriptionChange = (value: string) => {
+    setSubscription(value);
+    setIsSearchingOrFiltering(true);
+    setPage(1);
+  };
+  // --- Reset manual loading once API finishes ---
+  useEffect(() => {
+    if (!isFetching) setIsSearchingOrFiltering(false);
+  }, [isFetching]);
+
+  const loadingState = isFetching ;
 
   return (
     <div className="flex flex-col gap-8 py-10 px-4 max-md:max-w-screen overflow-hidden">
@@ -60,7 +73,7 @@ export const ManageUser = () => {
           </div>
         </div>
         <div className="flex gap-2 items-center max-w-[320px] w-full ">
-          <Select value={subscription} onValueChange={setSubscription}>
+          <Select value={subscription} onValueChange={handleSubscriptionChange}>
             <SelectTrigger className="w-1/2">
               <SelectValue placeholder="Subscription" />
             </SelectTrigger>
@@ -73,16 +86,23 @@ export const ManageUser = () => {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <Select value={banned} onValueChange={setBanned}>
+          <Select
+            value={banned === null ? "null" : banned ? "true" : "false"}
+            onValueChange={(val) => {
+              setBanned(val === "null" ? null : val === "true");
+              setIsSearchingOrFiltering(true);
+              setPage(1);
+            }}
+          >
             <SelectTrigger className="w-1/2">
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Status</SelectLabel>
-                <SelectItem value="all">All User</SelectItem>
-                <SelectItem value="Banned">Block</SelectItem>
-                <SelectItem value="Unbanned">Unblock</SelectItem>
+                <SelectItem value="null">All Users</SelectItem>
+                <SelectItem value="true">Banned</SelectItem>
+                <SelectItem value="false">Unbanned</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -91,7 +111,7 @@ export const ManageUser = () => {
       <UserTable
         data={data?.results.results ?? []}
         count={data?.count ?? 0}
-        isLoading={isLoading}
+        isLoading={loadingState}
         page={page}
         setPage={setPage}
         perPage={perPage}
