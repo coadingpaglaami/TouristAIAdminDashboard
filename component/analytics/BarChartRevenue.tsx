@@ -20,30 +20,14 @@ import {
   ChartContainer,
   ChartTooltip,
 } from "@/components/ui/chart";
-import { Calendar as CalendarIcon } from "@/svg/Chart";
-import { Calendar } from "@/components/ui/calendar";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { DateRange } from "react-day-picker";
-import { addDays, format } from "date-fns";
-
-const chartData = [
-  { month: "January", revenue: 186 },
-  { month: "February", revenue: 305 },
-  { month: "March", revenue: 237 },
-  { month: "April", revenue: 73 },
-  { month: "May", revenue: 209 },
-  { month: "June", revenue: 214 },
-  { month: "July", revenue: 180 },
-  { month: "August", revenue: 220 },
-  { month: "September", revenue: 195 },
-  { month: "October", revenue: 250 },
-  { month: "November", revenue: 270 },
-  { month: "December", revenue: 300 },
-];
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useAnalyticsRevenueGrowthDataQuery } from "@/services/api";
 
 const chartConfig = {
   revenue: {
@@ -75,46 +59,54 @@ const CustomChartTooltipContent = ({
 };
 
 export const BarChartRevenue = () => {
-  const today = new Date();
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: today,
-    to: addDays(today, 30),
+  const creationYear = 2022; // set your project creation year
+  const currentYear = new Date().getFullYear();
+
+  const years = Array.from(
+    { length: currentYear - creationYear + 1 },
+    (_, i) => creationYear + i
+  );
+
+  const [selectedYear, setSelectedYear] = useState(currentYear.toString());
+  const { data: revenueGrowthData } = useAnalyticsRevenueGrowthDataQuery({
+    year: selectedYear,
   });
 
   // Format total revenue text
   const description = () => (
     <div className="flex items-center gap-2 tracking-wider">
       <span className="font-semibold text-black">
-        Total {chartData.reduce((acc, item) => acc + item.revenue, 0)}k
+        Total {revenueGrowthData?.total_revenue !== undefined
+          ? (() => {
+          const value = Number(revenueGrowthData.total_revenue);
+          if (isNaN(value)) return revenueGrowthData.total_revenue;
+          if (value >= 1_000_000_000)
+            return `${(value / 1_000_000_000).toFixed(2)}b$`;
+          if (value >= 1_000_000)
+            return `${(value / 1_000_000).toFixed(2)}m$`;
+          if (value >= 1_000)
+            return `${(value / 1_000).toFixed(2)}k$`;
+          return `${value}$`;
+        })()
+          : "--"}
       </span>
 
       {/* Calendar Button with Popover */}
-      <Popover>
-        <PopoverTrigger asChild>
-          <button className="text-muted-foreground p-2 hover:bg-accent rounded-md">
-            <CalendarIcon />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-2" align="end">
-          <Calendar
-            mode="range"
-            selected={date}
-            onSelect={setDate}
-            numberOfMonths={2}
-            pagedNavigation
-            showOutsideDays={false}
-            className="rounded-md border"
-          />
-          <div className="text-xs text-muted-foreground mt-2 text-center">
-            {date?.from && date?.to
-              ? `${format(date.from, "LLL dd, y")} - ${format(
-                  date.to,
-                  "LLL dd, y"
-                )}`
-              : "Select a date range"}
-          </div>
-        </PopoverContent>
-      </Popover>
+      <Select
+        defaultValue={currentYear.toString()}
+        onValueChange={setSelectedYear}
+      >
+        <SelectTrigger className="w-[120px]">
+          <SelectValue placeholder="Select Year" />
+        </SelectTrigger>
+        <SelectContent>
+          {years.map((year) => (
+            <SelectItem key={year} value={year.toString()}>
+              {year}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 
@@ -136,7 +128,10 @@ export const BarChartRevenue = () => {
           className="max-h-[24vh] min-w-full"
         >
           <ResponsiveContainer>
-            <BarChart data={chartData} className="max-h-[18vh] min-w-full">
+            <BarChart
+              data={revenueGrowthData?.revenue_growth}
+              className="max-h-[18vh] min-w-full"
+            >
               <CartesianGrid vertical={false} strokeDasharray="3 3" />
               <XAxis
                 dataKey="month"
@@ -146,7 +141,7 @@ export const BarChartRevenue = () => {
                 tickFormatter={(value: string) => value.slice(0, 3)}
               />
               <YAxis
-                dataKey="revenue"
+                dataKey="total"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={10}
@@ -158,7 +153,7 @@ export const BarChartRevenue = () => {
                 content={<CustomChartTooltipContent />}
               />
               <Bar
-                dataKey="revenue"
+                dataKey="total"
                 fill="#28C86B"
                 radius={[8, 8, 0, 0]}
                 name="Revenue"

@@ -8,8 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useMemo, useState } from "react";
-import Image from "next/image";
+import { useState } from "react";
 import {
   Delete,
   Chevron,
@@ -34,94 +33,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-interface UserTable {
-  image: string;
-  name: string;
-  subscription: "1 hour" | "2 days" | "3 days" | "5 days" | "7 days" | "9 days";
-  amount: number;
-  lastactive: string;
-  duration: string;
-}
-
-interface Filter {
-  search: string;
-  duration: string | undefined;
-}
-
-// Short date + time for Activate/Expired columns
-function formatShortDateTime(date: Date) {
-  return date.toLocaleString("en-US", {
-    day: "2-digit",
-    month: "short",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-}
-
-// Relative time for Last Active column
-function formatRelativeTime(date: Date) {
-  const now = new Date();
-  const diff = (now.getTime() - date.getTime()) / 1000; // in seconds
-
-  if (diff < 60) return `${Math.floor(diff)} seconds ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
-  if (diff < 345600) return `${Math.floor(diff / 86400)} days ago`; // < 4 days
-
-  // fallback for older than 4 days
-  return date.toLocaleString("en-US", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-const generateDummyData = (count: number): UserTable[] => {
-  const images = [
-    "/table 1.jpg",
-    "/table 2.jpg",
-    "/table 3.jpg",
-    "/table 4.jpg",
-    "/table 5.jpg",
-    "/table 6.jpg",
-    "/table 7.jpg",
-    "/table 8.jpg",
-    "/table 9.jpg",
-  ];
-  const names = [
-    "Sujon",
-    "Shihab",
-    "Farhan",
-    "Shaon",
-    "Chailau",
-    "Atik",
-    "Mijan",
-    "Hossain",
-    "Jubayer",
-    "Alamin",
-    "Ankan",
-    "Ayon",
-  ];
-  const subscriptions: Array<
-    "1 hour" | "2 days" | "3 days" | "5 days" | "7 days" | "9 days"
-  > = ["1 hour", "2 days", "3 days", "5 days", "7 days", "9 days"];
-  const amounts = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
-
-  return Array.from({ length: count }, (_, i) => {
-    const baseDate = new Date();
-    baseDate.setDate(baseDate.getDate() - Math.floor(Math.random() * 10));
-    const subscription = subscriptions[i % subscriptions.length];
-    return {
-      image: images[i % images.length],
-      name: names[i % names.length],
-      subscription,
-      amount: amounts[i % amounts.length],
-      lastactive: baseDate.toISOString(),
-      duration: "",
-    };
-  });
-};
+import { UserSubscription } from "@/interface/BoosterRecord";
+import { AvatarAndImage } from "../reusable";
+import {
+  useBoosterDeleteMutation,
+  useBoosterPauseMutation,
+} from "@/services/api";
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function getPagination(current: number, total: number) {
   const delta = 2;
@@ -152,62 +71,58 @@ function getPagination(current: number, total: number) {
   }
   return rangeWithDots;
 }
-export const PaymentTable = ({ search, duration }: Filter) => {
-  const [data, setData] = useState<UserTable[]>(generateDummyData(80));
-  const [blocked, setBlocked] = useState<{ [key: number]: boolean }>({});
-  const [page, setPage] = useState(1);
-  const [deleteUser, setDeleteUser] = useState<UserTable | null>(null);
-  const rowsPerPage = 7;
 
-  const handleBlockToggle = (idx: number) => {
-    setBlocked((prev) => ({
-      ...prev,
-      [idx]: !prev[idx],
-    }));
+interface PaymentTable {
+  data: UserSubscription[];
+  count: number;
+  isLoading: boolean;
+  page: number;
+  setPage: (page: number) => void;
+  perPage: number;
+}
+export const PaymentTable = ({
+  data,
+  count,
+  isLoading,
+  page,
+  setPage,
+  perPage,
+}: PaymentTable) => {
+  const [deleteUser, setDeleteUser] = useState<UserSubscription | null>(null);
+  const totalPages = Math.ceil(count / perPage);
+  const [pauseMutation] = useBoosterPauseMutation();
+  const [deleteMutation] = useBoosterDeleteMutation();
+  const handleBlockToggle = async (idx: number, action: string) => {
+    try {
+      await pauseMutation({ id: idx, action }).unwrap();
+      toast.success(
+        `Subscription has been ${action === "pause" ? "paused" : "played"}`,
+        { richColors: true }
+      );
+    } catch (error) {
+      toast.error("Failed to update user status", { richColors: true });
+      console.log(error);
+    }
   };
 
-  const handleUnblock = (idx: number) => {
-    setBlocked((prev) => ({
-      ...prev,
-      [idx]: false,
-    }));
-  };
-
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteUser) return;
 
     // Update the data state by removing the user
-    setData((prevData) =>
-      prevData.filter((user) => user.name !== deleteUser.name)
-    );
-
-    console.log("Deleted user:", deleteUser.name);
-    setDeleteUser(null); // Close the delete dialog
+    try {
+      await deleteMutation(deleteUser.id).unwrap();
+      toast.success(`${deleteUser?.user.username} has been deleted`, {
+        richColors: true,
+      });
+      setDeleteUser(null); // Close the delete dialog
+    } catch (error) {
+      toast.error("Failed to delete user", { richColors: true });
+      console.log(error)
+    }
   };
 
   // Filter Data based on search and duration
-  const filteredData = useMemo(() => {
-    return data.filter((item) => {
-      // Filter by search (user name)
-      const isSearchMatch =
-        item.name.toLowerCase().includes(search.toLowerCase()) ||
-        item.amount.toString().includes(search.toLowerCase()) ||
-        item.lastactive.toString().includes(search.toLowerCase()) ||
-        item.duration.toString().includes(search.toLowerCase());
 
-      // Filter by duration (subscription)
-      const isDurationMatch =
-        duration === "all" || !duration ? true : item.subscription === duration;
-
-      return isSearchMatch && isDurationMatch;
-    });
-  }, [data, search, duration]);
-
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-  const paginatedData = filteredData.slice(
-    (page - 1) * rowsPerPage,
-    page * rowsPerPage
-  );
   const paginationNumbers = getPagination(page, totalPages);
 
   return (
@@ -223,11 +138,9 @@ export const PaymentTable = ({ search, duration }: Filter) => {
               <TableHead className="text-xs font-semibold text-gray-500  text-center py-3">
                 Subscription
               </TableHead>
+
               <TableHead className="text-xs font-semibold text-gray-500 text-center py-3">
-                Activate Time
-              </TableHead>
-              <TableHead className="text-xs font-semibold text-gray-500 text-center py-3">
-                Expired Time
+                Duration
               </TableHead>
               <TableHead className="text-xs font-semibold text-gray-500  py-3 text-center">
                 Amount
@@ -271,127 +184,138 @@ export const PaymentTable = ({ search, duration }: Filter) => {
             </TableRow>
           </TableHeader>
           <TableBody className="tracking-wider">
-            {paginatedData.map((item, idx) => {
-              const globalIdx = (page - 1) * rowsPerPage + idx;
-              const isBlocked = blocked[globalIdx];
+            {isLoading
+              ? Array.from({ length: 7 }).map((_, idx) => (
+                  <TableRow key={idx} className="border-none">
+                    {/* User */}
+                    <TableCell className="py-4">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                        <Skeleton className="h-4 w-24" />
+                      </div>
+                    </TableCell>
 
-              return (
-                <TableRow
-                  key={globalIdx}
-                  className="transition hover:bg-gray-50 border-none"
-                >
-                  {/* User */}
-                  <TableCell
-                    className={`py-4 ${isBlocked ? "opacity-30" : ""}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="relative w-8 h-8 rounded-full p-2">
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          className="  border border-gray-200 object-cover rounded-full"
+                    {/* Status */}
+                    <TableCell className="py-4 text-center">
+                      <div className="flex justify-center">
+                        <Skeleton className="h-6 w-20 rounded-full" />
+                      </div>
+                    </TableCell>
+
+                    {/* Duration */}
+                    <TableCell className="py-4 text-center">
+                      <div className="flex flex-col items-center gap-1">
+                        <Skeleton className="h-4 w-28" />
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                    </TableCell>
+
+                    {/* Amount */}
+                    <TableCell className="py-4 text-center">
+                      <Skeleton className="h-4 w-12 mx-auto" />
+                    </TableCell>
+
+                    {/* Last Active */}
+                    <TableCell className="py-4 text-center">
+                      <Skeleton className="h-4 w-20 mx-auto" />
+                    </TableCell>
+
+                    {/* Action */}
+                    <TableCell className="py-4 text-center">
+                      <div className="flex gap-2 justify-center">
+                        <Skeleton className="h-8 w-8 rounded" />
+                        <Skeleton className="h-8 w-8 rounded" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              : data.map((item, idx) => {
+                  const globalIdx = (page - 1) * perPage + idx;
+                  const isBlocked = item.action.pause_play === "pause";
+
+                  return (
+                    <TableRow
+                      key={globalIdx}
+                      className="transition hover:bg-gray-50 border-none"
+                    >
+                      {/* User */}
+                      <TableCell
+                        className={`py-4 ${isBlocked ? "opacity-30" : ""}`}
+                      >
+                        <AvatarAndImage
+                          username={item.user.username}
+                          avatar_url={item.user.avatar}
                         />
-                      </div>
-                      <div className="font-medium text-gray-800">
-                        {item.name}
-                      </div>
-                    </div>
-                  </TableCell>
-                  {/* Status */}
-                  <TableCell
-                    className={`py-4 text-center ${
-                      isBlocked ? "opacity-30" : ""
-                    }`}
-                  >
-                    <div className="flex justify-center">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold mb-1 bg-[#BDBDBD]`}
+                      </TableCell>
+                      {/* Status */}
+                      <TableCell
+                        className={`py-4 text-center ${
+                          isBlocked ? "opacity-30" : ""
+                        }`}
                       >
-                        {item.subscription}
-                      </span>
-                    </div>
-                  </TableCell>
-                  {/* Duration */}
-                  {/* Activate Time */}
-                  <TableCell
-                    className={`py-4 text-center ${
-                      isBlocked ? "opacity-30" : ""
-                    }`}
-                  >
-                    <span className="text-sm">
-                      {formatShortDateTime(new Date(item.lastactive))}
-                    </span>
-                  </TableCell>
-
-                  {/* Expired Time */}
-                  <TableCell
-                    className={`py-4 text-center ${
-                      isBlocked ? "opacity-30" : ""
-                    }`}
-                  >
-                    <span className="text-sm">
-                      {(() => {
-                        const start = new Date(item.lastactive);
-                        const end = new Date(start);
-
-                        if (item.subscription === "1 hour") {
-                          end.setHours(start.getHours() + 1);
-                        } else {
-                          const days = parseInt(item.subscription);
-                          end.setDate(start.getDate() + days);
-                        }
-
-                        return formatShortDateTime(end);
-                      })()}
-                    </span>
-                  </TableCell>
-                  {/* Amount */}
-                  <TableCell
-                    className={`py-4 text-center ${
-                      isBlocked ? "opacity-30" : ""
-                    }`}
-                  >
-                    <span className="font-semibold text-gray-700">
-                      ${item.amount}
-                    </span>
-                  </TableCell>
-                  {/* Last Active */}
-                  <TableCell
-                    className={`py-4 text-center ${
-                      isBlocked ? "opacity-30" : ""
-                    }`}
-                  >
-                    <span className="text-sm">
-                      {formatRelativeTime(new Date(item.lastactive))}
-                    </span>
-                  </TableCell>
-                  {/* Action */}
-                  <TableCell className="py-4 text-center">
-                    <div className="flex gap-2 justify-center">
-                      <button
-                        className="p-2 hover:bg-gray-100 rounded transition"
-                        title={isBlocked ? "Unblock" : "Block"}
-                        onClick={() =>
-                          isBlocked
-                            ? handleUnblock(globalIdx)
-                            : handleBlockToggle(globalIdx)
-                        }
+                        <div className="flex justify-center">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold mb-1 bg-[#BDBDBD]`}
+                          >
+                            {item.subscription_name}
+                          </span>
+                        </div>
+                      </TableCell>
+                      {/* Duration */}
+                      <TableCell
+                        className={`py-4 text-center ${
+                          isBlocked ? "opacity-30" : ""
+                        }`}
                       >
-                        {isBlocked ? <Play /> : <Pause />}
-                      </button>
-                      <button
-                        className="p-2 hover:bg-gray-100 rounded transition"
-                        title="Delete"
-                        onClick={() => setDeleteUser(item)}
+                        <div className="flex text-sm flex-col gap-1">
+                          <span>{item.activate_time}</span>
+                          <span className="text-center text-[#969696]">
+                            {item.expire_time}
+                          </span>
+                        </div>
+                      </TableCell>
+                      {/* Amount */}
+                      <TableCell
+                        className={`py-4 text-center ${
+                          isBlocked ? "opacity-30" : ""
+                        }`}
                       >
-                        <Delete />
-                      </button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+                        <span className="font-semibold text-gray-700">
+                          ${item.amount}
+                        </span>
+                      </TableCell>
+                      {/* Last Active */}
+                      <TableCell
+                        className={`py-4 text-center ${
+                          isBlocked ? "opacity-30" : ""
+                        }`}
+                      >
+                        <span className="text-sm">{item.last_active}</span>
+                      </TableCell>
+                      {/* Action */}
+                      <TableCell className="py-4 text-center">
+                        <div className="flex gap-2 justify-center">
+                          <button
+                            className="p-2 hover:bg-gray-100 rounded transition"
+                            title={isBlocked ? "Play" : "Pause"}
+                            onClick={() =>
+                              handleBlockToggle(item.id, item.action.pause_play)
+                            }
+                          >
+                            {isBlocked ? <Play /> : <Pause />}
+                          </button>
+                          <button
+                            className="p-2 hover:bg-gray-100 rounded transition"
+                            title="Delete"
+                            onClick={() => setDeleteUser(item)}
+                          >
+                            <Delete />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
           </TableBody>
         </Table>
       </div>
@@ -409,7 +333,7 @@ export const PaymentTable = ({ search, duration }: Filter) => {
             <DialogDescription>
               Are you sure you want to delete{" "}
               <span className="font-semibold text-red-600">
-                {deleteUser?.name}
+                {deleteUser?.user.username}
               </span>
               ? This action cannot be undone.
             </DialogDescription>
@@ -431,14 +355,13 @@ export const PaymentTable = ({ search, duration }: Filter) => {
       {/* Pagination Controls */}
       <div className="flex md:items-center md:justify-between md:flex-row flex-col mt-4">
         <div className="text-sm text-gray-600">
-          Showing {(page - 1) * rowsPerPage + 1} to{" "}
-          {Math.min(page * rowsPerPage, filteredData.length)} from{" "}
-          {filteredData.length} records
+          Showing {(page - 1) * perPage + 1} to{" "}
+          {Math.min(page * perPage, count)} from {count} records
         </div>
         <div className="flex items-center gap-1">
           <button
             className="p-3.5 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            onClick={() => setPage(Math.max(1, page - 1))}
             disabled={page === 1}
           >
             <Chevron />
@@ -468,7 +391,7 @@ export const PaymentTable = ({ search, duration }: Filter) => {
           )}
           <button
             className="p-3.5 rounded disabled:opacity-50 border border-[#4C5363] flex justify-center items-center"
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            onClick={() => setPage(Math.min(totalPages, page + 1))}
             disabled={page === totalPages}
           >
             <ChevronNext />

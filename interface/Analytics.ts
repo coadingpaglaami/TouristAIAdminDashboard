@@ -1,40 +1,38 @@
-export interface AnalyticsResponse {
-  returning_users: {
-    weekly: ReturningUser[];
-    monthly: ReturningUser[];
-    yearly: ReturningUser[];
-  };
-  user_status_distribution: UserStatusDistribution;
-  revenue_growth: RevenueGrowth[];
-  revenue_leaderboard: RevenueLeaderboard;
-}
-
-interface ReturningUser {
+interface ReportItem {
   label: string;
   count: number;
 }
 
-export interface UserStatusDistribution {
+export interface ReturningUsersResponse {
+  weekly: ReportItem[];
+  monthly: ReportItem[];
+  yearly: ReportItem[];
+}
+export interface AnalyticsUserStatusDistribution {
   total: number;
-  free_count?: number;
-  premium_count?: number;
+  free_count: number;
+  premium_count: number;
   free_percentage: number;
   premium_percentage: number;
 }
-
-interface RevenueGrowth {
-  month: number;
-  total: number;
+interface TopUser {
+  username: string;
+  avatar_url: string | null;
+  revenue: number;
 }
 
-interface RevenueLeaderboard {
-  top_users: RevenueUser[];
+export interface AnalyticsRevenueStatsResponse {
+  top_users: TopUser[];
   average_revenue_per_user: number;
   growth_percentage: number;
 }
 
-interface RevenueUser {
-  username: string;
-  avatar_url: string | null;
-  revenue: number;
+export interface RevenueGrowthItem {
+  month: string;
+  total: number;
+}
+
+export interface RevenueGrowthDataResponse {
+  revenue_growth: RevenueGrowthItem[];
+  total_revenue: number;
 }

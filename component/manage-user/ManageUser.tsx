@@ -30,7 +30,6 @@ export const ManageUser = () => {
   const [page, setPage] = useState(1);
   const perPage = 7;
   const debouncedSearch = useDebounce(search, 300);
-  const [isSearchingOrFiltering, setIsSearchingOrFiltering] = useState(false);
   const { data, isFetching  } = useManageUserQuery({
     limit: perPage,
     page,
@@ -40,18 +39,15 @@ export const ManageUser = () => {
   });
   const handleSearchChange = (value: string) => {
     setSearch(value);
-    setIsSearchingOrFiltering(true);
+
     setPage(1);
   };
   const handleSubscriptionChange = (value: string) => {
     setSubscription(value);
-    setIsSearchingOrFiltering(true);
+
     setPage(1);
   };
   // --- Reset manual loading once API finishes ---
-  useEffect(() => {
-    if (!isFetching) setIsSearchingOrFiltering(false);
-  }, [isFetching]);
 
   const loadingState = isFetching ;
 
@@ -89,8 +85,7 @@ export const ManageUser = () => {
           <Select
             value={banned === null ? "null" : banned ? "true" : "false"}
             onValueChange={(val) => {
-              setBanned(val === "null" ? null : val === "true");
-              setIsSearchingOrFiltering(true);
+              setBanned(val === "null" ? null : val === "true")
               setPage(1);
             }}
           >

@@ -1,24 +1,18 @@
 "use client";
-import { useAnalyticsQuery } from "@/services/api";
+import {  useAnalyticsReturningUsersQuery, useAnalyticsUserStatusDistributionQuery } from "@/services/api";
 import { BarChartReturn } from "./BarChartReturn";
 import { BarChartRevenue } from "./BarChartRevenue";
 import { PieChartStatus } from "./PieChartStatus";
 import { RevenueLeaderBoard } from "./RevenueLeaderBoard";
 import { useState } from "react";
-import { DateRange } from "react-day-picker";
-import { format } from "date-fns";
 
 export const Analytics = () => {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [range, setRange] = useState<"weekly" | "monthly" | "yearly">("weekly");
-  const { data, error, isLoading } = useAnalyticsQuery({
+  const { data,  } = useAnalyticsReturningUsersQuery({
     period: range,
-    leaderboard_count: 5,
-    start_date: dateRange?.from
-      ? format(dateRange.from, "yyyy-MM-dd")
-      : undefined,
-    end_date: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
+   
   });
+  const { data: userStatusData } = useAnalyticsUserStatusDistributionQuery();
 
   return (
     <div className="flex flex-col gap-4 w-full my-4 md:my-6 lg:my-8 px-2 sm:px-4">
@@ -27,22 +21,17 @@ export const Analytics = () => {
           <BarChartReturn
             range={range}
             setRange={setRange}
-            returningUsers={
-              data?.returning_users || { weekly: [], monthly: [], yearly: [] }
-            }
+            returningUsers={data || { weekly: [], monthly: [], yearly: [] }}
+
           />
         </div>
         <div className="w-full bg-white rounded-lg">
           <PieChartStatus
-            total={data?.user_status_distribution.total || 0}
-            free_percentage={
-              data?.user_status_distribution.free_percentage || 0
-            }
-            premium_percentage={
-              data?.user_status_distribution.premium_percentage || 0
-            }
-            free_count={data?.user_status_distribution.free_count || 0}
-            premium_count={data?.user_status_distribution.premium_count || 0}
+            total={userStatusData?.total || 0}
+            free_percentage={userStatusData?.free_percentage || 0}
+            premium_percentage={userStatusData?.premium_percentage || 0}
+            free_count={userStatusData?.free_count || 0}
+            premium_count={userStatusData?.premium_count || 0}
           />
         </div>
       </div>

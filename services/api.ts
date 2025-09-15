@@ -1,15 +1,14 @@
-import {
-
-  createApi,
-
-  fetchBaseQuery,
-
-} from "@reduxjs/toolkit/query/react";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { OverviewResponse } from "@/interface/Overview";
 import { UserActivityResponse } from "@/interface/UserActivity";
 import { ManageUsersResponse } from "@/interface/ManageUser";
-import { Analytics } from "@/component/analytics";
-import { AnalyticsResponse } from "@/interface/Analytics";
+import {
+  AnalyticsRevenueStatsResponse,
+  AnalyticsUserStatusDistribution,
+  ReturningUsersResponse,
+  RevenueGrowthDataResponse,
+} from "@/interface/Analytics";
+import { BoosterRecordResponse } from "@/interface/BoosterRecord";
 const baseURL = "https://ppp7rljm-8000.inc1.devtunnels.ms/admin-api/";
 
 interface LogOutRequest {
@@ -32,14 +31,25 @@ interface ManageUserProps {
   subscription?: string;
   banned?: boolean;
 }
-interface AnalyticsProps {
+interface ReturningUsersProps {
   period: string;
-  leaderboard_count: number;
-  start_date?: string; // ISO date string
-  end_date?: string;   // ISO date string
-
 }
-
+interface RevenuProps {
+  period: string;
+}
+interface RevenueGrowthProps {
+  year: string;
+}
+interface BoosterRecordProps {
+  limit: number;
+  page: number;
+}
+interface ActionProps {
+  action: string;
+}
+interface BoosterPauseRes {
+  message: string;
+}
 export const baseQuery = fetchBaseQuery({
   baseUrl: baseURL,
   prepareHeaders: (headers) => {
@@ -166,12 +176,70 @@ export const api = createApi({
       }),
       invalidatesTags: ["User"],
     }),
-    analytics:builder.query<AnalyticsResponse, AnalyticsProps>({
-      query:({period,leaderboard_count,start_date,end_date}:AnalyticsProps)=>({
-        url:`analytics/?period=${period}${leaderboard_count?`&leaderboard_count=${leaderboard_count}`:""}${start_date?`&start_date=${start_date}`:""}${end_date?`&end_date=${end_date}`:""}`,
-        method:"GET"
-      })
-    })
+    analyticsReturningUsers: builder.query<
+      ReturningUsersResponse,
+      ReturningUsersProps
+    >({
+      query: ({ period }: ReturningUsersProps) => ({
+        url: `returning-users/?period=${period}`,
+        method: "GET",
+      }),
+    }),
+    analyticsUserStatusDistribution: builder.query<
+      AnalyticsUserStatusDistribution,
+      void
+    >({
+      query: () => ({
+        url: `user-status-distribution/`,
+        method: "GET",
+      }),
+      providesTags: ["User"],
+    }),
+    analyticsRevenueLeaderBoard: builder.query<
+      AnalyticsRevenueStatsResponse,
+      RevenuProps
+    >({
+      query: ({ period }: RevenuProps) => ({
+        url: `revenue-leaderboard/?period=${period}`,
+        method: "GET",
+      }),
+      providesTags: ["User"],
+    }),
+    analyticsRevenueGrowthData: builder.query<
+      RevenueGrowthDataResponse,
+      RevenueGrowthProps
+    >({
+      query: ({ year }: RevenueGrowthProps) => ({
+        url: `revenue-growth/?year=${year}`,
+        method: "GET",
+      }),
+      providesTags: ["User"],
+    }),
+    boosterRecord: builder.query<BoosterRecordResponse, BoosterRecordProps>({
+      query: ({ limit, page }: BoosterRecordProps) => ({
+        url: `payment-records/?limit=${limit}&page=${page}`,
+        method: "GET",
+      }),
+      providesTags: ["User"],
+    }),
+    boosterPause: builder.mutation<
+      BoosterPauseRes,
+     ActionProps & { id: number }
+    >({
+      query: ({ id, action }) => ({
+        url: `payment-records/${id}/toggle/`,
+        method: "PATCH",
+        body: { action },
+      }),
+      invalidatesTags: ["User"],
+    }),
+    boosterDelete: builder.mutation({
+      query: (id: number) => ({
+        url: `payment-records/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["User"],
+    }),
   }),
 });
 
@@ -189,5 +257,11 @@ export const {
   useEditUserMutation,
   useBanUserMutation,
   useUnbanUserMutation,
-  useAnalyticsQuery,
+  useAnalyticsReturningUsersQuery,
+  useAnalyticsUserStatusDistributionQuery,
+  useAnalyticsRevenueLeaderBoardQuery,
+  useAnalyticsRevenueGrowthDataQuery,
+  useBoosterPauseMutation,
+  useBoosterDeleteMutation,
+  useBoosterRecordQuery,
 } = api;

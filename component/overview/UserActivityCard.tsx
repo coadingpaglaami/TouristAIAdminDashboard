@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AvatarAndImage } from "../reusable";
 
 interface UserActivity {
   name: string;
@@ -63,7 +64,7 @@ export const UserActivitiesCard = ({
                   <React.Fragment key={index}>
                     <TableRow className="w-full border-none">
                       <TableCell className="w-1/3 font-medium py-4">
-                        <div className="flex items-center">
+                        {/* <div className="flex items-center">
                           <div className="w-10 h-10 rounded-full mr-3 flex items-center justify-center border-2 border-black">
                             <Image
                               src={item.image || "/avatar.png"}
@@ -77,7 +78,11 @@ export const UserActivitiesCard = ({
                             {item.name.charAt(0).toUpperCase()}
                             {item.name.slice(1)}
                           </p>
-                        </div>
+                        </div> */}
+                        <AvatarAndImage
+                          username={item.name}
+                          avatar_url={item.image}
+                        />
                       </TableCell>
                       <TableCell className="w-1/3 text-center py-4">
                         {" "}

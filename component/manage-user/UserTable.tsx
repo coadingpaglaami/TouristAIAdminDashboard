@@ -8,8 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {  useState } from "react";
-import Image from "next/image";
+import { useState } from "react";
 import {
   Delete,
   Block,
@@ -51,6 +50,7 @@ import {
 } from "@/services/api";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AvatarAndImage } from "../reusable";
 
 function getPagination(current: number, total: number) {
   const delta = 2;
@@ -115,6 +115,9 @@ export const UserTable = ({
     if (!id) return;
     try {
       await deleteUserInfo(id).unwrap(); // call API
+      toast.success(`${deleteUser?.user.username} has been deleted`, {
+        richColors: true,
+      });
       setDeleteUser(null); // close dialog
     } catch (err) {
       console.error("Failed to delete:", err);
@@ -279,19 +282,10 @@ export const UserTable = ({
                       <TableCell
                         className={isBlocked ? "opacity-50" : "opacity-100"}
                       >
-                        <div className="flex items-center gap-2">
-                          <div className="relative w-8 h-8 rounded-full p-2">
-                            <Image
-                              src={item.user.avatar || "/avatar.png"}
-                              alt={item.user.username}
-                              fill
-                              className="  border border-gray-200 object-cover rounded-full"
-                            />
-                          </div>
-                          <div className="font-medium">
-                            {item.user.username.charAt(0).toUpperCase() + item.user.username.slice(1).toLowerCase()}
-                          </div>
-                        </div>
+                        <AvatarAndImage
+                          username={item.user.username}
+                          avatar_url={item.user.avatar}
+                        />
                       </TableCell>
                       {/* Status */}
                       <TableCell
@@ -359,7 +353,6 @@ export const UserTable = ({
                                 title="Edit"
                                 onClick={() => setSelectedUser(item)}
                                 disabled={isBlocked}
-                                
                               >
                                 <Edit />
                               </button>
@@ -371,18 +364,11 @@ export const UserTable = ({
                                 </DialogTitle>
                               </DialogHeader>
                               <div className="flex items-center gap-2 p-6">
-                                <Image
-                                  src={
-                                    item.user.avatar || "/default-avatar.png"
-                                  }
-                                  alt={item.user.username}
-                                  height={32}
-                                  width={32}
-                                  className="w-8 h-8 rounded-full"
+              
+                                <AvatarAndImage
+                                  username={item.user.username}
+                                  avatar_url={item.user.avatar}
                                 />
-                                <div className="font-medium">
-                                  {item.user.username}
-                                </div>
                                 <div
                                   className={`px-3 py-1 rounded-full text-xs font-semibold ${
                                     item.subscription.text === "Premium"

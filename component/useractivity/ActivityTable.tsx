@@ -22,6 +22,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { ActivityResult } from "@/interface/UserActivity";
 import { useDeleteContenMutation } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AvatarAndImage } from "../reusable";
 
 // Helper for pagination numbers
 function getPagination(current: number, total: number) {
@@ -132,21 +133,10 @@ export const ActivityTable = ({
                   return (
                     <TableRow key={index} className="border-none">
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="relative w-8 h-8 rounded-full p-2">
-                            <Image
-                              src={
-                                item.user.profile_picture_url || "/avatar.png"
-                              }
-                              alt={item.user.username}
-                              fill
-                              className="  border border-gray-200 object-cover rounded-full"
-                            />
-                          </div>
-                          <span className="font-medium">
-                            {item.user.username}
-                          </span>
-                        </div>
+                        <AvatarAndImage
+                        username={item.user.username}
+                        avatar_url={item.user.profile_picture_url}                       
+                        />
                       </TableCell>
 
                       <TableCell>

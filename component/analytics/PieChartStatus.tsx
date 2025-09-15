@@ -15,7 +15,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { UserStatusDistribution } from "@/interface/Analytics";
+import { AnalyticsUserStatusDistribution } from "@/interface/Analytics";
 
 const description = (
   free_percentage: number,
@@ -73,7 +73,7 @@ export const PieChartStatus = ({
   premium_percentage,
   free_count,
   premium_count,
-}: UserStatusDistribution) => {
+}: AnalyticsUserStatusDistribution) => {
   const chartData = [
     { browser: "Premium", visitors: premium_count, fill: "#FF7A00" },
     { browser: "Free", visitors: free_count, fill: "#D9D9D9" },
@@ -110,48 +110,3 @@ export const PieChartStatus = ({
     </Card>
   );
 };
-
-// "use client";
-// import React from "react";
-// import {
-//   PieChart,
-//   Pie,
-//   Cell,
-//   ResponsiveContainer,
-//   Tooltip,
-//   Legend,
-// } from "recharts";
-
-// const data = [
-//   { name: "Booster user", value: 70 },
-//   { name: "Free user", value: 30 },
-// ];
-
-// const COLORS = ["#FF8A00", "#D3D3D3"]; // orange for Booster user, gray for Free user
-
-// export const PieChartStatus = () => {
-//   return (
-//     <ResponsiveContainer width="100%" height={400}>
-//       <PieChart>
-//              <Legend />
-//         <Pie
-//           data={data}
-//           dataKey="value"
-//           nameKey="name"
-//           cx="50%"
-//           cy="50%"
-//           outerRadius={150}
-//           innerRadius={120}
-//           startAngle={90}
-//           endAngle={-270}
-//         >
-//           {data.map((entry, index) => (
-//             <Cell key={`cell-${index}`} fill={COLORS[index]} />
-//           ))}
-//         </Pie>
-//         <Tooltip />
-
-//       </PieChart>
-//     </ResponsiveContainer>
-//   );
-// };
