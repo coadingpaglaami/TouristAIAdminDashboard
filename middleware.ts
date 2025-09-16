@@ -41,9 +41,10 @@ export async function middleware(req: NextRequest) {
             const response = NextResponse.next();
 
             response.cookies.set("access_token", newAccessToken, {
-              path: "/",
+              path: "/admin/dashboard",
               maxAge: 600,
             });
+            console.log("Access token refreshed successfully");
             return response;
           } else {
             return  NextResponse.redirect(

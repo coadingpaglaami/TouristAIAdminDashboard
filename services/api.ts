@@ -9,6 +9,7 @@ import {
   RevenueGrowthDataResponse,
 } from "@/interface/Analytics";
 import { BoosterRecordResponse } from "@/interface/BoosterRecord";
+import { SubscriptionPlansResponse } from "@/interface/Subscription";
 const baseURL = "https://ppp7rljm-8000.inc1.devtunnels.ms/admin-api/";
 
 interface LogOutRequest {
@@ -43,12 +44,30 @@ interface RevenueGrowthProps {
 interface BoosterRecordProps {
   limit: number;
   page: number;
+  search?: string;
 }
 interface ActionProps {
   action: string;
 }
 interface BoosterPauseRes {
   message: string;
+}
+type DurationFormat = `${number} ${number} ${number}` | "lifetime";
+
+export interface BoosterProps {
+  name: string;
+  price: number;
+  duration: DurationFormat;
+  currency: string;
+  isLifetime?: boolean;
+  description?: string;
+}
+interface PricingPlanProps {
+  page: number;
+  limit: number;
+}
+export interface PauseStatus {
+  is_paused: boolean;
 }
 export const baseQuery = fetchBaseQuery({
   baseUrl: baseURL,
@@ -216,15 +235,17 @@ export const api = createApi({
       providesTags: ["User"],
     }),
     boosterRecord: builder.query<BoosterRecordResponse, BoosterRecordProps>({
-      query: ({ limit, page }: BoosterRecordProps) => ({
-        url: `payment-records/?limit=${limit}&page=${page}`,
+      query: ({ limit, page, search }: BoosterRecordProps) => ({
+        url: `payment-records/?limit=${limit}&page=${page}${
+          search ? `&search=${search}` : ""
+        }`,
         method: "GET",
       }),
       providesTags: ["User"],
     }),
     boosterPause: builder.mutation<
       BoosterPauseRes,
-     ActionProps & { id: number }
+      ActionProps & { id: number }
     >({
       query: ({ id, action }) => ({
         url: `payment-records/${id}/toggle/`,
@@ -239,6 +260,26 @@ export const api = createApi({
         method: "DELETE",
       }),
       invalidatesTags: ["User"],
+    }),
+    boostCreate: builder.mutation<BoosterProps, BoosterProps>({
+      query: (body) => ({
+        url: `subscription-plans/`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["User"],
+    }),
+    boostShow: builder.query<SubscriptionPlansResponse, PricingPlanProps>({
+      query: ({ page, limit }) =>
+        `subscription-plans/?page=${page}&limit=${limit}`,
+      providesTags: ["User"],
+    }),
+    boostPausePlay: builder.mutation<any, { id: number; is_paused: boolean }>({
+      query: ({ id, is_paused }) => ({
+        url: `subscription-plans/${id}/`,
+        method: "PATCH",
+        body: { is_paused },
+      }),
     }),
   }),
 });
@@ -264,4 +305,7 @@ export const {
   useBoosterPauseMutation,
   useBoosterDeleteMutation,
   useBoosterRecordQuery,
+  useBoostCreateMutation,
+  useBoostShowQuery,
+  useBoostPausePlayMutation,
 } = api;

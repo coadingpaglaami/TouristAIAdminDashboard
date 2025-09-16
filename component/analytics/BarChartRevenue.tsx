@@ -52,7 +52,7 @@ const CustomChartTooltipContent = ({
       <div className="font-semibold mb-1">{label}</div>
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground">Revenue:</span>
-        <span className="font-bold">{revenue}k</span>
+        <span className="font-bold">{revenue}$</span>
       </div>
     </div>
   );
@@ -112,7 +112,7 @@ export const BarChartRevenue = () => {
 
   // Custom tick formatter: do not add 'k' for 0
   const yAxisTickFormatter = (value: number) =>
-    value === 0 ? "0" : `${value}k`;
+    value === 0 ? "0" : `${value}$`;
 
   return (
     <Card className=" h-full w-full py-6">

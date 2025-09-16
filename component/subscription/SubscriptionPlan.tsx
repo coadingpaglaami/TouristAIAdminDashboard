@@ -19,6 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useBoostPausePlayMutation, useBoostShowQuery } from "@/services/api";
 
 interface Plan {
   name: string;
@@ -104,26 +105,31 @@ const plansData: Plan[] = [
 export const SubscriptionPlan = () => {
   const [plans, setPlans] = useState<Plan[]>(plansData);
   const [page, setPage] = useState(1);
+  const rowsPerPage = 4;
+  const { data: boosterdata, isFetching } = useBoostShowQuery({
+    page,
+    limit: rowsPerPage,
+  });
+  const [boostPausePlay] = useBoostPausePlayMutation();
   const [deletePlan, setDeletePlan] = useState<Plan | null>(null);
-  const rowsPerPage = 5;
-  const totalPages = Math.ceil(plans.length / rowsPerPage);
+  const count = boosterdata?.count || 0;
+  const totalPages = Math.ceil(count / rowsPerPage);
 
-  const toggleStatus = (index: number) => {
-    setPlans((prev) => {
-      return prev.map((plan, i) => {
-        if (i === index) {
-          console.log("Toggling status for plan:", plan);
-        }
-        return i === index
-          ? {
-              ...plan,
-              status: plan.status === "Active" ? "Inactive" : "Active",
-            }
-          : plan;
-      });
-    });
+  const toggleStatus = async (index: number, is_paused: boolean) => {
+       console.log('Paused',is_paused)
+    try {
+      
+  
+      await boostPausePlay({
+        id: index,
+        is_paused: !is_paused,
+      }).unwrap();
+      console.log(`Successfully toggled plan to`,);
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      // rollback if API fails
+    }
   };
-
   const handleDelete = () => {
     if (!deletePlan) return;
 
@@ -164,7 +170,7 @@ export const SubscriptionPlan = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedPlans.map((plan, idx) => (
+            {boosterdata?.results?.map((plan, idx) => (
               <TableRow
                 key={idx + (page - 1) * rowsPerPage}
                 className="border-none"
@@ -186,14 +192,14 @@ export const SubscriptionPlan = () => {
                     plan.status === "Inactive" ? "opacity-50" : ""
                   }`}
                 >
-                  {plan.duration} {plan.durationUnit}
+                  {plan.duration} {plan.duration}
                 </TableCell>
                 <TableCell
                   className={`text-sm text-[#1C1B1F] font-medium tracking-wider ${
                     plan.status === "Inactive" ? "opacity-50" : ""
                   }`}
                 >
-                  ${plan.price} HK
+                  {plan.price} {plan.currency}
                 </TableCell>
                 <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
                   <span
@@ -208,12 +214,8 @@ export const SubscriptionPlan = () => {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() =>
-                        toggleStatus(idx + (page - 1) * rowsPerPage)
-                      }
-                    >
-                      {plan.status === "Active" ? <Pause /> : <Play />}
+                    <button onClick={() => toggleStatus(plan.id, plan.is_paused)}>
+                      {plan.status==='Inactive' ? <Play /> : <Pause />}
                     </button>
                     <button
                       className="text-red-500"

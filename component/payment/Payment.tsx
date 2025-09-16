@@ -19,7 +19,7 @@ export const PaymentRecord = () => {
   const [duration, setDuration] = useState<string | undefined>(undefined);
   const [page, setPage] = useState(1);
   const limit = 7;
-  const { data, isFetching } = useBoosterRecordQuery({ limit, page });
+  const { data, isFetching } = useBoosterRecordQuery({ limit, page, search });
 
   return (
     <div className="flex flex-col gap-8 py-10 px-4 max-md:max-w-screen overflow-hidden">
@@ -31,7 +31,10 @@ export const PaymentRecord = () => {
               placeholder="Search..."
               type="search"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
             />
             <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
               <SearchIcon />
@@ -58,7 +61,14 @@ export const PaymentRecord = () => {
           </Select>
         </div>
       </div>
-      <PaymentTable data={data?.results.results || []} count={data?.count || 0} isLoading={isFetching} page={page} setPage={setPage} perPage={limit} />
+      <PaymentTable
+        data={data?.results.results || []}
+        count={data?.count || 0}
+        isLoading={isFetching}
+        page={page}
+        setPage={setPage}
+        perPage={limit}
+      />
     </div>
   );
 };

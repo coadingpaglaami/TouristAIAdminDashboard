@@ -19,11 +19,20 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { SelectNative } from "@/components/ui/select-native";
 import { useId, useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import { BoosterProps, useBoostCreateMutation } from "@/services/api";
+import { toast } from "sonner";
 
 export const Subscription = () => {
   const id = useId();
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [currency, setCurrency] = useState("HKD");
   const [counters, setCounters] = useState([0, 0, 0]);
   const [isLifetime, setIsLifetime] = useState(false);
+  const [createPlan, { isLoading }] = useBoostCreateMutation();
+  const [open, setOpen] = useState(false);
+  const [description, setDescription] = useState("");
+
   const handleChange = (index: number, value: string) => {
     const num = Number(value.replace(/\D/g, "")); // only digits
     setCounters((prev) => {
@@ -97,6 +106,36 @@ export const Subscription = () => {
       return updated;
     });
   };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const payload: BoosterProps = {
+      name,
+      price: Number(price),
+      duration: isLifetime
+        ? "lifetime"
+        : (`${counters[0]} ${counters[1]} ${counters[2]}` as `${number} ${number} ${number}`),
+      currency: currency.toLowerCase(),
+      description,
+    };
+
+    console.log("Payload:", payload);
+    try {
+      await createPlan(payload).unwrap();
+      setOpen(false);
+      // Reset form
+      setName("");
+      setPrice("");
+      setCurrency("HKD");
+      setCounters([0, 0, 0]);
+      setIsLifetime(false);
+      toast.success("Plan created successfully!", {
+        richColors: true,
+      });
+    } catch (error) {
+      console.error("Error creating plan:", error);
+    }
+  };
 
   const CounterBox = (index: number, label: string) => (
     <div key={index} className="flex flex-col gap-1">
@@ -133,8 +172,8 @@ export const Subscription = () => {
           Add New Plan
         </span>
       </button> */}
-      <Dialog>
-        <form>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <form onSubmit={handleSubmit}>
           <DialogTrigger asChild>
             <Button className="orange p-3 rounded-md  flex items-center  gap-2 float-right mb-4">
               {" "}
@@ -159,9 +198,10 @@ export const Subscription = () => {
                   Plan name
                 </Label>
                 <Input
-                  id="name-1"
+                  id="plan-name"
                   name="name"
-                  className="focus:outline-none focus:ring-0 focus-visible:ring-0 focus:border-1 focus:border-gray-300"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
               <div className="flex gap-3 items-center justify-between">
@@ -175,7 +215,9 @@ export const Subscription = () => {
 
                   <div
                     className={`max-w-[60%] w-full flex gap-4 mt-2 ${
-                      isLifetime ? "opacity-50 pointer-events-none cursor-not-allowed select-none" : ""
+                      isLifetime
+                        ? "opacity-50 pointer-events-none cursor-not-allowed select-none"
+                        : ""
                     }`}
                   >
                     {/* Day */}
@@ -203,6 +245,21 @@ export const Subscription = () => {
                   <Label htmlFor={id}>LifeTime</Label>
                 </div>
               </div>
+              <div>
+                <Label
+                  htmlFor="plan-description"
+                  className="text-[#1C1B1F] text-sm font-normal tracking-wider"
+                >
+                  Description
+                </Label>
+                <Input
+                  id="plan-description"
+                  name="description"
+                  placeholder="Enter plan description"
+                  className="-me-px rounded-e-none shadow-none focus-visible:z-10 focus:outline-none focus:ring-0 focus-visible:ring-0 focus:border-1 focus:border-gray-300"
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
               <div className="*:not-first:mt-2">
                 <Label
                   htmlFor={id}
@@ -212,15 +269,21 @@ export const Subscription = () => {
                 </Label>
                 <div className="flex rounded-md shadow-xs">
                   <Input
-                    id={id}
+                    value={price}
                     className="-me-px rounded-e-none shadow-none focus-visible:z-10 focus:outline-none focus:ring-0 focus-visible:ring-0 focus:border-1 focus:border-gray-300"
                     placeholder="price"
                     type="text"
+                    onChange={(e) => setPrice(e.target.value)}
                   />
-                  <SelectNative className="text-muted-foreground hover:text-foreground w-fit rounded-s-none shadow-none">
-                    <option>HK Dollar</option>
-                    <option>US Dollar</option>
-                    <option>Euro</option>
+
+                  <SelectNative
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                    className="text-muted-foreground hover:text-foreground w-fit rounded-s-none shadow-none"
+                  >
+                    <option value="HKD">HK Dollar</option>
+                    <option value="USD">US Dollar</option>
+                    <option value="EUR">Euro</option>
                   </SelectNative>
                 </div>
               </div>
@@ -234,7 +297,12 @@ export const Subscription = () => {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button className="bg-[#FF7A00] p-3 rounded-md text-white hover:bg-[#FF7A00]">
+              <Button
+                className="bg-[#FF7A00] p-3 rounded-md text-white hover:bg-[#FF7A00] disabled:opacity-50 disabled:pointer-events-none"
+                type="submit"
+                onClick={handleSubmit}
+                disabled={isLoading}
+              >
                 Activate
               </Button>
             </DialogFooter>
