@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { useBoosterRecordQuery } from "@/services/api";
+import { useBoosterRecordQuery, useBoostShowQuery } from "@/services/api";
 
 export const PaymentRecord = () => {
   const [search, setSearch] = useState("");
@@ -20,7 +20,10 @@ export const PaymentRecord = () => {
   const [page, setPage] = useState(1);
   const limit = 7;
   const { data, isFetching } = useBoosterRecordQuery({ limit, page, search });
-
+  const { data: boostData } = useBoostShowQuery({
+    page,
+    limit
+  });
   return (
     <div className="flex flex-col gap-8 py-10 px-4 max-md:max-w-screen overflow-hidden">
       <div className="flex md:justify-between md:items-center md:flex-row flex-col gap-4">
@@ -50,12 +53,11 @@ export const PaymentRecord = () => {
               <SelectGroup>
                 <SelectLabel>Subscription</SelectLabel>
                 <SelectItem value="all">All</SelectItem>
-                <SelectItem value="1 hour">1 hour</SelectItem>
-                <SelectItem value="2 days">2 days</SelectItem>
-                <SelectItem value="3 days">3 days</SelectItem>
-                <SelectItem value="5 days">5 days</SelectItem>
-                <SelectItem value="7 days">7 days</SelectItem>
-                <SelectItem value="9 days">9 days</SelectItem>
+                {boostData?.results.map((item) => (
+                  <SelectItem key={item.id} value={item.name}>
+                    {item.name}
+                  </SelectItem>
+                ))}
               </SelectGroup>
             </SelectContent>
           </Select>

@@ -7,133 +7,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useUserEarningsQuery } from "@/services/api";
 import Image from "next/image";
+import { AvatarAndImage } from "../reusable";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface UserEarning {
-  name: string;
-  image: string;
-  email: string;
-  totalSpent: number;
-  purchasedate: string;
-  subscription: number;
-  subscriptionunit: "Hour" | "Day";
-  card: "Visa" | "MasterCard";
-  status: "Active" | "Inactive";
-}
-
-const userEarnings: UserEarning[] = [
-  {
-    name: "Alice Johnson",
-    image: "/table 1.jpg",
-    email: "alice.johnson@example.com",
-    totalSpent: 120.5,
-    purchasedate: "2024-05-01",
-    subscription: 3,
-    subscriptionunit: "Day",
-    card: "Visa",
-    status: "Active",
-  },
-  {
-    name: "Bob Smith",
-    image: "/table 2.jpg",
-    email: "bob.smith@example.com",
-    totalSpent: 89.99,
-    purchasedate: "2024-04-15",
-    subscription: 9,
-    subscriptionunit: "Hour",
-    card: "MasterCard",
-    status: "Inactive",
-  },
-  {
-    name: "Charlie Brown",
-    image: "/table 3.jpg",
-    email: "charlie.brown@example.com",
-    totalSpent: 200.0,
-    purchasedate: "2024-03-22",
-    subscription: 7,
-    subscriptionunit: "Day",
-    card: "Visa",
-    status: "Active",
-  },
-  {
-    name: "Diana Prince",
-    image: "/table 4.jpg",
-    email: "diana.prince@example.com",
-    totalSpent: 150.75,
-    purchasedate: "2024-06-10",
-    subscription: 9,
-    subscriptionunit: "Hour",
-    card: "MasterCard",
-    status: "Active",
-  },
-  {
-    name: "Ethan Hunt",
-    image: "/table 5.jpg",
-    email: "ethan.hunt@example.com",
-    totalSpent: 99.5,
-    purchasedate: "2024-05-30",
-    subscription: 2,
-    subscriptionunit: "Day",
-    card: "Visa",
-    status: "Inactive",
-  },
-  {
-    name: "Fiona Gallagher",
-    image: "/table 6.jpg",
-    email: "fiona.gallagher@example.com",
-    totalSpent: 175.2,
-    purchasedate: "2024-04-28",
-    subscription: 9,
-    subscriptionunit: "Hour",
-    card: "MasterCard",
-    status: "Active",
-  },
-  {
-    name: "George Miller",
-    image: "/table 7.jpg",
-    email: "george.miller@example.com",
-    totalSpent: 110.0,
-    purchasedate: "2024-03-18",
-    subscription: 1,
-    subscriptionunit: "Day",
-    card: "Visa",
-    status: "Inactive",
-  },
-  {
-    name: "Hannah Lee",
-    image: "/table 8.jpg",
-    email: "hannah.lee@example.com",
-    totalSpent: 210.3,
-    purchasedate: "2024-06-01",
-    subscription: 9,
-    subscriptionunit: "Hour",
-    card: "MasterCard",
-    status: "Active",
-  },
-  {
-    name: "Ian Curtis",
-    image: "/table 9.jpg",
-    email: "ian.curtis@example.com",
-    totalSpent: 130.0,
-    purchasedate: "2024-05-12",
-    subscription: 5,
-    subscriptionunit: "Day",
-    card: "Visa",
-    status: "Inactive",
-  },
-  {
-    name: "Julia Roberts",
-    image: "/table 3.jpg",
-    email: "julia.roberts@example.com",
-    totalSpent: 160.8,
-    purchasedate: "2024-04-05",
-    subscription: 9,
-    subscriptionunit: "Hour",
-    card: "MasterCard",
-    status: "Active",
-  },
-];
 export const UserEarning = () => {
+  const { data, isLoading } = useUserEarningsQuery();
   return (
     <div className="bg-white rounded-lg p-4  my-4 ">
       <h2 className="font-semibold tracking-wider text-xl text-[#1C1B1F]">
@@ -160,65 +40,100 @@ export const UserEarning = () => {
             </TableRow>
           </TableHeader>
           <TableBody className="">
-            {userEarnings.map((plan, idx) => (
-              <TableRow key={idx} className="border-none">
-                <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
-                  <div className="flex items-center gap-2">
-                    <div className="relative w-8 h-8 rounded-full p-2">
-                      <Image
-                        src={plan.image}
-                        alt={plan.name}
-                        fill
-                        className="  border border-gray-200 object-cover rounded-full"
+            {isLoading
+              ? Array.from({ length: 5 }).map((_, idx) => (
+                  <TableRow key={`skeleton-${idx}`} className="border-none">
+                    {/* Avatar + Name */}
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-8 w-8 rounded-full" />
+                        <Skeleton className="h-4 w-24" />
+                      </div>
+                    </TableCell>
+
+                    {/* Email */}
+                    <TableCell>
+                      <Skeleton className="h-4 w-36" />
+                    </TableCell>
+
+                    {/* Subscription */}
+                    <TableCell>
+                      <Skeleton className="h-4 w-32" />
+                    </TableCell>
+
+                    {/* Total Spent */}
+                    <TableCell>
+                      <Skeleton className="h-4 w-20" />
+                    </TableCell>
+
+                    {/* Purchase Date */}
+                    <TableCell>
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+
+                    {/* Card Logo */}
+                    <TableCell>
+                      <Skeleton className="h-6 w-10 rounded" />
+                    </TableCell>
+
+                    {/* Status Badge */}
+                    <TableCell>
+                      <Skeleton className="h-6 w-16 rounded-full" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              : data?.results.slice(0, 10).map((plan, idx) => (
+                  <TableRow key={idx} className="border-none">
+                    <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
+                      <AvatarAndImage
+                        username={plan.user.name}
+                        avatar_url={plan.user.avatar}
                       />
-                    </div>
-                    <span className="font-medium">{plan.name}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
-                  {plan.email}
-                </TableCell>
-                <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
-                  {plan.subscription} {plan.subscriptionunit}
-                </TableCell>
-                <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
-                  ${plan.totalSpent} HK
-                </TableCell>
-                <TableCell>{plan.purchasedate}</TableCell>
-                <TableCell className=" tracking-wider ">
-                  <div className="float-left">
-                    {plan.card == "Visa" ? (
-                      <Image
-                        src="/visa.png"
-                        alt="Visa"
-                        width={25}
-                        height={25}
-                        className="object-center"
-                      />
-                    ) : (
-                      <Image
-                        src="/mastercard.png"
-                        alt="MasterCard"
-                        width={25}
-                        height={25}
-                        className="object-center"
-                      />
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold  ${
-                      plan.status === "Active"
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-300 text-gray-700"
-                    }`}
-                  >
-                    {plan.status}
-                  </span>
-                </TableCell>
-              </TableRow>
-            ))}
+                    </TableCell>
+                    <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
+                      {plan.email}
+                    </TableCell>
+                    <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
+                      {plan.subscription}
+                    </TableCell>
+                    <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
+                      {plan.total_spent}
+                    </TableCell>
+                    <TableCell>{plan.purchase_date}</TableCell>
+                    <TableCell className=" tracking-wider ">
+                      <div className="float-left">
+                        {plan.card == "Visa" ? (
+                          <Image
+                            src="/visa.png"
+                            alt="Visa"
+                            width={25}
+                            height={25}
+                            className="object-center"
+                          />
+                        ) : (
+                          <Image
+                            src="/mastercard.png"
+                            alt="MasterCard"
+                            width={25}
+                            height={25}
+                            className="object-center"
+                          />
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold  ${
+                          plan.status.text === "Active"
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-300 text-gray-700"
+                        }`}
+                      >
+                        {plan.status.text}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
           </TableBody>
         </Table>
       </div>

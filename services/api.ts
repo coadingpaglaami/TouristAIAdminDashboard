@@ -9,7 +9,14 @@ import {
   RevenueGrowthDataResponse,
 } from "@/interface/Analytics";
 import { BoosterRecordResponse } from "@/interface/BoosterRecord";
-import { SubscriptionPlansResponse } from "@/interface/Subscription";
+import {
+  PopularPlansResponse,
+  SubscriptionPlansResponse,
+  UserEarningsResponse,
+} from "@/interface/Subscription";
+import {
+  UserProfileResponseForAdmin,
+} from "@/interface/AdminAccount";
 const baseURL = "https://ppp7rljm-8000.inc1.devtunnels.ms/admin-api/";
 
 interface LogOutRequest {
@@ -69,10 +76,18 @@ interface PricingPlanProps {
 export interface PauseStatus {
   is_paused: boolean;
 }
+export interface UserProfileResponse {
+  username: string;
+  email: string;
+  profile_picture_url: string | null;
+}
 export const baseQuery = fetchBaseQuery({
   baseUrl: baseURL,
-  prepareHeaders: (headers) => {
-    headers.set("Content-Type", "application/json");
+  prepareHeaders: (headers, { getState, endpoint }) => {
+    console.log(getState);
+    if (!(endpoint === "changeInfo" || endpoint === "passwordChange")) {
+      headers.set("Content-Type", "application/json");
+    }
 
     // ✅ Get token from cookies
     if (typeof window !== "undefined") {
@@ -98,7 +113,7 @@ export const baseQuery = fetchBaseQuery({
 export const api = createApi({
   reducerPath: "api",
   baseQuery,
-  tagTypes: ["User"],
+  tagTypes: ["User", "Booster"],
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (logindata) => ({
@@ -274,11 +289,45 @@ export const api = createApi({
         `subscription-plans/?page=${page}&limit=${limit}`,
       providesTags: ["User"],
     }),
-    boostPausePlay: builder.mutation<any, { id: number; is_paused: boolean }>({
+    boostPausePlay: builder.mutation<{ id: number; is_paused: boolean }, { id: number; is_paused: boolean }>({
       query: ({ id, is_paused }) => ({
         url: `subscription-plans/${id}/`,
         method: "PATCH",
         body: { is_paused },
+      }),
+      invalidatesTags: ["Booster"],
+    }),
+    deleteBoost: builder.mutation({
+      query: (id: number) => ({
+        url: `subscription-plans/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Booster"],
+    }),
+    popularPlan: builder.query<PopularPlansResponse, void>({
+      query: () => `most-popular-plans/`,
+      providesTags: ["Booster"],
+    }),
+    userEarnings: builder.query<UserEarningsResponse, void>({
+      query: () => `user-earnings/`,
+      providesTags: ["Booster"],
+    }),
+    getProfile: builder.query<UserProfileResponse, void>({
+      query: () => "profile/",
+    }),
+    changeInfo: builder.mutation<UserProfileResponseForAdmin, FormData>({
+      query: (formData) => ({
+        url: "profile/",
+        method: "PUT",
+        body: formData,
+      }),
+      invalidatesTags: ["User"],
+    }),
+    passwordChange: builder.mutation<string, FormData>({
+      query: (formData) => ({
+        url: "password-change/",
+        method: "POST",
+        body: formData,
       }),
     }),
   }),
@@ -308,4 +357,10 @@ export const {
   useBoostCreateMutation,
   useBoostShowQuery,
   useBoostPausePlayMutation,
+  useDeleteBoostMutation,
+  usePopularPlanQuery,
+  useUserEarningsQuery,
+  useGetProfileQuery,
+  useChangeInfoMutation,
+  usePasswordChangeMutation,
 } = api;

@@ -1,6 +1,7 @@
 "use client";
 import { getCookie, removeCookie } from "@/lib/cookies";
-import { useLogoutMutation } from "@/services/api";
+import { stringToColor } from "@/lib/stringToColor";
+import { useGetProfileQuery, useLogoutMutation } from "@/services/api";
 import {
   Dashboard,
   Message,
@@ -35,6 +36,7 @@ export const Sidebaar = ({ isProfile }: SidebaarProps) => {
   const router = useRouter();
   const [logout] = useLogoutMutation();
   const [profile, openprofile] = useState(isProfile || false);
+  const { data: userProfile } = useGetProfileQuery();
   const menus = [
     {
       path: "/admin/dashboard",
@@ -91,13 +93,13 @@ export const Sidebaar = ({ isProfile }: SidebaarProps) => {
   const handleLogOut = async () => {
     const refresh = getCookie("refresh_token") || "";
     try {
-       const res = await logout({ refresh: refresh }).unwrap();
+      const res = await logout({ refresh: refresh }).unwrap();
       console.log(res);
       removeCookie("access_token");
       removeCookie("refresh_token");
       sessionStorage.clear();
       toast.success("Logged out successfully");
-        router.push("/admin/login");
+      router.push("/admin/login");
     } catch (err: unknown) {
       if (err instanceof Error) {
         toast.error("Failed to log out: " + err.message);
@@ -181,17 +183,32 @@ export const Sidebaar = ({ isProfile }: SidebaarProps) => {
           onClick={() => openprofile(!profile)}
           className="flex gap-2 mx-2 items-center justify-between py-2"
         >
-          <Image
-            src="/user.png"
-            alt="user"
-            height={100}
-            width={100}
-            className="rounded-full h-14 w-14"
-          />
+          {userProfile?.profile_picture_url ? (
+            <div className="relative w-14 h-14 rounded-full p-2">
+              <Image
+                src={userProfile?.profile_picture_url}
+                alt={userProfile?.username}
+                fill
+                className="  border border-gray-200 object-cover rounded-full"
+              />
+            </div>
+          ) : (
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center text-white font-semibold text-xl"
+              style={{
+                backgroundColor: stringToColor(userProfile?.username || ""),
+              }}
+            >
+              {userProfile?.username.charAt(0).toUpperCase()}
+            </div>
+          )}
 
           {/* Profile details - Desktop only */}
           <div className=" flex-col gap-1 text-[#854C3A] hidden xl:flex">
-            <span className="text-lg font-medium">Ostain Alex</span>
+            <span className="text-lg font-medium">
+              {userProfile?.username.slice(0, 1).toUpperCase()}
+              {userProfile?.username.slice(1).toLowerCase()}
+            </span>
             <span className="font-thin">TRIPMATE</span>
           </div>
 
@@ -205,7 +222,9 @@ export const Sidebaar = ({ isProfile }: SidebaarProps) => {
           className="flex items-center justify-center mb-4 gap-2 font-semibold text-lg border-t cursor-pointer border-gray-300 pt-2"
         >
           <LogOut />{" "}
-          <span className="text-[#854C3A] tracking-wider max-lg:hidden">Log Out</span>
+          <span className="text-[#854C3A] tracking-wider max-lg:hidden">
+            Log Out
+          </span>
         </button>
       )}
     </div>

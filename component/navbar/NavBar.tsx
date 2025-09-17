@@ -33,13 +33,17 @@ import { useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { getCookie, removeCookie } from "@/lib/cookies";
-import { useLogoutMutation, useOverviewQuery } from "@/services/api";
+import {
+  useGetProfileQuery,
+  useLogoutMutation,
+} from "@/services/api";
 import { useRouter } from "next/navigation";
+import { stringToColor } from "@/lib/stringToColor";
 interface NavBarProps {
   isprofile?: boolean;
 }
 export const NavBar = ({ isprofile }: NavBarProps) => {
-  const { data: overviewData } = useOverviewQuery('Weekly');
+  const { data: userProfile } = useGetProfileQuery();
   const pathname = usePathname();
   const [logout] = useLogoutMutation();
   const router = useRouter();
@@ -211,19 +215,30 @@ export const NavBar = ({ isprofile }: NavBarProps) => {
                   href="/admin/profile"
                   className="flex gap-2 mx-2 items-center justify-between"
                 >
-                  <Image
-                    src="/user.png"
-                    alt="user"
-                    height={100}
-                    width={100}
-                    className="rounded-full h-14 w-14"
-                  />
-
+                  {userProfile?.profile_picture_url ? (
+                    <div className="relative w-14 h-14 rounded-full p-2">
+                      <Image
+                        src={userProfile?.profile_picture_url}
+                        alt={userProfile?.username}
+                        fill
+                        className="  border border-gray-200 object-cover rounded-full"
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="w-14 h-14 rounded-full flex items-center justify-center text-white font-semibold text-xl"
+                      style={{
+                        backgroundColor: stringToColor(
+                          userProfile?.username || ""
+                        ),
+                      }}
+                    >
+                      {userProfile?.username.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   {/* Profile details - Desktop only */}
                   <div className="flex flex-col gap-1 text-[#854C3A] ">
-                    <span className="text-lg font-medium whitespace-nowrap max-md:text-sm">
-                      Ostain Alex
-                    </span>
+                    <span className="text-lg font-medium whitespace-nowrap max-md:text-sm">{userProfile?.username}</span>
                     <span className="font-thin">TRIPMATE</span>
                   </div>
 
@@ -245,7 +260,7 @@ export const NavBar = ({ isprofile }: NavBarProps) => {
         </Sheet>
       </div>
       <div className="max-md:text-sm">
-        {overviewData?.greeting || "Good Morning Jason Wance"}
+       Have A Nice Day {userProfile?.username.slice(0, 1).toUpperCase()}{userProfile?.username.slice(1).toLowerCase()}
       </div>
     </div>
   );

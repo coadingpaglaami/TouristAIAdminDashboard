@@ -19,131 +19,64 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useBoostPausePlayMutation, useBoostShowQuery } from "@/services/api";
+import {
+  useBoostPausePlayMutation,
+  useBoostShowQuery,
+  useDeleteBoostMutation,
+} from "@/services/api";
+import { SubscriptionPlanInfo } from "@/interface/Subscription";
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface Plan {
-  name: string;
-  duration: number;
-  durationUnit: "Hour" | "Day";
-  price: number;
-  status: "Active" | "Inactive";
-}
-
-const plansData: Plan[] = [
-  {
-    name: "1 Hour boost",
-    duration: 1,
-    durationUnit: "Hour",
-    price: 5,
-    status: "Active",
-  },
-  {
-    name: "3 Hours boost",
-    duration: 3,
-    durationUnit: "Hour",
-    price: 12,
-    status: "Active",
-  },
-  {
-    name: "Premium Hourly",
-    duration: 6,
-    durationUnit: "Hour",
-    price: 20,
-    status: "Inactive",
-  },
-  {
-    name: "1 Day Basic Daily",
-    duration: 1,
-    durationUnit: "Day",
-    price: 25,
-    status: "Active",
-  },
-  {
-    name: "3 Days Standard Daily",
-    duration: 3,
-    durationUnit: "Day",
-    price: 60,
-    status: "Active",
-  },
-  {
-    name: "7 Days Premium Daily",
-    duration: 7,
-    durationUnit: "Day",
-    price: 120,
-    status: "Inactive",
-  },
-  {
-    name: "2 Days Weekend Pass",
-    duration: 2,
-    durationUnit: "Day",
-    price: 40,
-    status: "Active",
-  },
-  {
-    name: "8 Hours Night Owl",
-    duration: 8,
-    durationUnit: "Hour",
-    price: 15,
-    status: "Inactive",
-  },
-  {
-    name: "5 Days Explorer",
-    duration: 5,
-    durationUnit: "Day",
-    price: 90,
-    status: "Active",
-  },
-  {
-    name: "2 Hours boost",
-    duration: 2,
-    durationUnit: "Hour",
-    price: 8,
-    status: "Active",
-  },
-];
 
 export const SubscriptionPlan = () => {
-  const [plans, setPlans] = useState<Plan[]>(plansData);
   const [page, setPage] = useState(1);
   const rowsPerPage = 4;
-  const { data: boosterdata, isFetching } = useBoostShowQuery({
+  const {
+    data: boosterdata,
+    isFetching,
+    refetch,
+  } = useBoostShowQuery({
     page,
     limit: rowsPerPage,
   });
   const [boostPausePlay] = useBoostPausePlayMutation();
-  const [deletePlan, setDeletePlan] = useState<Plan | null>(null);
+  const [deleteBoost, { isLoading: isDeleting }] = useDeleteBoostMutation();
+  const [deletePlan, setDeletePlan] = useState<SubscriptionPlanInfo | null>(
+    null
+  );
   const count = boosterdata?.count || 0;
   const totalPages = Math.ceil(count / rowsPerPage);
 
   const toggleStatus = async (index: number, is_paused: boolean) => {
-       console.log('Paused',is_paused)
+    console.log("Paused", is_paused);
     try {
-      
-  
+      console.log("Toggling plan id:", index, "to", !is_paused);
       await boostPausePlay({
         id: index,
         is_paused: !is_paused,
       }).unwrap();
-      console.log(`Successfully toggled plan to`,);
+      await refetch();
+      console.log(`Successfully toggled plan to`);
     } catch (error) {
       console.error("Error toggling status:", error);
       // rollback if API fails
     }
   };
-  const handleDelete = () => {
+  const handleDelete = async (deletePlan: SubscriptionPlanInfo | null) => {
     if (!deletePlan) return;
 
-    // Remove the plan from the list
-    setPlans((prevPlans) =>
-      prevPlans.filter((plan) => plan.name !== deletePlan.name)
-    );
-    setDeletePlan(null); // Close the dialog after deletion
+    try {
+      await deleteBoost(deletePlan.id).unwrap();
+      toast.success(`Deleted ${deletePlan.name}`, {
+        richColors: true,
+      });
+      await refetch(); // refresh data after deletion
+      setDeletePlan(null); // Close the dialog
+    } catch (error) {
+      console.error("Error deleting plan:", error);
+    }
   };
-
-  const paginatedPlans = plans.slice(
-    (page - 1) * rowsPerPage,
-    page * rowsPerPage
-  );
 
   // Generate pagination numbers with a range to display
   const paginationNumbers = [];
@@ -170,63 +103,130 @@ export const SubscriptionPlan = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {boosterdata?.results?.map((plan, idx) => (
-              <TableRow
-                key={idx + (page - 1) * rowsPerPage}
-                className="border-none"
-              >
-                <TableCell
-                  className={`text-sm text-[#1C1B1F] font-medium tracking-wider ${
-                    plan.status === "Inactive" ? "opacity-50" : ""
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="bg-[#FF7A00] p-2">
-                      <Schedule />
-                    </div>
-                    {plan.name}
-                  </div>
-                </TableCell>
-                <TableCell
-                  className={`text-sm text-[#1C1B1F] font-medium tracking-wider ${
-                    plan.status === "Inactive" ? "opacity-50" : ""
-                  }`}
-                >
-                  {plan.duration} {plan.duration}
-                </TableCell>
-                <TableCell
-                  className={`text-sm text-[#1C1B1F] font-medium tracking-wider ${
-                    plan.status === "Inactive" ? "opacity-50" : ""
-                  }`}
-                >
-                  {plan.price} {plan.currency}
-                </TableCell>
-                <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold  ${
-                      plan.status === "Active"
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-300 text-gray-700"
-                    }`}
+            {isFetching
+              ? Array.from({ length: rowsPerPage }).map((_, idx) => (
+                  <TableRow key={`skeleton-${idx}`} className="border-none">
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className="bg-[#FF7A00] p-2">
+                          <Schedule />
+                        </div>
+                        <Skeleton className="h-4 w-32" />
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-16" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-20" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-6 w-20 rounded-full" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-6 w-6 rounded-md" />
+                        <Skeleton className="h-6 w-6 rounded-md" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              : boosterdata?.results?.map((plan, idx) => (
+                  <TableRow
+                    key={idx + (page - 1) * rowsPerPage}
+                    className="border-none"
                   >
-                    {plan.status}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => toggleStatus(plan.id, plan.is_paused)}>
-                      {plan.status==='Inactive' ? <Play /> : <Pause />}
-                    </button>
-                    <button
-                      className="text-red-500"
-                      onClick={() => setDeletePlan(plan)}
+                    <TableCell
+                      className={`text-sm text-[#1C1B1F] font-medium tracking-wider ${
+                        plan.status === "Inactive" ? "opacity-50" : ""
+                      }`}
                     >
-                      <Delete />
-                    </button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+                      <div className="flex items-center gap-2">
+                        <div className="bg-[#FF7A00] p-2">
+                          <Schedule />
+                        </div>
+                        {plan.name}
+                      </div>
+                    </TableCell>
+                    <TableCell
+                      className={`text-sm text-[#1C1B1F] font-medium tracking-wider ${
+                        plan.status === "Inactive" ? "opacity-50" : ""
+                      }`}
+                    >
+                      {plan.duration}
+                    </TableCell>
+                    <TableCell
+                      className={`text-sm text-[#1C1B1F] font-medium tracking-wider ${
+                        plan.status === "Inactive" ? "opacity-50" : ""
+                      }`}
+                    >
+                      {plan.price}
+                    </TableCell>
+                    <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold  ${
+                          plan.status === "Active"
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-300 text-gray-700"
+                        }`}
+                      >
+                        {plan.status}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => toggleStatus(plan.id, plan.is_paused)}
+                        >
+                          {plan.is_paused ? <Play /> : <Pause />}
+                        </button>
+                        <Dialog
+                          open={!!deletePlan && deletePlan.id === plan.id}
+                          onOpenChange={(open) =>
+                            !open ? setDeletePlan(null) : setDeletePlan(plan)
+                          }
+                        >
+                          <DialogTrigger asChild>
+                            <button
+                              className="p-2 hover:bg-gray-100 rounded"
+                              title="Delete"
+                              onClick={() => setDeletePlan(plan)}
+                            >
+                              <Delete />
+                            </button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Delete Confirmation</DialogTitle>
+                              <DialogDescription>
+                                Are you sure you want to delete{" "}
+                                <span className="font-semibold text-red-600">
+                                  {deletePlan?.name}
+                                </span>
+                                ? <br /> This action cannot be undone.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                              <Button
+                                variant="outline"
+                                onClick={() => setDeletePlan(null)}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                className="orange p-2 rounded-md"
+                                onClick={async () => handleDelete(deletePlan)}
+                                disabled={isDeleting}
+                              >
+                                Delete
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
           </TableBody>
         </Table>
       </div>
@@ -262,39 +262,6 @@ export const SubscriptionPlan = () => {
           )
         )}
       </div>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={!!deletePlan}
-        onOpenChange={(open) => !open && setDeletePlan(null)}
-      >
-        <DialogTrigger asChild>
-          <button className="p-2 hover:bg-gray-100 rounded" />
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Confirmation</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete{" "}
-              <span className="font-semibold text-red-600">
-                {deletePlan?.name}
-              </span>
-              ? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeletePlan(null)}>
-              Cancel
-            </Button>
-            <Button
-              className="p-2 rounded-md orange text-white"
-              onClick={handleDelete}
-            >
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

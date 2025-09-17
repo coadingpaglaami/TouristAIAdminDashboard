@@ -78,7 +78,7 @@ export const RevenueLeaderBoard = () => {
       <div className="md:max-w-[35vw] overflow-x-auto">
         <Table className=" w-full border-t border-gray-300 overflow-y-scroll">
           <TableBody className="w-full">
-            {data?.top_users.map((entry, index) => (
+            {data?.top_users.slice(0, 5).map((entry, index) => (
               <TableRow key={index} className="border-none">
                 <TableCell className="border-none">
                   <AvatarAndImage
