@@ -53,3 +53,15 @@ export interface UserEarningsResponse {
   previous: string | null;
   results: UserEarning[];
 }
+export interface Plan {
+  id: number;
+  name: string;
+  duration: string;
+  price: string;
+  status: "Active" | "Inactive";  // since only these appear
+  is_paused: boolean;
+  currency: string;
+  description: string;
+  stripe_price_id: string;
+}
+export type PlansResponse = Plan[];

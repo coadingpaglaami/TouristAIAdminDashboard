@@ -86,7 +86,6 @@ export const ManageUser = () => {
             value={banned === null ? "null" : banned ? "true" : "false"}
             onValueChange={(val) => {
               setBanned(val === "null" ? null : val === "true")
-              setPage(1);
             }}
           >
             <SelectTrigger className="w-1/2">

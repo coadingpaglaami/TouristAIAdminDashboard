@@ -12,18 +12,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { useBoosterRecordQuery, useBoostShowQuery } from "@/services/api";
+import { useAdminGetAllSubscriptionPlansQuery, useBoosterRecordQuery } from "@/services/api";
 
 export const PaymentRecord = () => {
   const [search, setSearch] = useState("");
   const [duration, setDuration] = useState<string | undefined>(undefined);
   const [page, setPage] = useState(1);
   const limit = 7;
-  const { data, isFetching } = useBoosterRecordQuery({ limit, page, search });
-  const { data: boostData } = useBoostShowQuery({
-    page,
-    limit
-  });
+  const { data, isFetching } = useBoosterRecordQuery({ limit, page, search, subscription_plan: duration });
+  const { data: boostData } = useAdminGetAllSubscriptionPlansQuery();
+  console.log({ boostData });
   return (
     <div className="flex flex-col gap-8 py-10 px-4 max-md:max-w-screen overflow-hidden">
       <div className="flex md:justify-between md:items-center md:flex-row flex-col gap-4">
@@ -50,15 +48,15 @@ export const PaymentRecord = () => {
               <SelectValue placeholder="Select duration" />
             </SelectTrigger>
             <SelectContent>
-              <SelectGroup>
+                <SelectGroup className="overflow-y-auto max-h-60">
                 <SelectLabel>Subscription</SelectLabel>
                 <SelectItem value="all">All</SelectItem>
-                {boostData?.results.map((item) => (
-                  <SelectItem key={item.id} value={item.name}>
-                    {item.name}
+                {boostData?.map((item) => (
+                  <SelectItem key={item.id} value={item.name.toLowerCase()}>
+                  {item.name}
                   </SelectItem>
                 ))}
-              </SelectGroup>
+                </SelectGroup>
             </SelectContent>
           </Select>
         </div>

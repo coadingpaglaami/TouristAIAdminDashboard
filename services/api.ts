@@ -10,13 +10,12 @@ import {
 } from "@/interface/Analytics";
 import { BoosterRecordResponse } from "@/interface/BoosterRecord";
 import {
+  PlansResponse,
   PopularPlansResponse,
   SubscriptionPlansResponse,
   UserEarningsResponse,
 } from "@/interface/Subscription";
-import {
-  UserProfileResponseForAdmin,
-} from "@/interface/AdminAccount";
+import { UserProfileResponseForAdmin } from "@/interface/AdminAccount";
 const baseURL = "https://ppp7rljm-8000.inc1.devtunnels.ms/admin-api/";
 
 interface LogOutRequest {
@@ -52,6 +51,7 @@ interface BoosterRecordProps {
   limit: number;
   page: number;
   search?: string;
+  subscription_plan?: string;
 }
 interface ActionProps {
   action: string;
@@ -173,7 +173,7 @@ export const api = createApi({
       query: ({ limit, page, search, banned, subscription }) => ({
         url: `manage-users/?limit=${limit}&page=${page}${
           search ? `&search=${search}` : ``
-        }${banned ? `&banned=${banned}` : ``}${
+        }${banned !== null ? `&banned=${banned}` : ``}${
           subscription ? `&subscription=${subscription}` : ``
         }`,
         method: "GET",
@@ -250,10 +250,15 @@ export const api = createApi({
       providesTags: ["User"],
     }),
     boosterRecord: builder.query<BoosterRecordResponse, BoosterRecordProps>({
-      query: ({ limit, page, search }: BoosterRecordProps) => ({
+      query: ({
+        limit,
+        page,
+        search,
+        subscription_plan,
+      }: BoosterRecordProps) => ({
         url: `payment-records/?limit=${limit}&page=${page}${
           search ? `&search=${search}` : ""
-        }`,
+        }${subscription_plan ? `&subscription_plan=${subscription_plan}` : ""}`,
         method: "GET",
       }),
       providesTags: ["User"],
@@ -289,7 +294,10 @@ export const api = createApi({
         `subscription-plans/?page=${page}&limit=${limit}`,
       providesTags: ["User"],
     }),
-    boostPausePlay: builder.mutation<{ id: number; is_paused: boolean }, { id: number; is_paused: boolean }>({
+    boostPausePlay: builder.mutation<
+      { id: number; is_paused: boolean },
+      { id: number; is_paused: boolean }
+    >({
       query: ({ id, is_paused }) => ({
         url: `subscription-plans/${id}/`,
         method: "PATCH",
@@ -330,6 +338,9 @@ export const api = createApi({
         body: formData,
       }),
     }),
+    adminGetAllSubscriptionPlans: builder.query<PlansResponse, void>({
+      query: () => `subscription-plans/all/`,
+    }),
   }),
 });
 
@@ -363,4 +374,5 @@ export const {
   useGetProfileQuery,
   useChangeInfoMutation,
   usePasswordChangeMutation,
+  useAdminGetAllSubscriptionPlansQuery,
 } = api;
