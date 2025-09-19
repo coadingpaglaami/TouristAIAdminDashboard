@@ -55,7 +55,7 @@ export const RevenueLeaderBoard = () => {
         </span>
         <div className="flex items-center gap-2">
           <span className="text-2xl font-bold tracking-wider leading-10">
-            {data?.average_revenue_per_user}$
+            {data?.average_revenue_per_user.toFixed(2)}$
           </span>
           <div className="text-sm">
             <span className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -87,7 +87,7 @@ export const RevenueLeaderBoard = () => {
                     avatar_url={entry.avatar_url}
                   />
                 </TableCell>
-                <TableCell className="border-none">${entry.revenue}</TableCell>
+                <TableCell className="border-none">${entry.revenue.toFixed(2)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

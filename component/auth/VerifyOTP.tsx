@@ -18,13 +18,10 @@ export const Verify: React.FC = () => {
   const [otpCode, setOtp] = useState<string[]>(["", "", "", "", "", ""]); // 6 digits
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
-  const [isDisabled, setIsDisabled] = useState<boolean>(false);
-  const [countdown, setCountdown] = useState<number>(0);
-  const [buttonText, setButtonText] = useState<string>("Verify OTP");
   const [wrongOtp, setWrongOtp] = useState<boolean>(false);
   const router = useRouter();
-  const [verifyOtp, {}] = useVerifyOtpMutation();
-  const [adminLoginVerify, {}] = useAdminLoginVerifyMutation();
+  const [verifyOtp, {isLoading}] = useVerifyOtpMutation();
+  const [adminLoginVerify, {isLoading: isAdminLoading}] = useAdminLoginVerifyMutation();
   const email = sessionStorage.getItem("userMail");
 
   // useEffect(() => {
@@ -123,36 +120,13 @@ export const Verify: React.FC = () => {
     }
   };
   // Resend OTP logic
-  const countdownDuration = 30; // usually 30 or 60 seconds
-  const handleResend = () => {
-    setIsDisabled(true);
-    setCountdown(countdownDuration);
-    // 🔔 You can also trigger backend resend OTP here
-    // resendOtp({ email: sessionStorage.getItem("userMail") })
-  };
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
 
-    if (isDisabled && countdown > 0) {
-      timer = setTimeout(() => {
-        setCountdown((prev) => prev - 1);
-        setButtonText(`Resend OTP in ${countdown - 1}s`);
-      }, 1000);
-    } else if (countdown === 0 && isDisabled) {
-      setIsDisabled(false);
-      setButtonText("Resend OTP");
-    }
-
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [isDisabled, countdown]);
 
   return (
     <div className="md:min-w-[400px] w-full">
       <h4 className="text-2xl font-semibold text-white text-center">
-        Forget Password
+        {loginstorage ? "Verify OTP" : "Forget Password"}
       </h4>
       <p className="text-lg text-white text-center">
         Please input the verification code sent to your email {email}
@@ -190,12 +164,12 @@ export const Verify: React.FC = () => {
         <button
           onClick={handleVerify}
           className="w-full p-2 disabled:!opacity-50 disabled:!bg-white disabled:!text-black disabled:!cursor-not-allowed text-white defaultbutton rounded-md orange font-bold"
-          disabled={isButtonDisabled}
+          disabled={isButtonDisabled || isLoading || isAdminLoading}
         >
           Verify OTP
         </button>
 
-        <button
+        {/* <button
           onClick={handleResend}
           className={`w-full p-2 rounded-md border transition-colors duration-300 ${
             isDisabled
@@ -205,7 +179,7 @@ export const Verify: React.FC = () => {
           disabled={isDisabled}
         >
           {buttonText}
-        </button>
+        </button> */}
       </div>
     </div>
   );

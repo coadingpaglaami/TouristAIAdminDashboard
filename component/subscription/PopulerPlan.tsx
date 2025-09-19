@@ -29,7 +29,7 @@ export const PopularPlan = () => {
               <Skeleton className="h-4 w-40" />
             </div>
           ))
-        : data?.most_popular.map((plan) => (
+        : data?.most_popular.length===0? <p className="h-full flex items-center justify-center">No popular plans available</p> : data?.most_popular.map((plan) => (
             <>
               <div className="mb-8">
                 <h2 className="text-lg font-medium flex items-center">
@@ -53,27 +53,7 @@ export const PopularPlan = () => {
               </div>
             </>
           ))}
-      {/* <div>
-        <h2 className="text-lg font-medium flex items-center">
-          <span className="mr-2">
-            <Calendar />
-          </span>{" "}
-          <span>10 days</span>
-        </h2>
-        <p className="text-sm text-gray-600 mt-2 mb-4">
-          Users prefer this plan for quick and short-term needs. It remains the
-          second most chosen option.
-        </p>
-        <div className="w-full h-2 bg-gray-300 rounded-full mb-2">
-          <div
-            className="h-full rounded-full bg-blue-500"
-            style={{ width: "88%" }}
-          ></div>
-        </div>
-        <p className="text-sm font-semibold text-gray-800">
-          88% of total subscriber
-        </p>
-      </div> */}
+
     </div>
   );
 };
