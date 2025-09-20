@@ -30,11 +30,11 @@ export const UserActivity = () => {
   const perPage = 7;
     // ✅ Debounce search to avoid too many API calls
   const debouncedSearch = useDebounce(search, 300);
-  const { data, isLoading } = useUserActivityQuery({
+  const { data, isFetching } = useUserActivityQuery({
     page,
     limit: perPage,
     search: debouncedSearch,
-    type:activity
+    type: activity
   });
 
   const handleSearchChange = (value: string) => {
@@ -78,7 +78,7 @@ export const UserActivity = () => {
         <ActivityTable
           data={data?.results.results ?? []}
           count={data?.count ?? 0}
-          isLoading={isLoading}
+          isLoading={isFetching}
           page={page}
           setPage={setPage}
           perPage={perPage}

@@ -14,6 +14,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export const UserEarning = () => {
   const { data, isLoading } = useUserEarningsQuery();
+  const sortedData =  [...(data?.results ?? [])].sort((a, b) =>
+    parseFloat(b.total_spent.replace(/[^0-9.-]+/g, "")) -
+    parseFloat(a.total_spent.replace(/[^0-9.-]+/g, ""))
+  );
   return (
     <div className="bg-white rounded-lg p-4  my-4 ">
       <h2 className="font-semibold tracking-wider text-xl text-[#1C1B1F]">
@@ -82,7 +86,7 @@ export const UserEarning = () => {
                     </TableCell>
                   </TableRow>
                 ))
-              : data?.results.slice(0, 10).map((plan, idx) => (
+              : sortedData.slice(0, 10).map((plan, idx) => (
                   <TableRow key={idx} className="border-none">
                     <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
                       <AvatarAndImage
@@ -94,7 +98,7 @@ export const UserEarning = () => {
                       {plan.email}
                     </TableCell>
                     <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
-                      {plan.subscription}
+                      {plan.subscription.replace(/\s*\([^)]*\)/g, "")}
                     </TableCell>
                     <TableCell className="text-sm text-[#1C1B1F] font-medium tracking-wider">
                       {plan.total_spent}

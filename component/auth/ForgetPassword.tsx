@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import React, { useState, ChangeEvent, FormEvent } from "react";
 
 export const ForgetPassword: React.FC = () => {
-  const [forgotPassword] = useForgotPasswordMutation();
+  const [forgotPassword,{isLoading}] = useForgotPasswordMutation();
   const [formData, setFormData] = useState<{ email: string }>({
     email: "",
   });
@@ -61,7 +61,8 @@ export const ForgetPassword: React.FC = () => {
 
         <button
           type="submit"
-          className="w-full p-2 text-white defaultbutton rounded-md orange font-bold"
+          className="w-full p-2 text-white defaultbutton rounded-md orange font-bold disabled:opacity-50"
+          disabled={isLoading}
         >
           Get OTP
         </button>

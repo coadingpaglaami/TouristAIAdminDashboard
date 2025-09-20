@@ -23,6 +23,7 @@ import { ActivityResult } from "@/interface/UserActivity";
 import { useDeleteContenMutation } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AvatarAndImage } from "../reusable";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 // Helper for pagination numbers
 function getPagination(current: number, total: number) {
@@ -134,8 +135,8 @@ export const ActivityTable = ({
                     <TableRow key={index} className="border-none">
                       <TableCell>
                         <AvatarAndImage
-                        username={item.user.username}
-                        avatar_url={item.user.profile_picture_url}                       
+                          username={item.user.username}
+                          avatar_url={item.user.profile_picture_url}
                         />
                       </TableCell>
 
@@ -188,13 +189,15 @@ export const ActivityTable = ({
                             <DialogTitle className="sr-only">
                               <VisuallyHidden>Profile photo</VisuallyHidden>
                             </DialogTitle>
-                            <Image
-                              src={item.photo}
-                              alt="photo"
-                              height={400}
-                              width={400}
-                              className="rounded object-cover max-h-[60vh] w-full  max-w-full"
-                            />
+                            <AspectRatio ratio={16 / 9}>
+                              <Image
+                                src={item.photo}
+                                alt="photo"
+                                height={400}
+                                width={400}
+                                className="rounded-md object-cover w-full h-full"
+                              />
+                            </AspectRatio>
                           </DialogContent>
                         </Dialog>
                       </TableCell>
@@ -215,6 +218,9 @@ export const ActivityTable = ({
                           </button>
 
                           <DialogContent>
+                            <DialogTitle className="sr-only">
+                              <VisuallyHidden>Profile photo</VisuallyHidden>
+                            </DialogTitle>
                             <div className="p-4">
                               <h3 className="text-lg font-semibold mb-2">
                                 Delete Confirmation
@@ -222,7 +228,7 @@ export const ActivityTable = ({
                               <p className="text-sm text-gray-700 mb-4">
                                 Are you sure you want to delete{" "}
                                 <span className="font-semibold text-red-600">
-                                  {deleteUser?.user.username}
+                                  {deleteUser?.user.username.charAt(0).toUpperCase()}{deleteUser?.user.username.slice(1).toLowerCase()}
                                 </span>
                                 ?
                                 <br />
@@ -236,9 +242,11 @@ export const ActivityTable = ({
                                   Cancel
                                 </Button>
                                 <Button
-                                  className="bg-orange-500 text-white"
+                                  className="bg-orange-500 text-white hover:bg-orange-600"
                                   onClick={() => handleDelete(deleteUser?.id)}
                                   disabled={isDeleting}
+                                  type="button"
+                                  
                                 >
                                   {isDeleting ? "Deleting..." : "Delete"}
                                 </Button>

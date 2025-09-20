@@ -6,6 +6,7 @@ import {
   SheetContent,
   SheetFooter,
   SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
@@ -33,12 +34,10 @@ import { useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { getCookie, removeCookie } from "@/lib/cookies";
-import {
-  useGetProfileQuery,
-  useLogoutMutation,
-} from "@/services/api";
+import { useGetProfileQuery, useLogoutMutation } from "@/services/api";
 import { useRouter } from "next/navigation";
 import { stringToColor } from "@/lib/stringToColor";
+import { VisuallyHidden } from "react-aria-components";
 interface NavBarProps {
   isprofile?: boolean;
 }
@@ -141,7 +140,11 @@ export const NavBar = ({ isprofile }: NavBarProps) => {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-64">
-            <SheetHeader></SheetHeader>
+            <SheetHeader>
+              <SheetTitle className="sr-only">
+                <VisuallyHidden>Profile photo</VisuallyHidden>
+              </SheetTitle>
+            </SheetHeader>
             {/* Logo + Text */}
             <div className="flex flex-col gap-2 relative z-30">
               {/* Logo + Text */}
@@ -238,7 +241,9 @@ export const NavBar = ({ isprofile }: NavBarProps) => {
                   )}
                   {/* Profile details - Desktop only */}
                   <div className="flex flex-col gap-1 text-[#854C3A] ">
-                    <span className="text-lg font-medium whitespace-nowrap max-md:text-sm">{userProfile?.username}</span>
+                    <span className="text-lg font-medium whitespace-nowrap max-md:text-sm">
+                      {userProfile?.username}
+                    </span>
                     <span className="font-thin">TRIPMATE</span>
                   </div>
 
@@ -260,7 +265,8 @@ export const NavBar = ({ isprofile }: NavBarProps) => {
         </Sheet>
       </div>
       <div className="max-md:text-sm">
-       Have A Nice Day {userProfile?.username.slice(0, 1).toUpperCase()}{userProfile?.username.slice(1).toLowerCase()}
+        Have A Nice Day {userProfile?.username.slice(0, 1).toUpperCase()}
+        {userProfile?.username.slice(1).toLowerCase()}
       </div>
     </div>
   );

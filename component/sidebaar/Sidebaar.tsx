@@ -98,7 +98,9 @@ export const Sidebaar = ({ isProfile }: SidebaarProps) => {
       removeCookie("access_token");
       removeCookie("refresh_token");
       sessionStorage.clear();
-      toast.success("Logged out successfully");
+      toast.success("Logged out successfully",{
+        richColors: true
+      });
       router.push("/admin/login");
     } catch (err: unknown) {
       if (err instanceof Error) {

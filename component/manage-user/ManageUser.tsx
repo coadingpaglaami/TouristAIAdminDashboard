@@ -52,8 +52,8 @@ export const ManageUser = () => {
   const loadingState = isFetching ;
 
   return (
-    <div className="flex flex-col gap-8 py-10 px-4 max-md:max-w-screen overflow-hidden">
-      <div className="flex md:justify-between md:items-center gap-4 flex-col md:flex-row w-full">
+    <div className="flex flex-col gap-8 py-10 px-4 max-lg:max-w-screen overflow-hidden">
+      <div className="flex lg:justify-between lg:items-center gap-4 flex-col lg:flex-row w-full">
         <div className="*:not-first:mt-2 max-w-[400px] w-full">
           <div className="relative">
             <Input
@@ -85,7 +85,9 @@ export const ManageUser = () => {
           <Select
             value={banned === null ? "null" : banned ? "true" : "false"}
             onValueChange={(val) => {
-              setBanned(val === "null" ? null : val === "true")
+              setPage(1);
+              setBanned(val === "null" ? null : val === "true");
+             
             }}
           >
             <SelectTrigger className="w-1/2">

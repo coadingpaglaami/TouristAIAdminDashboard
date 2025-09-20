@@ -147,7 +147,7 @@ export const Verify: React.FC = () => {
                   handleInputChange(index, e.target.value)
                 }
                 onKeyDown={(e) => handleKeyDown(index, e)}
-                className={`otp-input w-12 h-12 text-center text-xl font-bold ${
+                className={`otp-input md:w-12 md:h-12 w-10 h-10 text-center text-xl font-bold ${
                   otpCode[index]
                     ? "border-2 border-[#F7C56B]"
                     : "border-2 border-white"
