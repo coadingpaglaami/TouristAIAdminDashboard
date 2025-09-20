@@ -102,7 +102,7 @@ export const Profile = () => {
                 {(profileName || "A")[0].toUpperCase()}
               </div>
             )}
-            <div className="absolute bottom-1 right-1">
+            <div className="absolute top-1/2">
               <Camera />
             </div>
           </label>
