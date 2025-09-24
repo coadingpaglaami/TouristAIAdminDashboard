@@ -60,7 +60,7 @@ export const UserActivity = () => {
             </div>
           </div>
           <div className="flex gap-2 md:items-center md:justify-end md:max-w-[320px] md:w-1/2 w-full ">
-            <Select value={activity ?? "all"} onValueChange={setActivity}>
+            <Select value={activity ?? "all"} onValueChange={(value) => {setActivity(value); setPage(1);}}>
               <SelectTrigger className="">
                 <SelectValue placeholder="Activity" />
               </SelectTrigger>

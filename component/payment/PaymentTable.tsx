@@ -93,6 +93,8 @@ export const PaymentTable = ({
   const [pauseMutation] = useBoosterPauseMutation();
   const [deleteMutation] = useBoosterDeleteMutation();
   const handleBlockToggle = async (idx: number, action: string) => {
+   if(action === "pause") action = "play";
+   else action = "pause";
     try {
       await pauseMutation({ id: idx, action }).unwrap();
       toast.success(
@@ -232,6 +234,9 @@ export const PaymentTable = ({
               : data.map((item, idx) => {
                   const globalIdx = (page - 1) * perPage + idx;
                   const isBlocked = item.action.pause_play === "pause";
+                  const given = new Date(item.expire_time);
+                  const now = new Date();
+                  const isExpired = given <= now;
 
                   return (
                     <TableRow
@@ -295,15 +300,15 @@ export const PaymentTable = ({
                       {/* Action */}
                       <TableCell className="py-4 text-center">
                         <div className="flex gap-2 justify-center">
-                          <button
-                            className="p-2 hover:bg-gray-100 rounded transition"
+                        {!isExpired &&  <button
+                            className={"p-2 hover:bg-gray-100 rounded transition"}
                             title={isBlocked ? "Play" : "Pause"}
                             onClick={() =>
                               handleBlockToggle(item.id, item.action.pause_play)
                             }
                           >
-                            {isBlocked ? <Play /> : <Pause />}
-                          </button>
+                            { isBlocked ? <Play /> : <Pause />}
+                          </button>}
                           <button
                             className="p-2 hover:bg-gray-100 rounded transition"
                             title="Delete"

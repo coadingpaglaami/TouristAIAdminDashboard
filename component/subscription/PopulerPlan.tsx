@@ -1,6 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePopularPlanQuery } from "@/services/api";
 import { Calendar } from "@/svg/Chart";
+import React from "react";
 
 export const PopularPlan = () => {
   const { data, isLoading } = usePopularPlanQuery();
@@ -29,8 +30,8 @@ export const PopularPlan = () => {
               <Skeleton className="h-4 w-40" />
             </div>
           ))
-        : data?.most_popular.length===0? <p className="h-full flex items-center justify-center">No popular plans available</p> : data?.most_popular.map((plan) => (
-            <>
+        : data?.most_popular.length===0? <p className="h-full flex items-center justify-center">No popular plans available</p> : data?.most_popular.map((plan, index) => (
+            <React.Fragment key={index}>
               <div className="mb-8">
                 <h2 className="text-lg font-medium flex items-center">
                   <span className="mr-2">
@@ -51,7 +52,7 @@ export const PopularPlan = () => {
                   {plan.percentage} of total subscriber
                 </p>
               </div>
-            </>
+            </React.Fragment>
           ))}
 
     </div>

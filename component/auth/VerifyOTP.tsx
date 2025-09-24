@@ -35,14 +35,14 @@ export const Verify: React.FC = () => {
 
   const loginstorage = sessionStorage.getItem("Login");
 
-  useEffect(() => {
-    return () => {
-      // clear email only in forgot-password flow
-      if (!loginstorage) {
-        sessionStorage.removeItem("userMail");
-      }
-    };
-  }, [loginstorage]);
+  // useEffect(() => {
+  //   return () => {
+  //     // clear email only in forgot-password flow
+  //     if (!loginstorage) {
+  //       sessionStorage.removeItem("userMail");
+  //     }
+  //   };
+  // }, [loginstorage]);
 
   // ✅ Enable/disable verify button based on input
   useEffect(() => {
