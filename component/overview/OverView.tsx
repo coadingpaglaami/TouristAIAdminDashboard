@@ -5,7 +5,7 @@ import { CategoryStatsCard } from "./CategoryStatesCard";
 import { PlatformStatsCard } from "./PlatformStatesCard";
 import { UserActivitiesCard } from "./UserActivityCard";
 import { UserTypesCard } from "./UserTypeCard";
-import {  TimePeriod } from "@/lib/data";
+import { TimePeriod } from "@/lib/data";
 import { useOverviewQuery } from "@/services/api";
 
 export const Overview = () => {
@@ -13,8 +13,6 @@ export const Overview = () => {
   const { data: overviewData, isLoading } = useOverviewQuery(selectedPeriod);
   console.log("Overview Data:", selectedPeriod);
   // const data = getDataByPeriod(selectedPeriod);
-
- 
 
   const periods: TimePeriod[] = ["Weekly", "Monthly", "Yearly"];
 
@@ -64,8 +62,8 @@ export const Overview = () => {
             </div>
           </div>
           {/* Category Stats */}
-          <div className="flex gap-4 flex-col md:flex-row md:justify-between md:h-[420px]">
-            <div className="lg:w-1/2 w-full h-full">
+          <div className="flex gap-4 flex-col md:flex-row md:items-stretch">
+            <div className="lg:w-1/2 w-full bg-white rounded-md flex-1">
               <CategoryStatsCard
                 active_premium_user={
                   overviewData?.overview?.premium_insights
@@ -80,8 +78,7 @@ export const Overview = () => {
               />
             </div>
 
-            {/* User Activities - Full width */}
-            <div className="lg:col-span-2 w-full lg:w-1/2 h-full">
+            <div className="lg:w-1/2 bg-white rounded-lg w-full flex-1 overflow-hidden">
               <UserActivitiesCard
                 data={overviewData?.overview?.search_frequency || []}
                 loading={isLoading}

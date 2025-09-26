@@ -13,7 +13,7 @@ export const CategoryStatsCard = ({ active_premium_user, renewal_rate, churn_rat
     { name: "Churn Rate", percentage: churn_rate },
   ]
   return (
-    <div className="bg-white rounded-lg shadow h-full">
+    <div className=" rounded-lg shadow h-full">
       <div className="text-xl font-semibold mb-4 border-b border-gray-300 pb-3">
         <p className="p-4 tracking-wider">Premium user insights</p>
       </div>

@@ -29,7 +29,7 @@ export const UserActivitiesCard = ({
     (a: UserActivity, b: UserActivity) => b.search_history - a.search_history
   );
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className=" shadow p-6">
       <h2 className="text-xl font-semibold mb-4 ">Search Frequency</h2>
       <div className="space-y-4">
         <Table className="w-full">
