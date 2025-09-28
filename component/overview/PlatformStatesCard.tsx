@@ -146,12 +146,23 @@ export const PlatformStatsCard = ({
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
               <span className="text-sm">{item.nametwo}</span>
-          <span className="text-sm">{loading ? <Skeleton className="w-8 h-6" /> : item.totalboostsearchrate}</span>
-
+              <span className="text-sm">
+                {loading ? (
+                  <Skeleton className="w-8 h-6" />
+                ) : (
+                  item.totalboostsearchrate
+                )}
+              </span>
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm">{item.engrate}</span>
-              <span className="text-sm">{loading ? <Skeleton className="w-8 h-6" /> : item.boostsearchengagementrate}</span>
+              <span className="text-sm">
+                {loading ? (
+                  <Skeleton className="w-8 h-6" />
+                ) : (
+                  item.boostsearchengagementrate +  "%"
+                )}
+              </span>
             </div>
           </div>
         </div>

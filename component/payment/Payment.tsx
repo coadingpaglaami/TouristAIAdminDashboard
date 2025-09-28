@@ -12,14 +12,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { useAdminGetAllSubscriptionPlansQuery, useBoosterRecordQuery } from "@/services/api";
+import {
+  useAdminGetAllSubscriptionPlansQuery,
+  useBoosterRecordQuery,
+} from "@/services/api";
 
 export const PaymentRecord = () => {
   const [search, setSearch] = useState("");
   const [duration, setDuration] = useState<string | undefined>(undefined);
   const [page, setPage] = useState(1);
   const limit = 7;
-  const { data, isFetching } = useBoosterRecordQuery({ limit, page, search, subscription_plan: duration });
+  const { data, isFetching } = useBoosterRecordQuery({
+    limit,
+    page,
+    search,
+    subscription_plan: duration,
+  });
   const { data: boostData } = useAdminGetAllSubscriptionPlansQuery();
   console.log({ boostData });
   return (
@@ -43,20 +51,26 @@ export const PaymentRecord = () => {
           </div>
         </div>
         <div className="flex gap-2 items-center md:max-w-[320px] w-full ">
-          <Select value={duration ?? "all"} onValueChange={setDuration}>
+          <Select
+            value={duration ?? "all"}
+            onValueChange={() => {
+              setDuration(duration);
+              setPage(1);
+            }}
+          >
             <SelectTrigger className="lg:w-[350px]">
               <SelectValue placeholder="Select duration" />
             </SelectTrigger>
             <SelectContent>
-                <SelectGroup className="overflow-y-auto max-h-60">
+              <SelectGroup className="overflow-y-auto max-h-60">
                 <SelectLabel>Subscription</SelectLabel>
                 <SelectItem value="all">All</SelectItem>
                 {boostData?.map((item) => (
                   <SelectItem key={item.id} value={item.name.toLowerCase()}>
-                  {item.name}
+                    {item.name}
                   </SelectItem>
                 ))}
-                </SelectGroup>
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
