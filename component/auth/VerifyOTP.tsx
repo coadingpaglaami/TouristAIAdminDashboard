@@ -20,31 +20,17 @@ export const Verify: React.FC = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
   const [wrongOtp, setWrongOtp] = useState<boolean>(false);
   const router = useRouter();
-  const [verifyOtp, {isLoading}] = useVerifyOtpMutation();
-  const [adminLoginVerify, {isLoading: isAdminLoading}] = useAdminLoginVerifyMutation();
-  const email = sessionStorage.getItem("userMail");
+  const [verifyOtp, { isLoading }] = useVerifyOtpMutation();
+  const [adminLoginVerify, { isLoading: isAdminLoading }] =
+    useAdminLoginVerifyMutation();
+  const [email, setEmail] = useState<string | null>(null);
+  const [loginstorage, setLoginStorage] = useState<string | null>(null);
 
-  // useEffect(() => {
+  useEffect(() => {
+    setEmail(sessionStorage.getItem("userMail"));
+    setLoginStorage(sessionStorage.getItem("Login"));
+  }, []);
 
-  //   return () => {
-  //     if (pathname === "/admin/verify") {
-  //       sessionStorage.removeItem("userMail");
-  //     }
-  //   };
-  // }, [pathname]);
-
-  const loginstorage = sessionStorage.getItem("Login");
-
-  // useEffect(() => {
-  //   return () => {
-  //     // clear email only in forgot-password flow
-  //     if (!loginstorage) {
-  //       sessionStorage.removeItem("userMail");
-  //     }
-  //   };
-  // }, [loginstorage]);
-
-  // ✅ Enable/disable verify button based on input
   useEffect(() => {
     const allFilled = otpCode.every((digit) => digit.length === 1);
     setIsButtonDisabled(!allFilled);
@@ -120,8 +106,6 @@ export const Verify: React.FC = () => {
     }
   };
   // Resend OTP logic
-
-
 
   return (
     <div className="md:min-w-[400px] w-full">
