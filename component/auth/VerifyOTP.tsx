@@ -89,7 +89,6 @@ export const Verify: React.FC = () => {
         console.log("✅ Inside TRY, success body:", verify);
         console.log("👉 Redirecting now...");
         setWrongOtp(false);
-        sessionStorage.removeItem("userMail");
         router.push("/admin/reset-password");
       } catch (err: unknown) {
         if (typeof err === "object" && err !== null) {

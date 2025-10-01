@@ -1,12 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useAdminResetPasswordMutation } from "@/services/api";
 
 interface FormData {
-  newpassword: string;
-  password: string;
+  new_password: string;
+  confirm_password: string;
+  email: string | null;
 }
 
 export const ResetPassword = () => {
@@ -14,21 +16,33 @@ export const ResetPassword = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
-    newpassword: "",
-    password: "",
+    new_password: "",
+    confirm_password: "",
+    email: "",
   });
+  const [data, { isLoading }] = useAdminResetPasswordMutation();
+
+  useEffect(() => {
+    const userMail = sessionStorage.getItem("userMail");
+    if (userMail) {
+      setFormData((prev) => ({ ...prev, email: userMail }));
+    }
+  }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form Submitted:", formData);
-
-    // Dummy redirect (no API)
-    router.push("/admin/success");
+    try {
+      await data(formData).unwrap();
+      // Dummy redirect (no API)
+      router.push("/admin/success");
+    } catch (err) {
+      console.error("Error resetting password:", err);
+    }
   };
 
   return (
@@ -50,7 +64,7 @@ export const ResetPassword = () => {
             <input
               type={showNewPassword ? "text" : "password"}
               id="newpassword"
-              name="newpassword"
+              name="new_password"
               placeholder="*******"
               onChange={handleChange}
               className="block w-full p-2 rounded-md bg-white text-black focus:outline-none"
@@ -83,7 +97,7 @@ export const ResetPassword = () => {
             <input
               type={showPassword ? "text" : "password"}
               id="password"
-              name="password"
+              name="confirm_password"
               placeholder="*******"
               onChange={handleChange}
               className="block w-full p-2 rounded-md bg-white text-black focus:outline-none"
@@ -106,7 +120,8 @@ export const ResetPassword = () => {
         {/* Submit */}
         <button
           type="submit"
-          className="w-full p-2 text-white orange rounded-md hover:bg-orange-600 font-bold mt-4"
+          className="w-full p-2 text-white orange rounded-md hover:bg-orange-600 font-bold mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isLoading}
         >
           Reset Password
         </button>

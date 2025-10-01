@@ -151,6 +151,13 @@ export const api = createApi({
         body: data,
       }),
     }),
+    adminResetPassword: builder.mutation({
+      query: (data) => ({
+        url: "reset-password/",
+        method: "POST",
+        body: data,
+      }),
+    }),
     overview: builder.query<OverviewResponse, string>({
       query: (period: string) => `overview/?period=${period}`,
       providesTags: ["User"],
@@ -350,6 +357,7 @@ export const {
   useLogoutMutation,
   useForgotPasswordMutation,
   useVerifyOtpMutation,
+  useAdminResetPasswordMutation,
   useAdminLoginVerifyMutation,
   useUserActivityQuery,
   useDeleteContenMutation,

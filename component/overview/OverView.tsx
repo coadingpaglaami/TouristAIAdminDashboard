@@ -78,7 +78,7 @@ export const Overview = () => {
               />
             </div>
 
-            <div className="lg:w-1/2 bg-white rounded-lg w-full flex-1 overflow-hidden">
+            <div className="lg:w-1/2 bg-white rounded-lg w-full flex-1 overflow-hidden shadow-md">
               <UserActivitiesCard
                 data={overviewData?.overview?.search_frequency || []}
                 loading={isLoading}

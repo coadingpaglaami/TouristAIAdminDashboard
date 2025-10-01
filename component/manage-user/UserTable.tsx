@@ -181,6 +181,7 @@ export const UserTable = ({
                 Subscription
               </TableHead>
               <TableHead className="text-xs text-[#969696]">Email</TableHead>
+              <TableHead className="text-xs text-[#969696]">Search History</TableHead>
               <TableHead className="text-xs text-[#969696]">
                 Last Active
               </TableHead>
@@ -330,8 +331,12 @@ export const UserTable = ({
                         {item.email}
                       </TableCell>
                       {/* Last Active */}
-                      <TableCell
+                      <TableCell 
                         className={isBlocked ? "opacity-50" : "opacity-100"}
+                      ><span className="text-center">{item.search_history} times</span> 
+                        </TableCell>
+                      <TableCell
+                        className={isBlocked ? "opacity-50" : "opacity-100 "}
                       >
                         {item.last_active}
                       </TableCell>

@@ -23,6 +23,7 @@ export interface User {
     badge: string;
   };
   email: string;
+  search_history: number;
   last_active: string;
   actions: {
     edit_id: number;
