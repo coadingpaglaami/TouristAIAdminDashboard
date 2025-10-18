@@ -16,7 +16,7 @@ import {
   UserEarningsResponse,
 } from "@/interface/Subscription";
 import { UserProfileResponseForAdmin } from "@/interface/AdminAccount";
-const baseURL = "https://ppp7rljm-8000.inc1.devtunnels.ms/admin-api/";
+const baseURL = "https://api.tripmate.cloud/admin-api/";
 
 interface LogOutRequest {
   refresh: string;
